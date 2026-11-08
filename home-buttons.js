@@ -55,5 +55,11 @@
   };
 
   
-window.show(window.location.hash === "#compliance" ? "compliance" : "home");
+
+window.show(
+  ["business", "compliance"].includes(window.location.hash.slice(1))
+    ? window.location.hash.slice(1)
+    : "home"
+);
+
 })();
