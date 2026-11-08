@@ -1,1 +1,22 @@
-{"name":"Enterprise360","short_name":"Enterprise360","start_url":"./index.html","display":"standalone","background_color":"#edf2f5","theme_color":"#14283b","description":"Enterprise360 business support prototype"}
+{
+  "name": "Enterprise360",
+  "short_name": "Enterprise360",
+  "description": "Enterprise360 Business Support App",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#edf2f5",
+  "theme_color": "#14283b",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
