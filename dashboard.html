@@ -97,7 +97,7 @@ main {
 
 <main>
   <section class="welcome">
-    <h2>Welcome to Your Business Hub</h2>
+    <h2 id="memberWelcome">Welcome to Your Business Hub</h2>
     <p>Manage your business, explore opportunities
     and track your growth in one place.</p>
   </section>
@@ -142,5 +142,24 @@ main {
     </div>
   </section>
 </main>
+
+<script>
+(function () {
+  try {
+    const saved = localStorage.getItem("e360-demo-v1");
+    if (!saved) return;
+
+    const profile = JSON.parse(saved);
+    const businessName = String(profile.business || "").trim();
+
+    if (businessName) {
+      document.getElementById("memberWelcome").textContent =
+        "Welcome, " + businessName + "!";
+    }
+  } catch (error) {
+    console.warn("Demo business profile unavailable.");
+  }
+})();
+</script>
 </body>
 </html>
