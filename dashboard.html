@@ -192,5 +192,43 @@ main {
   }
 })();
 </script>
+
+
+<script>
+(function () {
+  try {
+    const saved = localStorage.getItem("e360-demo-v1");
+    if (!saved) return;
+
+    const profile = JSON.parse(saved);
+
+    const business = String(profile.business || "").trim();
+    const sector = String(profile.sector || "").trim();
+    const plan = profile.plan || "Starter";
+
+    document.getElementById("profileBusiness").textContent =
+      business || "Not provided";
+
+    document.getElementById("profileSector").textContent =
+      sector || "Not provided";
+
+    document.getElementById("profilePlan").textContent =
+      plan + " (Demo)";
+
+    // Calculate completion from business name and sector.
+    const completed = [business, sector].filter(Boolean).length;
+    const percent = Math.round((completed / 2) * 100);
+
+    document.getElementById("profilePercent").textContent =
+      percent + "%";
+
+    document.getElementById("profileBar").style.width =
+      percent + "%";
+
+  } catch (error) {
+    console.warn("Demo business profile unavailable.");
+  }
+})();
+</script>
 </body>
 </html>
