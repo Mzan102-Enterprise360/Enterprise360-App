@@ -16,7 +16,7 @@
     if (!hubCard) return;
 
     const buttons = document.createElement("div");
-    buttons.id = "enterprise360-buttons";
+    buttons.id = "mzanconnect-buttons";
 
     buttons.style.cssText =
       "display:grid;" +
@@ -25,7 +25,7 @@
       "margin:12px 0 18px;";
 
     const links = [
-      ["Join Enterprise360", "register.html", "#147b59"],
+      ["Join MzanConnect", "register.html", "#147b59"],
       ["Member Login", "login.html", "#14283b"]
     ];
 
@@ -54,13 +54,11 @@
     hubCard.insertAdjacentElement("afterend", buttons);
   };
 
-  
-
-window.show(
-  ["business", "compliance", "opportunities"].includes(window.location.hash.slice(1))
-    ? window.location.hash.slice(1)
-    : "home"
-);
-
+  window.show(
+    ["business", "compliance", "opportunities"].includes(
+      window.location.hash.slice(1)
+    )
+      ? window.location.hash.slice(1)
+      : "home"
+  );
 })();
-
