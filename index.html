@@ -20,12 +20,19 @@ function filterOpportunities() {
   const search = document.getElementById('opportunitySearch')
     .value.toLowerCase().trim();
 
+  const category = document.getElementById('opportunityCategory')
+    .value;
+
   document.querySelectorAll('.opportunity-item')
     .forEach(card => {
-      const matches = card.textContent
-        .toLowerCase().includes(search);
+      const text = card.textContent.toLowerCase();
+      const matchesSearch = text.includes(search);
+      const matchesCategory = category === 'all' ||
+        card.querySelector('.pill')
+          .textContent.toLowerCase().includes(category);
 
-      card.style.display = matches ? '' : 'none';
+      card.style.display =
+        matchesSearch && matchesCategory ? '' : 'none';
     });
 }
 
