@@ -1,70 +1,58 @@
 
-function showEnterpriseButtons() {
-  // Remove previously generated buttons.
-  document.getElementById("enterprise360-buttons")?.remove();
+(function () {
+  const originalShow = window.show;
 
-  // Create the button row.
-  const buttons = document.createElement("div");
-  buttons.id = "enterprise360-buttons";
-  buttons.style.cssText =
-    "display:grid;grid-template-columns:repeat(2,minmax(0,1fr));" +
-    "gap:10px;margin:16px 0;width:100%;";
+  if (typeof originalShow !== "function") return;
 
-  [
-    ["Join Enterprise360", "register.html", "#147b59"],
-    ["Member Login", "login.html", "#14283b"]
-  ].forEach(([label, url, color]) => {
-    const link = document.createElement("a");
-    link.href = url;
-    link.textContent = label;
-    link.style.cssText =
-      "display:flex;align-items:center;justify-content:center;" +
-      "min-width:0;padding:14px 6px;border-radius:12px;" +
-      "background:" + color + ";color:white;" +
-      "font-size:14px;font-weight:bold;text-align:center;" +
-      "text-decoration:none;";
-    buttons.appendChild(link);
-  });
+  window.show = function (page) {
+    originalShow(page);
 
-  // Find the Growth Hub heading.
-  const headings = Array.from(
-    document.querySelectorAll("h1,h2,h3,h4,h5,h6")
-  );
+    if (page !== "home") return;
 
-  const hub = headings.find(el =>
-    /business growth hub/i.test(el.textContent)
-  );
+    const view = document.getElementById("view");
+    if (!view) return;
 
-  if (hub) {
-    const container =
-      hub.closest(".card,.hero,.welcome-card,section") ||
-      hub.parentElement;
+    const hubCard = view.querySelector(".card");
+    if (!hubCard) return;
 
-    if (container && container !== document.body) {
-      container.insertAdjacentElement("afterend", buttons);
-      return;
-    }
-  }
+    const buttons = document.createElement("div");
+    buttons.id = "enterprise360-buttons";
 
-  // Fallback: display beneath the Welcome heading.
-  const welcome = headings.find(el =>
-    /welcome to enterprise360/i.test(el.textContent)
-  );
+    buttons.style.cssText =
+      "display:grid;" +
+      "grid-template-columns:repeat(2,minmax(0,1fr));" +
+      "gap:10px;" +
+      "margin:12px 0 18px;";
 
-  if (welcome) {
-    welcome.insertAdjacentElement("afterend", buttons);
-  } else {
-    // Final fallback: show at the top of the page.
-    const main = document.querySelector("main") || document.body;
-    main.prepend(buttons);
-  }
-}
+    const links = [
+      ["Join Enterprise360", "register.html", "#147b59"],
+      ["Member Login", "login.html", "#14283b"]
+    ];
 
-if (document.readyState === "loading") {
-  document.addEventListener(
-    "DOMContentLoaded",
-    showEnterpriseButtons
-  );
-} else {
-  showEnterpriseButtons();
-}
+    links.forEach(([label, url, color]) => {
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.textContent = label;
+
+      link.style.cssText =
+        "display:flex;" +
+        "align-items:center;" +
+        "justify-content:center;" +
+        "background:" + color + ";" +
+        "color:white;" +
+        "padding:14px 6px;" +
+        "border-radius:12px;" +
+        "text-align:center;" +
+        "text-decoration:none;" +
+        "font-weight:bold;" +
+        "font-size:13px;";
+
+      buttons.appendChild(link);
+    });
+
+    hubCard.insertAdjacentElement("afterend", buttons);
+  };
+
+  window.show("home");
+})();
