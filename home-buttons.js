@@ -54,5 +54,6 @@
     hubCard.insertAdjacentElement("afterend", buttons);
   };
 
-  window.show("home");
+  
+window.show(window.location.hash === "#compliance" ? "compliance" : "home");
 })();
