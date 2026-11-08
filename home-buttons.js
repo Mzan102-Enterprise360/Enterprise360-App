@@ -1,23 +1,18 @@
 
 document.addEventListener("DOMContentLoaded", function () {
+  const welcome = [...document.querySelectorAll("h1,h2")]
+    .find(el => el.textContent.trim() === "Welcome to Enterprise360");
+
+  if (!welcome) return;
+
   const buttons = document.createElement("div");
+  buttons.style.cssText =
+    "display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0;";
 
   buttons.innerHTML = `
-    <div style="padding:20px;display:grid;gap:12px">
-      <a href="register.html"
-         style="background:#147b59;color:white;padding:16px;
-         text-align:center;border-radius:12px;
-         text-decoration:none;font-weight:bold">
-        Join Enterprise360
-      </a>
-      <a href="login.html"
-         style="background:#14283b;color:white;padding:16px;
-         text-align:center;border-radius:12px;
-         text-decoration:none;font-weight:bold">
-        Member Login
-      </a>
-    </div>
+    <a href="register.html" style="background:#147b59;color:white;padding:14px 6px;border-radius:12px;text-align:center;text-decoration:none;font-weight:bold;font-size:14px;">Join Enterprise360</a>
+    <a href="login.html" style="background:#14283b;color:white;padding:14px 6px;border-radius:12px;text-align:center;text-decoration:none;font-weight:bold;font-size:14px;">Member Login</a>
   `;
 
-  document.body.appendChild(buttons);
+  welcome.insertAdjacentElement("afterend", buttons);
 });
