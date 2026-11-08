@@ -3,7 +3,12 @@
 if(page==='opportunities')html=`<h2>Funding & Tender Opportunities</h2><div class="card"><h3>Discover Business Opportunities</h3><p>Explore funding, tenders, RFQs, grants and business development programmes to help your enterprise grow.</p><p class="muted">Enterprise360 is currently in demo mode. Opportunities displayed below are examples, not verified live opportunities.
 </p></div><div class="card"><label for="opportunitySearch">Search Opportunities</label>
 
-<input id="opportunitySearch" type="search" placeholder="Search funding, tenders or training"><button type="button" onclick="filterOpportunities()">🔍 Search</button>
+<input id="opportunitySearch" type="search" placeholder="Search funding, tenders or training">
+
+
+<label for="opportunityCategory">Opportunity Category</label><select id="opportunityCategory"><option value="all">All Categories</option><option value="funding">Funding</option><option value="tender">Tenders</option><option value="rfq">RFQs</option><option value="grant">Grants</option><option value="training">Training</option></select>
+
+<button type="button" onclick="filterOpportunities()">🔍 Search</button>
 
 </div>${[['Funding example'
 ,'Small business expansion support','Example only — not a live funding call'],['Tender example','Local supplier procurement','Example only — not a live tender'],['Training example','Financial management workshop','Example only — not a live event']].map(x=>`
