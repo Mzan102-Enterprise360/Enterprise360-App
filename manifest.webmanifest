@@ -1,7 +1,8 @@
+
 {
-  "name": "Enterprise360",
-  "short_name": "Enterprise360",
-  "description": "Enterprise360 Business Support App",
+  "name": "MzanConnect",
+  "short_name": "MzanConnect",
+  "description": "MzanConnect Business Opportunities and Supplier Development Platform. Empowering Her. Uplifting Youth. Growing Mzansi.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
