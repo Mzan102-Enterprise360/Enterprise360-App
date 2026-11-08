@@ -156,6 +156,34 @@ main {
     </a>
   </div>
 
+<section class="panel">
+  <h3>🛡️ My Compliance Progress</h3>
+
+  <p>
+    Checklist Completion:
+    <strong id="compliancePercent">0%</strong>
+  </p>
+
+  <div class="progress">
+    <div id="complianceBar" style="width:0%"></div>
+  </div>
+
+  <p id="complianceCount" class="note">
+    0 of 5 requirements completed
+  </p>
+
+  <div id="complianceList"></div>
+
+  <p class="note">
+    Self-reported checklist only.
+    This does not verify official compliance.
+  </p>
+
+  <div class="actions">
+    <a href="index.html">Update Checklist</a>
+  </div>
+</section>
+
   <section class="panel">
     <h3>My Business Readiness</h3>
     <p>Profile completion: 60% (demo)</p>
@@ -230,5 +258,59 @@ main {
   }
 })();
 </script>
+
+<script>
+(function () {
+  const requirements = [
+    "CIPC records",
+    "SARS tax status",
+    "CSD registration",
+    "B-BBEE documents",
+    "Relevant industry licences"
+  ];
+
+  let tasks = {};
+
+  try {
+    const saved = JSON.parse(
+      localStorage.getItem("e360-demo-v1") || "{}"
+    );
+    tasks = saved.tasks || {};
+  } catch (error) {
+    console.warn("Compliance demo data unavailable.");
+  }
+
+  const list = document.getElementById("complianceList");
+  const completed = requirements.filter(
+    (_, i) => tasks["c" + i] === true
+  ).length;
+
+  const percent = Math.round(
+    (completed / requirements.length) * 100
+  );
+
+  document.getElementById("compliancePercent").textContent =
+    percent + "%";
+
+  document.getElementById("complianceBar").style.width =
+    percent + "%";
+
+  document.getElementById("complianceCount").textContent =
+    completed + " of " + requirements.length +
+    " requirements completed";
+
+  requirements.forEach((name, i) => {
+    const item = document.createElement("p");
+    const checked = tasks["c" + i] === true;
+
+    item.textContent =
+      (checked ? "✓ " : "○ ") + name;
+
+    item.style.color = checked ? "#147b59" : "#526675";
+    list.appendChild(item);
+  });
+})();
+</script>
+
 </body>
 </html>
