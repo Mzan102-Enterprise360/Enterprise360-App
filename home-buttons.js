@@ -14,5 +14,15 @@ document.addEventListener("DOMContentLoaded", function () {
     <a href="login.html" style="background:#14283b;color:white;padding:14px 6px;border-radius:12px;text-align:center;text-decoration:none;font-weight:bold;font-size:14px;">Member Login</a>
   `;
 
+const growthHub = [...document.querySelectorAll("*")]
+  .find(el => el.children.length === 0 &&
+    el.textContent.trim() === "Your Business Growth Hub");
+
+if (growthHub) {
+  const hubBox = growthHub.closest(".card") || growthHub.parentElement;
+  hubBox.insertAdjacentElement("afterend", buttons);
+} else {
   welcome.insertAdjacentElement("afterend", buttons);
+}
+
 });
