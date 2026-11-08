@@ -1,0 +1,53 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Enterprise360 Login</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#edf2f5;color:#14283b}
+header{background:#14283b;color:white;padding:28px 20px;text-align:center}
+header h1{margin:0 0 10px}
+header p{margin:0;color:#c3d4df}
+main{max-width:440px;margin:35px auto;padding:20px}
+.card{background:white;padding:28px 22px;border-radius:18px;box-shadow:0 2px 8px #0001}
+h2{text-align:center}
+label{display:block;margin-top:20px;font-weight:bold}
+input{width:100%;padding:14px;margin-top:8px;border:1px solid #bbc7ce;border-radius:9px;font-size:16px}
+button{width:100%;padding:15px;margin-top:25px;background:#147b59;color:white;border:0;border-radius:10px;font-size:17px;font-weight:bold}
+.note{font-size:13px;color:#526675;line-height:1.6}
+a{color:#147b59}
+</style>
+</head>
+<body>
+<header>
+<h1>◇ Enterprise360</h1>
+<p>Empowering Businesses. Enabling Growth.</p>
+</header>
+<main>
+<div class="card">
+<h2>Welcome Back</h2>
+<p style="text-align:center">Affiliate Login</p>
+<form id="loginForm">
+<label for="email">Email Address</label>
+<input id="email" type="email" placeholder="Enter email" required>
+<label for="password">Password</label>
+<input id="password" type="password" placeholder="Enter password" required>
+<button type="submit">Login</button>
+</form>
+<p id="message" class="note" role="status"></p>
+<p style="text-align:center"><a href="register.html">Become an Affiliate</a></p>
+<p style="text-align:center"><a href="index.html">Back to Home</a></p>
+<p class="note"><strong>Demo only.</strong> This screen does not authenticate users or store passwords. Do not enter real credentials.</p>
+</div>
+</main>
+<script>
+document.getElementById('loginForm').addEventListener('submit',function(e){
+e.preventDefault();
+document.getElementById('message').textContent='Demo login screen only. Secure member login is not connected yet.';
+});
+</script>
+</body>
+</html>
