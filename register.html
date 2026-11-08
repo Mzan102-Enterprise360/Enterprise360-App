@@ -4,18 +4,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Join Enterprise360</title>
+<meta name="theme-color" content="#14283b">
+<title>Join MzanConnect | Business Registration</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:#edf2f5;color:#14283b}
 header{background:#14283b;color:white;padding:24px 18px}
 header h1{margin:0;font-size:26px}
-header p{color:#d3dce4}
+header p{color:#d3dce4;line-height:1.5}
 main{max-width:600px;margin:auto;padding:20px 16px 60px}
 .card{background:white;padding:22px;border-radius:18px;box-shadow:0 2px 8px #0001}
 label{display:block;font-weight:bold;margin:17px 0 7px}
 input,select{width:100%;padding:13px;border:1px solid #b7c5ce;border-radius:9px;font-size:16px}
-button{background:#147b59;color:white;border:0;border-radius:10px;padding:15px;width:100%;font-size:16px;font-weight:bold;margin-top:22px}
+button{background:#147b59;color:white;border:0;border-radius:10px;padding:15px;width:100%;font-size:16px;font-weight:bold;margin-top:22px;cursor:pointer}
 .note{font-size:13px;color:#526675;line-height:1.5}
 a{color:#147b59}
 #result{display:none;background:#e4f3eb;padding:15px;border-radius:10px;margin-top:20px;line-height:1.6;overflow-wrap:anywhere}
@@ -23,20 +24,24 @@ a{color:#147b59}
 </head>
 <body>
 <header>
-<h1>Enterprise360</h1>
-<p>Empowering Businesses. Enabling Growth.</p>
+<h1>◈ MzanConnect</h1>
+<p>Business Opportunities &amp; Supplier Development</p>
+<p>Empowering Her. Uplifting Youth. Growing Mzansi.</p>
 </header>
 <main>
-<p><a href="index.html">← Back to Enterprise360</a></p>
+<p><a href="index.html">← Back to MzanConnect</a></p>
 <div class="card">
-<h2>Become an Affiliate</h2>
-<p>Join our business growth and support community.</p>
-<p class="note"><strong>Demonstration only.</strong> Please use fictional business details. This form does not submit an application or create an account.</p>
+<h2>Join MzanConnect</h2>
+<p>Connect your enterprise with business opportunities, supplier development and growth support.</p>
+<p class="note"><strong>Demo only:</strong> Use fictional information. This form does not submit applications or create accounts. MzanConnect is not a job application portal.</p>
+
 <form id="registration">
 <label for="business">Business Name</label>
 <input id="business" required maxlength="100" placeholder="Example Business (Demo)">
+
 <label for="contact">Contact Person</label>
 <input id="contact" required maxlength="100" placeholder="Example Contact">
+
 <label for="sector">Business Sector</label>
 <select id="sector" required>
 <option value="">Select sector</option>
@@ -48,6 +53,7 @@ a{color:#147b59}
 <option>Professional Services</option>
 <option>Other</option>
 </select>
+
 <label for="package">Membership Package</label>
 <select id="package" required>
 <option value="">Select package</option>
@@ -55,35 +61,45 @@ a{color:#147b59}
 <option>Growth - R399/month</option>
 <option>Premium - R699/month</option>
 </select>
+
 <button type="submit">Preview Registration</button>
 </form>
+
 <div id="result" role="status"></div>
-<p class="note">Package prices are proposed pilot prices. No payments or real registrations are accepted here.</p>
+<p class="note">Membership prices are proposed pilot prices only. No payments or real registrations are accepted.</p>
 </div>
 </main>
 <script>
 document.getElementById('registration').addEventListener('submit',function(e){
 e.preventDefault();
+
 const business=document.getElementById('business').value;
 const contact=document.getElementById('contact').value;
 const sector=document.getElementById('sector').value;
 const plan=document.getElementById('package').value;
 const result=document.getElementById('result');
+
 result.replaceChildren();
+
 const heading=document.createElement('strong');
-heading.textContent='Registration Preview Only';
+heading.textContent='MzanConnect Registration Preview';
 result.append(heading);
+
 for(const [label,value] of [
-['Business',business],['Contact',contact],
-['Sector',sector],['Package',plan]
+['Business',business],
+['Contact',contact],
+['Sector',sector],
+['Package',plan]
 ]){
 const p=document.createElement('p');
 p.textContent=label+': '+value;
 result.append(p);
 }
+
 const note=document.createElement('p');
-note.textContent='No application has been submitted or saved.';
+note.textContent='Demo only. No account was created and no application was submitted.';
 result.append(note);
+
 result.style.display='block';
 });
 </script>
