@@ -44,9 +44,11 @@ a{color:#147b59}
 </div>
 </main>
 <script>
-document.getElementById('loginForm').addEventListener('submit',function(e){
-e.preventDefault();
-document.getElementById('message').textContent='Demo login screen only. Secure member login is not connected yet.';
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  // Demo navigation only — no authentication.
+  window.location.href = 'dashboard.html';
 });
 </script>
 </body>
