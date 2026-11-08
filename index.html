@@ -4,8 +4,23 @@ if(page==='opportunities')html=`<h2>Funding & Tender Opportunities</h2><div clas
 </p></div><div class="card"><label for="opportunitySearch">Search Opportunities</label><input id="opportunitySearch" type="search" placeholder="Search funding, tenders or training" oninput="filterOpportunities()"></div>${[['Funding example'
 ,'Small business expansion support','Example only — not a live funding call'],['Tender example','Local supplier procurement','Example only — not a live tender'],['Training example','Financial management workshop','Example only — not a live event']].map(x=>`
 <div class="card opportunity-item"><span class="pill">${x[0]}</span>
-<h3>${x[1]}</h3><p>${x[2]}</p><button class="secondary" onclick="show('chat')">Ask for assistance</button></div>`).join('')}`;if(page==='compliance')html=`<h2>Compliance Checklist</h2><p class="muted">Personal checklist only; does not verify official compliance.</p>${['CIPC records','SARS tax status','CSD registration','B-BBEE documents','Relevant industry licences'].map((x,i)=>`<div class="card"><label><input type="checkbox" style="width:auto" ${state.tasks['c'+i]?'checked':''} onchange="state.tasks['c${i}']=this.checked;save()"> ${x}</label></div>`).join('')}`;if(page==='growth')html=`<h2>Business Growth Passport</h2><p>Mark your business development milestones.</p>${['Complete business assessment','Review compliance','Prepare funding documents','Identify procurement opportunities','Complete monthly business review'].map((x,i)=>`<div class="card"><label><input type="checkbox" style="width:auto" ${state.tasks['g'+i]?'checked':''} onchange="state.tasks['g${i}']=this.checked;save()"> ${x}</label></div>`).join('')}`;if(page==='admin')html=`<h2>Administrator Preview</h2><div class="card"><h3>Example dashboard</h3><p>Member: ${esc(state.business||'Not registered')}</p><p>Plan: ${esc(state.plan)}</p><p>Demo chat messages: ${state.messages.length}</p><p class="muted">This is NOT a secure staff portal. Production admin access requires authentication and role permissions.</p></div><button class="secondary" onclick="if(confirm('Erase demo data on this device?')){localStorage.removeItem(key);location.reload()}">Reset demo</button>`;el.innerHTML=html;window.scrollTo(0,0)}function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function send(){let v=document.getElementById('message').value.trim();if(v){state.messages.push(v);save();show('chat')}}
+<h3>${x[1]}</h3><p>${x[2]}</p><button class="secondary" onclick="show('chat')">Ask for assistance</button></div>`).join('')}`;if(page==='compliance')html=`<h2>Compliance Checklist</h2><p class="muted">Personal checklist only; does not verify official compliance.</p>${['CIPC records','SARS tax status','CSD registration','B-BBEE documents','Relevant industry licences'].map((x,i)=>`<div class="card"><label><input type="checkbox" style="width:auto" ${state.tasks['c'+i]?'checked':''} onchange="state.tasks['c${i}']=this.checked;save()"> ${x}</label></div>`).join('')}`;if(page==='growth')html=`<h2>Business Growth Passport</h2><p>Mark your business development milestones.</p>${['Complete business assessment','Review compliance','Prepare funding documents','Identify procurement opportunities','Complete monthly business review'].map((x,i)=>`<div class="card"><label><input type="checkbox" style="width:auto" ${state.tasks['g'+i]?'checked':''} onchange="state.tasks['g${i}']=this.checked;save()"> ${x}</label></div>`).join('')}`;if(page==='admin')html=`<h2>Administrator Preview</h2><div class="card"><h3>Example dashboard</h3><p>Member: ${esc(state.business||'Not registered')}</p><p>Plan: ${esc(state.plan)}</p><p>Demo chat messages: ${state.messages.length}</p><p class="muted">This is NOT a secure staff portal. Production admin access requires authentication and role permissions.</p></div><button class="secondary" onclick="if(confirm('Erase demo data on this device?')){localStorage.removeItem(key);location.reload()}">Reset demo</button>`;el.innerHTML=html;window.scrollTo(0,0)}function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 
+
+function filterOpportunities() {
+  const search = document.getElementById('opportunitySearch')
+    .value.toLowerCase().trim();
+
+  document.querySelectorAll('.opportunity-item')
+    .forEach(card => {
+      const matches = card.textContent
+        .toLowerCase().includes(search);
+
+      card.style.display = matches ? '' : 'none';
+    });
+}
+
+function send(){let v=document.getElementById('message').value.trim();if(v){state.messages.push(v);save();show('chat')}}
 
 show(
   ['business', 'compliance', 'opportunities'].includes(window.location.hash.slice(1))
