@@ -55,8 +55,9 @@
   };
 
   
+
 window.show(
-  ["business", "compliance"].includes(window.location.hash.slice(1))
+  ["business", "compliance", "opportunities"].includes(window.location.hash.slice(1))
     ? window.location.hash.slice(1)
     : "home"
 );
