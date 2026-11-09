@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#14283b">
-<title>Join MzanConnect | Business Registration</title>
+<title>Join MzanConnect | Registration</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:#edf2f5;color:#14283b}
@@ -17,10 +16,13 @@ main{max-width:600px;margin:auto;padding:20px 16px 60px}
 label{display:block;font-weight:bold;margin:17px 0 7px}
 input,select{width:100%;padding:13px;border:1px solid #b7c5ce;border-radius:9px;font-size:16px}
 button{background:#147b59;color:white;border:0;border-radius:10px;padding:15px;width:100%;font-size:16px;font-weight:bold;margin-top:22px;cursor:pointer}
+button:disabled{opacity:.6;cursor:wait}
 .note{font-size:13px;color:#526675;line-height:1.5}
 a{color:#147b59}
 #result{display:none;background:#e4f3eb;padding:15px;border-radius:10px;margin-top:20px;line-height:1.6;overflow-wrap:anywhere}
+#result.error{background:#ffe8e8;color:#8a2424}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 <header>
@@ -28,19 +30,26 @@ a{color:#147b59}
 <p>Business Opportunities &amp; Supplier Development</p>
 <p>Empowering Her. Uplifting Youth. Growing Mzansi.</p>
 </header>
+
 <main>
 <p><a href="index.html">← Back to MzanConnect</a></p>
 <div class="card">
 <h2>Join MzanConnect</h2>
-<p>Connect your enterprise with business opportunities, supplier development and growth support.</p>
-<p class="note"><strong>Demo only:</strong> Use fictional information. This form does not submit applications or create accounts. MzanConnect is not a job application portal.</p>
+<p>Connect with business opportunities, supplier development and growth support.</p>
 
 <form id="registration">
-<label for="business">Business Name</label>
-<input id="business" required maxlength="100" placeholder="Example Business (Demo)">
+<label for="category">Account Category</label>
+<select id="category" required>
+<option value="">Select your category</option>
+<option value="business_owner">Existing Business Owner</option>
+<option value="aspiring_entrepreneur">Aspiring Entrepreneur</option>
+</select>
+
+<label for="business">Business Name or Business Idea</label>
+<input id="business" required maxlength="100" placeholder="Your business name or proposed idea">
 
 <label for="contact">Contact Person</label>
-<input id="contact" required maxlength="100" placeholder="Example Contact">
+<input id="contact" required maxlength="100" autocomplete="name" placeholder="Your full name">
 
 <label for="sector">Business Sector</label>
 <select id="sector" required>
@@ -54,53 +63,102 @@ a{color:#147b59}
 <option>Other</option>
 </select>
 
+<p class="note"><strong>Invitation-only founding pilot:</strong> Seven selected members receive free access (R0). No payment details are required. Keep your invitation code for your first login after confirming your email.</p>
 <label for="package">Membership Package</label>
 <select id="package" required>
-<option value="">Select package</option>
-<option>Starter - R199/month</option>
-<option>Growth - R399/month</option>
-<option>Premium - R699/month</option>
+<option value="Founding Member - Free Pilot">Founding Member - Free Pilot (R0)</option>
 </select>
+<p class="note">Paid plans will be offered later. No payment is required during this pilot.</p>
 
-<button type="submit">Preview Registration</button>
+<label for="email">Email Address</label>
+<input id="email" type="email" required autocomplete="email">
+
+<label for="password">Create Password</label>
+<input id="password" type="password" required minlength="8" autocomplete="new-password">
+
+<button id="submitButton" type="submit">Create My Account</button>
 </form>
 
-<div id="result" role="status"></div>
-<p class="note">Membership prices are proposed pilot prices only. No payments or real registrations are accepted.</p>
+<div id="result" role="status" aria-live="polite"></div>
+
+<p style="text-align:center">
+Already registered? <a href="login.html">Log In</a>
+</p>
+
+<p class="note">
+MzanConnect is a business opportunities and supplier development platform, not a job recruitment portal. Registration does not guarantee funding, tenders or business opportunities.
+</p>
 </div>
 </main>
+
 <script>
-document.getElementById('registration').addEventListener('submit',function(e){
-e.preventDefault();
+const mzanSupabase = window.supabase.createClient(
+  "https://akxzubckdebawqwwwaoe.supabase.co",
+  "sb_publishable_XEeBfPCzJ0MzGpHWHygeug_rGptbzno"
+);
 
-const business=document.getElementById('business').value;
-const contact=document.getElementById('contact').value;
-const sector=document.getElementById('sector').value;
-const plan=document.getElementById('package').value;
-const result=document.getElementById('result');
+const form = document.getElementById("registration");
+const button = document.getElementById("submitButton");
+const result = document.getElementById("result");
 
-result.replaceChildren();
-
-const heading=document.createElement('strong');
-heading.textContent='MzanConnect Registration Preview';
-result.append(heading);
-
-for(const [label,value] of [
-['Business',business],
-['Contact',contact],
-['Sector',sector],
-['Package',plan]
-]){
-const p=document.createElement('p');
-p.textContent=label+': '+value;
-result.append(p);
+function showResult(text, isError = false) {
+  result.textContent = text;
+  result.className = isError ? "error" : "";
+  result.style.display = "block";
 }
 
-const note=document.createElement('p');
-note.textContent='Demo only. No account was created and no application was submitted.';
-result.append(note);
+form.addEventListener("submit", async function(event) {
+  event.preventDefault();
+  button.disabled = true;
+  button.textContent = "Creating account...";
+  result.style.display = "none";
 
-result.style.display='block';
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  const profile = {
+    account_category: document.getElementById("category").value,
+    business_name: document.getElementById("business").value.trim(),
+    contact_name: document.getElementById("contact").value.trim(),
+    business_sector: document.getElementById("sector").value,
+    requested_package: document.getElementById("package").value
+  };
+
+  try {
+    const { data, error } = await mzanSupabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: profile,
+        emailRedirectTo: new URL("login.html", window.location.href).href
+      }
+    });
+
+    if (error) throw error;
+
+    if (data.session && data.user) {
+      const {error:profileError}=await mzanSupabase.from("business_profiles").upsert({
+        user_id:data.user.id,
+        business_name:profile.business_name,
+        contact_name:profile.contact_name,
+        sector:profile.business_sector
+      },{onConflict:"user_id"});
+      if(profileError){
+        showResult("Account created, but your business profile could not be saved. Please contact support.",true);
+        return;
+      }
+      showResult("Account created. Confirm your email if required, then log in with your founding invitation code.");
+    } else {
+      showResult("Registration request received. Check your email for a confirmation link, then log in with your founding invitation code.");
+    }
+
+    form.reset();
+  } catch (error) {
+    showResult(error.message || "Registration failed. Please try again.", true);
+  } finally {
+    button.disabled = false;
+    button.textContent = "Create My Account";
+  }
 });
 </script>
 </body>

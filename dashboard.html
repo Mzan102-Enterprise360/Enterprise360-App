@@ -4,311 +4,187 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Enterprise360 | Member Dashboard</title>
+<meta name="theme-color" content="#14283b">
+<title>MzanConnect | Member Dashboard</title>
 <style>
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  background: #f3f6f8;
-  font-family: Arial, sans-serif;
-  color: #14283b;
-}
-header {
-  background: #14283b;
-  color: white;
-  padding: 25px 18px;
-  text-align: center;
-}
-header h1 { margin: 0 0 8px; }
-header p { margin: 0; color: #d4e0e7; }
-main {
-  max-width: 850px;
-  margin: auto;
-  padding: 20px;
-}
-.welcome, .panel {
-  background: white;
-  padding: 20px;
-  border-radius: 14px;
-  margin-bottom: 18px;
-}
-.welcome h2 { margin-top: 0; }
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 18px;
-}
-.tile {
-  background: white;
-  padding: 22px 10px;
-  border-radius: 14px;
-  text-align: center;
-  text-decoration: none;
-  color: #14283b;
-  font-weight: bold;
-  border: 1px solid #e1e7eb;
-}
-.tile span {
-  display: block;
-  font-size: 28px;
-  margin-bottom: 10px;
-}
-.tile small {
-  display: block;
-  font-weight: normal;
-  margin-top: 8px;
-  color: #637482;
-}
-.progress {
-  background: #e5ecea;
-  border-radius: 20px;
-  overflow: hidden;
-  height: 12px;
-}
-.progress div {
-  background: #147b59;
-  height: 100%;
-  width: 60%;
-}
-.actions {
-  display: flex;
-  gap: 10px;
-}
-.actions a {
-  flex: 1;
-  text-align: center;
-  padding: 13px 8px;
-  border-radius: 10px;
-  text-decoration: none;
-  background: #147b59;
-  color: white;
-  font-weight: bold;
-}
-.actions a:last-child { background: #14283b; }
-.note { font-size: 12px; color: #667; }
+*{box-sizing:border-box}
+html{background:#f3f6f8}
+body{margin:0;background:#f3f6f8;font-family:Arial,sans-serif;color:#14283b;visibility:hidden}
+header{background:#14283b;color:white;padding:25px 18px;text-align:center}
+header h1{margin:0 0 8px}
+header p{margin:0;color:#d4e0e7}
+main{max-width:850px;margin:auto;padding:20px}
+.welcome,.panel{background:white;padding:20px;border-radius:14px;margin-bottom:18px}
+.welcome h2{margin-top:0}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.tile{background:white;padding:22px 10px;border-radius:14px;text-align:center;text-decoration:none;color:#14283b;font-weight:bold;border:1px solid #e1e7eb}
+.tile span{display:block;font-size:28px;margin-bottom:10px}
+.tile small{display:block;font-weight:normal;margin-top:8px;color:#637482}
+.progress{background:#e5ecea;border-radius:20px;overflow:hidden;height:12px}
+.progress div{background:#147b59;height:100%;width:0}
+.actions{display:flex;gap:10px}
+.actions a{flex:1;text-align:center;padding:13px 8px;border-radius:10px;text-decoration:none;background:#147b59;color:white;font-weight:bold}
+.actions a:last-child{background:#14283b}
+.note{font-size:12px;color:#667}
+#logoutButton{margin-top:15px;background:#fff;color:#14283b;border:0;border-radius:9px;padding:12px 22px;font-size:15px;font-weight:bold;cursor:pointer}
+#logoutButton:disabled{opacity:.6}
+#logoutMessage{color:#ffe3e3;font-size:13px}
+@media(max-width:420px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.actions{flex-wrap:wrap}.actions a{min-width:130px}}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 <header>
-  <h1>Enterprise360</h1>
-  <p>Empowering Businesses. Enabling Growth.</p>
+<h1>◈ MzanConnect</h1>
+<p>Empowering Her. Uplifting Youth. Growing Mzansi.</p>
+<button id="logoutButton" type="button">Log Out</button>
+<p id="logoutMessage" role="status"></p>
 </header>
-
 <main>
-  <section class="welcome">
-    <h2 id="memberWelcome">Welcome to Your Business Hub</h2>
-    <p>Manage your business, explore opportunities
-    and track your growth in one place.</p>
-  </section>
-
-<section class="panel">
-  <h3>🏢 My Business Profile</h3>
-
-  <p><strong>Business Name:</strong>
-    <span id="profileBusiness">Not provided</span>
-  </p>
-
-  <p><strong>Business Sector:</strong>
-    <span id="profileSector">Not provided</span>
-  </p>
-
-  <p><strong>Membership Package:</strong>
-    <span id="profilePlan">Starter (Demo)</span>
-  </p>
-
-  <h4>Profile Completion:
-    <span id="profilePercent">0%</span>
-  </h4>
-
-  <div class="progress">
-    <div id="profileBar" style="width:0%"></div>
-  </div>
-
-  <p class="note">
-    Demonstration profile stored on this device.
-  </p>
-
-  <div class="actions">
-    <a href="index.html">Edit Business Profile</a>
-  </div>
+<section class="welcome">
+<h2 id="memberWelcome">Welcome to Your Business Hub</h2>
+<p>Manage your business, explore opportunities and track your growth in one place.</p>
 </section>
-  <div class="grid">
-    <a class="tile"href="index.html#business">
-      <span>🏢</span>
-      My Business
-      <small>Business profile</small>
-    </a>
-    <a class="tile" href="index.html">
-      <span>🛡️</span>
-      Compliance
-      <small>Business requirements</small>
-    </a>
-<a class="tile" href="index.html#opportunities"><span>💼</span>Opportunities
-      <small>Funding and tenders</small>
-    </a>
-    <a class="tile" href="index.html">
-      <span>📈</span>
-      Growth Passport
-      <small>Track your progress</small>
-    </a>
-  </div>
-
 <section class="panel">
-  <h3>🛡️ My Compliance Progress</h3>
-
-  <p>
-    Checklist Completion:
-    <strong id="compliancePercent">0%</strong>
-  </p>
-
-  <div class="progress">
-    <div id="complianceBar" style="width:0%"></div>
-  </div>
-
-  <p id="complianceCount" class="note">
-    0 of 5 requirements completed
-  </p>
-
-  <div id="complianceList"></div>
-
-  <p class="note">
-    Self-reported checklist only.
-    This does not verify official compliance.
-  </p>
-
-  <div class="actions">
-<a href="index.html#compliance">Update Checklist</a>
-  </div>
+<h3>🏢 My Business Profile</h3>
+<p><strong>Business Name:</strong> <span id="profileBusiness">Not provided</span></p>
+<p><strong>Business Sector:</strong> <span id="profileSector">Not provided</span></p>
+<p><strong>Membership Package:</strong> <span id="profilePlan">Not selected</span></p>
+<h4>Profile Completion: <span id="profilePercent">0%</span></h4>
+<div class="progress"><div id="profileBar"></div></div>
+<p class="note">Secure member profile.</p>
+<div class="actions"><a href="member.html">Edit Business Profile</a></div>
 </section>
-
-  <section class="panel">
-    <h3>My Business Readiness</h3>
-    <p>Profile completion: 60% (demo)</p>
-    <div class="progress"><div></div></div>
-    <p class="note">
-      Demonstration only. No real business data is saved.
-    </p>
-  </section>
-
-  <section class="panel">
-    <h3>Quick Actions</h3>
-    <div class="actions">
-      <a href="index.html">Explore Services</a>
-      <a href="index.html">Home</a>
-    </div>
-  </section>
+<div class="grid">
+<a class="tile" href="member.html"><span>🏢</span>My Business<small>Business profile</small></a>
+<a class="tile" href="member.html?section=compliance"><span>🛡️</span>Compliance<small>Business requirements</small></a>
+<a class="tile" href="index.html#opportunities"><span>💼</span>Opportunities<small>Funding and tenders</small></a>
+<a class="tile" href="index.html#growth"><span>📈</span>Growth Passport<small>Track your progress</small></a>
+</div>
+<section class="panel">
+<h3>🛡️ My Compliance Progress</h3>
+<p>Checklist Completion: <strong id="compliancePercent">0%</strong></p>
+<div class="progress"><div id="complianceBar"></div></div>
+<p id="complianceCount" class="note">0 of 5 requirements completed</p>
+<div id="complianceList"></div>
+<p class="note">Self-reported checklist only. This does not verify official compliance.</p>
+<div class="actions"><a href="member.html?section=compliance">Update Checklist</a></div>
+</section>
+<section class="panel">
+<h3>My Business Readiness</h3>
+<p>Profile completion: 60% (demo)</p>
+<div class="progress"><div style="width:60%"></div></div>
+<p class="note">Demonstration only. No real business data is saved in this section.</p>
+</section>
+<section class="panel">
+<h3>Quick Actions</h3>
+<div class="actions">
+<a href="index.html">Explore Services</a>
+<a href="index.html">Home</a>
+</div>
+</section>
 </main>
-
 <script>
-(function () {
-  try {
-    const saved = localStorage.getItem("e360-demo-v1");
-    if (!saved) return;
-
-    const profile = JSON.parse(saved);
-    const businessName = String(profile.business || "").trim();
-
-    if (businessName) {
-      document.getElementById("memberWelcome").textContent =
-        "Welcome, " + businessName + "!";
+(async function initializeDashboard(){
+  const logoutButton=document.getElementById("logoutButton");
+  const logoutMessage=document.getElementById("logoutMessage");
+  let client;
+  try{
+    if(!window.supabase)throw new Error("Authentication library unavailable");
+    client=window.supabase.createClient(
+      "https://akxzubckdebawqwwwaoe.supabase.co",
+      "sb_publishable_XEeBfPCzJ0MzGpHWHygeug_rGptbzno"
+    );
+    const {data,error}=await client.auth.getUser();
+    if(error||!data.user){
+      window.location.replace("login.html");
+      return;
     }
-  } catch (error) {
-    console.warn("Demo business profile unavailable.");
+    const {data:founder,error:founderError}=await client.from("founding_memberships").select("pilot_status").eq("user_id",data.user.id).maybeSingle();
+    if(founderError||founder?.pilot_status!=="active"){
+      await client.auth.signOut();
+      window.location.replace("login.html");
+      return;
+    }
+    document.getElementById("profilePlan").textContent="Founding Member — Free Pilot";
+  }catch(error){
+    window.location.replace("login.html");
+    return;
   }
-})();
-</script>
 
+  logoutButton.addEventListener("click",async function(){
+    logoutButton.disabled=true;
+    logoutButton.textContent="Signing out...";
+    try{
+      const {error}=await client.auth.signOut();
+      if(error)throw error;
+      window.location.replace("login.html");
+    }catch(error){
+      logoutMessage.textContent="Unable to sign out. Please try again.";
+      logoutButton.disabled=false;
+      logoutButton.textContent="Log Out";
+    }
+  });
 
-<script>
-(function () {
+  // Read the signed-in member's own profile from Supabase.
   try {
-    const saved = localStorage.getItem("e360-demo-v1");
-    if (!saved) return;
-
-    const profile = JSON.parse(saved);
-
-    const business = String(profile.business || "").trim();
-    const sector = String(profile.sector || "").trim();
-    const plan = profile.plan || "Starter";
-
-    document.getElementById("profileBusiness").textContent =
-      business || "Not provided";
-
-    document.getElementById("profileSector").textContent =
-      sector || "Not provided";
-
-    document.getElementById("profilePlan").textContent =
-      plan + " (Demo)";
-
-    // Calculate completion from business name and sector.
-    const completed = [business, sector].filter(Boolean).length;
-    const percent = Math.round((completed / 2) * 100);
-
-    document.getElementById("profilePercent").textContent =
-      percent + "%";
-
-    document.getElementById("profileBar").style.width =
-      percent + "%";
-
-  } catch (error) {
-    console.warn("Demo business profile unavailable.");
+    const {data:{user}}=await client.auth.getUser();
+    const {data:profile,error:profileError}=await client
+      .from("business_profiles")
+      .select("business_name,sector,contact_name")
+      .eq("user_id",user.id)
+      .maybeSingle();
+    if(profileError)throw profileError;
+    if(profile){
+      const business=String(profile.business_name||"").trim();
+      const sector=String(profile.sector||"").trim();
+      document.getElementById("profileBusiness").textContent=business||"Not provided";
+      document.getElementById("profileSector").textContent=sector||"Not provided";
+      if(business)document.getElementById("memberWelcome").textContent="Welcome, "+business+"!";
+      const percent=Math.round([business,sector].filter(Boolean).length/2*100);
+      document.getElementById("profilePercent").textContent=percent+"%";
+      document.getElementById("profileBar").style.width=percent+"%";
+      document.querySelector(".panel .note").textContent="Profile loaded from your secure account.";
+    }
+  }catch(error){
+    console.warn("Secure profile could not be loaded.",error);
   }
-})();
-</script>
 
-<script>
-(function () {
-  const requirements = [
+  const requirements=[
     "CIPC records",
     "SARS tax status",
     "CSD registration",
     "B-BBEE documents",
     "Relevant industry licences"
   ];
-
-  let tasks = {};
-
-  try {
-    const saved = JSON.parse(
-      localStorage.getItem("e360-demo-v1") || "{}"
-    );
-    tasks = saved.tasks || {};
-  } catch (error) {
-    console.warn("Compliance demo data unavailable.");
+  let tasks={};
+  // Prefer server-side compliance records for signed-in members.
+  try{
+    const {data:{user}}=await client.auth.getUser();
+    const {data:items,error:itemsError}=await client.from("compliance_items")
+      .select("item_key,completed").eq("user_id",user.id);
+    if(itemsError)throw itemsError;
+    if(items && items.length){
+      items.forEach(item=>{if(/^c[0-4]$/.test(item.item_key))tasks[item.item_key]=item.completed===true;});
+    }
+  }catch(error){
+    console.warn("Compliance records unavailable.",error);
   }
-
-  const list = document.getElementById("complianceList");
-  const completed = requirements.filter(
-    (_, i) => tasks["c" + i] === true
-  ).length;
-
-  const percent = Math.round(
-    (completed / requirements.length) * 100
-  );
-
-  document.getElementById("compliancePercent").textContent =
-    percent + "%";
-
-  document.getElementById("complianceBar").style.width =
-    percent + "%";
-
-  document.getElementById("complianceCount").textContent =
-    completed + " of " + requirements.length +
-    " requirements completed";
-
-  requirements.forEach((name, i) => {
-    const item = document.createElement("p");
-    const checked = tasks["c" + i] === true;
-
-    item.textContent =
-      (checked ? "✓ " : "○ ") + name;
-
-    item.style.color = checked ? "#147b59" : "#526675";
+  const completed=requirements.filter((_,i)=>tasks["c"+i]===true).length;
+  const percent=Math.round(completed/requirements.length*100);
+  document.getElementById("compliancePercent").textContent=percent+"%";
+  document.getElementById("complianceBar").style.width=percent+"%";
+  document.getElementById("complianceCount").textContent=completed+" of "+requirements.length+" requirements completed";
+  const list=document.getElementById("complianceList");
+  requirements.forEach((name,i)=>{
+    const item=document.createElement("p");
+    const checked=tasks["c"+i]===true;
+    item.textContent=(checked?"✓ ":"○ ")+name;
+    item.style.color=checked?"#147b59":"#526675";
     list.appendChild(item);
   });
+  document.body.style.visibility="visible";
 })();
 </script>
-
 </body>
 </html>
