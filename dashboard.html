@@ -49,10 +49,10 @@ main{max-width:850px;margin:auto;padding:20px}
 <h3>🏢 My Business Profile</h3>
 <p><strong>Business Name:</strong> <span id="profileBusiness">Not provided</span></p>
 <p><strong>Business Sector:</strong> <span id="profileSector">Not provided</span></p>
-<p><strong>Membership Package:</strong> <span id="profilePlan">Starter (Demo)</span></p>
+<p><strong>Membership Package:</strong> <span id="profilePlan">Not selected</span></p>
 <h4>Profile Completion: <span id="profilePercent">0%</span></h4>
 <div class="progress"><div id="profileBar"></div></div>
-<p class="note">Demonstration profile stored on this device.</p>
+<p class="note">Secure member profile.</p>
 <div class="actions"><a href="index.html">Edit Business Profile</a></div>
 </section>
 <div class="grid">
@@ -119,28 +119,6 @@ main{max-width:850px;margin:auto;padding:20px}
     }
   });
 
-  try{
-    const saved=localStorage.getItem("e360-demo-v1");
-    if(saved){
-      const profile=JSON.parse(saved);
-      const business=String(profile.business||"").trim();
-      const sector=String(profile.sector||"").trim();
-      const plan=String(profile.plan||"Starter");
-      if(business){
-        document.getElementById("memberWelcome").textContent="Welcome, "+business+"!";
-      }
-      document.getElementById("profileBusiness").textContent=business||"Not provided";
-      document.getElementById("profileSector").textContent=sector||"Not provided";
-      document.getElementById("profilePlan").textContent=plan+" (Demo)";
-      const completed=[business,sector].filter(Boolean).length;
-      const percent=Math.round(completed/2*100);
-      document.getElementById("profilePercent").textContent=percent+"%";
-      document.getElementById("profileBar").style.width=percent+"%";
-    }
-  }catch(error){
-    console.warn("Demo business profile unavailable.");
-  }
-
   // Read the signed-in member's own profile from Supabase.
   try {
     const {data:{user}}=await client.auth.getUser();
@@ -173,12 +151,6 @@ main{max-width:850px;margin:auto;padding:20px}
     "Relevant industry licences"
   ];
   let tasks={};
-  try{
-    const saved=JSON.parse(localStorage.getItem("e360-demo-v1")||"{}");
-    tasks=saved.tasks||{};
-  }catch(error){
-    console.warn("Compliance demo data unavailable.");
-  }
   // Prefer server-side compliance records for signed-in members.
   try{
     const {data:{user}}=await client.auth.getUser();
