@@ -33,9 +33,13 @@ a{color:#147b59}
 <div class="card">
 <h2>Join MzanConnect</h2>
 <p>Connect your enterprise with business opportunities, supplier development and growth support.</p>
-<p class="note"><strong>Demo only:</strong> Use fictional information. This form does not submit applications or create accounts. MzanConnect is not a job application portal.</p>
+<p class="note">Create a member account. Business details are saved as account profile metadata, not as a verified business registration. MzanConnect is not a job application portal.</p>
 
 <form id="registration">
+<label for="email">Email Address</label>
+<input id="email" type="email" autocomplete="email" required>
+<label for="password">Password (at least 8 characters)</label>
+<input id="password" type="password" minlength="8" autocomplete="new-password" required>
 <label for="business">Business Name</label>
 <input id="business" required maxlength="100" placeholder="Example Business (Demo)">
 
@@ -62,45 +66,47 @@ a{color:#147b59}
 <option>Premium - R699/month</option>
 </select>
 
-<button type="submit">Preview Registration</button>
+<button id="registerButton" type="submit">Create Member Account</button>
 </form>
 
 <div id="result" role="status"></div>
-<p class="note">Membership prices are proposed pilot prices only. No payments or real registrations are accepted.</p>
+<p class="note">Membership prices are proposed pilot prices only. No payments are accepted. A membership package selection does not activate a paid subscription.</p>
 </div>
 </main>
-<script>
-document.getElementById('registration').addEventListener('submit',function(e){
-e.preventDefault();
-
-const business=document.getElementById('business').value;
-const contact=document.getElementById('contact').value;
-const sector=document.getElementById('sector').value;
-const plan=document.getElementById('package').value;
-const result=document.getElementById('result');
-
-result.replaceChildren();
-
-const heading=document.createElement('strong');
-heading.textContent='MzanConnect Registration Preview';
-result.append(heading);
-
-for(const [label,value] of [
-['Business',business],
-['Contact',contact],
-['Sector',sector],
-['Package',plan]
-]){
-const p=document.createElement('p');
-p.textContent=label+': '+value;
-result.append(p);
-}
-
-const note=document.createElement('p');
-note.textContent='Demo only. No account was created and no application was submitted.';
-result.append(note);
-
-result.style.display='block';
+<script type="module">
+import { supabase } from "./mzan-auth.js";
+const form = document.getElementById("registration");
+const result = document.getElementById("result");
+const button = document.getElementById("registerButton");
+const show = (message) => { result.textContent = message; result.style.display = "block"; };
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  button.disabled = true;
+  result.style.display = "none";
+  try {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: new URL("login.html", location.href).href,
+        data: {
+          business: document.getElementById("business").value.trim(),
+          contact: document.getElementById("contact").value.trim(),
+          sector: document.getElementById("sector").value,
+          selected_package: document.getElementById("package").value
+        }
+      }
+    });
+    if (error) show(error.message);
+    else if (data.session) location.replace("dashboard.html");
+    else show("Registration request received. If email confirmation is enabled, check your inbox and confirm your address before logging in.");
+  } catch (error) {
+    show("Registration service unavailable. Please try again later.");
+  } finally {
+    button.disabled = false;
+  }
 });
 </script>
 </body>
