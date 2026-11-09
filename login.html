@@ -106,9 +106,7 @@ form.addEventListener("submit", async (event) => {
         console.warn("Member profile setup can be completed from the dashboard.",profileError);
       }
     }
-    const {data:founder,error:claimError}=await mzanSupabase.rpc("claim_founding_membership");
-    if(claimError)throw new Error("Unable to verify your founding invitation.");
-    let approved=founder===true;
+    let approved=false;
     if(!approved){
       const {data:existingFounder,error:founderReadError}=await mzanSupabase.from("founding_memberships")
         .select("pilot_status").eq("user_id",data.user.id).maybeSingle();
