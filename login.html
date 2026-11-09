@@ -109,6 +109,12 @@ form.addEventListener("submit", async (event) => {
     const {data:founder,error:claimError}=await mzanSupabase.rpc("claim_founding_membership");
     if(claimError)throw new Error("Unable to verify your founding invitation.");
     let approved=founder===true;
+    if(!approved){
+      const {data:existingFounder,error:founderReadError}=await mzanSupabase.from("founding_memberships")
+        .select("pilot_status").eq("user_id",data.user.id).maybeSingle();
+      if(founderReadError)throw new Error("Unable to verify membership status.");
+      approved=existingFounder?.pilot_status==="active";
+    }
     const inviteCode=document.getElementById("inviteCode").value.trim().toUpperCase();
     if(!approved&&inviteCode){
       const {data:claimed,error:codeError}=await mzanSupabase.rpc("claim_founding_code",{p_code:inviteCode});
