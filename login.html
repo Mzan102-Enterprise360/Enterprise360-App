@@ -103,6 +103,12 @@ form.addEventListener("submit", async (event) => {
         console.warn("Member profile setup can be completed from the dashboard.",profileError);
       }
     }
+    const {data:founder,error:claimError}=await mzanSupabase.rpc("claim_founding_membership");
+    if(claimError)throw new Error("Unable to verify your founding invitation.");
+    if(founder!==true){
+      await mzanSupabase.auth.signOut();
+      throw new Error("The free pilot is invitation-only. Contact MzanConnect for one of seven founding places.");
+    }
     window.location.replace("dashboard.html");
   } catch (error) {
     showMessage(error.message || "Unable to sign in. Please try again.", true);
