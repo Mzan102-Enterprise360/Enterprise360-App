@@ -40,6 +40,9 @@ a{color:#147b59}
 <input id="email" type="email" autocomplete="email" required>
 <label for="password">Password</label>
 <input id="password" type="password" autocomplete="current-password" required>
+<label for="inviteCode">Founding invitation code (first login only)</label>
+<input id="inviteCode" autocomplete="off" placeholder="MZAN-...">
+<p class="note">Enter your unique code on your first login after confirming your email. Returning founding members can leave this blank.</p>
 <button id="loginButton" type="submit">Log In</button>
 </form>
 <p id="message" role="status" aria-live="polite"></p>
@@ -105,9 +108,16 @@ form.addEventListener("submit", async (event) => {
     }
     const {data:founder,error:claimError}=await mzanSupabase.rpc("claim_founding_membership");
     if(claimError)throw new Error("Unable to verify your founding invitation.");
-    if(founder!==true){
+    let approved=founder===true;
+    const inviteCode=document.getElementById("inviteCode").value.trim().toUpperCase();
+    if(!approved&&inviteCode){
+      const {data:claimed,error:codeError}=await mzanSupabase.rpc("claim_founding_code",{p_code:inviteCode});
+      if(codeError)throw new Error("Invitation verification is unavailable. Please try again.");
+      approved=claimed===true;
+    }
+    if(!approved){
       await mzanSupabase.auth.signOut();
-      throw new Error("The free pilot is invitation-only. Contact MzanConnect for one of seven founding places.");
+      throw new Error("Please enter a valid unused founding invitation code. Confirm your email first if required.");
     }
     window.location.replace("dashboard.html");
   } catch (error) {
