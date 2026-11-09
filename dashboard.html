@@ -72,9 +72,9 @@ main{max-width:850px;margin:auto;padding:20px}
 </section>
 <section class="panel">
 <h3>My Business Readiness</h3>
-<p>Profile completion: 60% (demo)</p>
-<div class="progress"><div style="width:60%"></div></div>
-<p class="note">Demonstration only. No real business data is saved in this section.</p>
+<p>Overall readiness: <strong id="readinessPercent">0%</strong></p>
+<div class="progress"><div id="readinessBar" style="width:0%"></div></div>
+<p id="readinessExplanation" class="note">Based on saved profile and self-reported compliance. Not an official certification.</p>
 </section>
 <section class="panel">
 <h3>Quick Actions</h3>
@@ -126,6 +126,7 @@ main{max-width:850px;margin:auto;padding:20px}
     }
   });
 
+  let profileFieldsCompleted=0;
   // Read the signed-in member's own profile from Supabase.
   try {
     const {data:{user}}=await client.auth.getUser();
@@ -141,7 +142,8 @@ main{max-width:850px;margin:auto;padding:20px}
       document.getElementById("profileBusiness").textContent=business||"Not provided";
       document.getElementById("profileSector").textContent=sector||"Not provided";
       if(business)document.getElementById("memberWelcome").textContent="Welcome, "+business+"!";
-      const percent=Math.round([business,sector].filter(Boolean).length/2*100);
+      profileFieldsCompleted=[business,sector].filter(Boolean).length;
+      const percent=Math.round(profileFieldsCompleted/2*100);
       document.getElementById("profilePercent").textContent=percent+"%";
       document.getElementById("profileBar").style.width=percent+"%";
       document.querySelector(".panel .note").textContent="Profile loaded from your secure account.";
@@ -175,6 +177,10 @@ main{max-width:850px;margin:auto;padding:20px}
   document.getElementById("compliancePercent").textContent=percent+"%";
   document.getElementById("complianceBar").style.width=percent+"%";
   document.getElementById("complianceCount").textContent=completed+" of "+requirements.length+" requirements completed";
+  const readiness=Math.round((profileFieldsCompleted+completed)/7*100);
+  document.getElementById("readinessPercent").textContent=readiness+"%";
+  document.getElementById("readinessBar").style.width=readiness+"%";
+  document.getElementById("readinessExplanation").textContent=profileFieldsCompleted+" of 2 profile fields and "+completed+" of 5 self-reported compliance items completed. Not an official certification.";
   const list=document.getElementById("complianceList");
   requirements.forEach((name,i)=>{
     const item=document.createElement("p");
