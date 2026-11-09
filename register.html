@@ -63,14 +63,16 @@ a{color:#147b59}
 <option>Other</option>
 </select>
 
+<p class="note"><strong>Invitation-only founding pilot:</strong> Seven selected members receive free access (R0). No payment details are required. Keep your invitation code for your first login after confirming your email.</p>
 <label for="package">Membership Package</label>
 <select id="package" required>
+<option value="Founding Member - Free Pilot">Founding Member - Free Pilot (R0)</option>
 <option value="">Select package</option>
 <option>Starter - R199/month</option>
 <option>Growth - R399/month</option>
 <option>Premium - R699/month</option>
 </select>
-<p class="note">These are proposed pilot prices. Selecting a package does not activate a subscription or charge you.</p>
+<p class="note">Paid plans are not active during the founding pilot. Selecting a paid plan does not charge you or activate a subscription.</p>
 
 <label for="email">Email Address</label>
 <input id="email" type="email" required autocomplete="email">
@@ -149,9 +151,9 @@ form.addEventListener("submit", async function(event) {
         showResult("Account created, but your business profile could not be saved. Please contact support.",true);
         return;
       }
-      showResult("Your account and business profile have been created. You can now log in.");
+      showResult("Account created. Confirm your email if required, then log in with your founding invitation code.");
     } else {
-      showResult("Registration request received. If email confirmation is enabled, check your inbox and follow the confirmation link before logging in.");
+      showResult("Registration request received. Check your email for a confirmation link, then log in with your founding invitation code.");
     }
 
     form.reset();
