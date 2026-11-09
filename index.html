@@ -324,11 +324,12 @@ show('chat');
 }
 }
 
-show(
-['home','business','compliance','opportunities','growth','chat'].includes(window.location.hash.slice(1))
-?window.location.hash.slice(1)
-:'home'
-);
+function showFromUrl(){
+const page=window.location.hash.slice(1);
+show(['home','business','compliance','opportunities','growth','chat'].includes(page)?page:'home');
+}
+window.addEventListener('hashchange',showFromUrl);
+showFromUrl();
 
 if('serviceWorker' in navigator){
 navigator.serviceWorker.register('./sw.js').catch(()=>{});
