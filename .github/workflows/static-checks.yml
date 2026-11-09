@@ -30,7 +30,7 @@ jobs:
                   if tag == 'script': self.inside = False
               def handle_data(self, data):
                   if self.inside: self.scripts[-1] += data
-          for name in ('index.html','login.html','register.html','dashboard.html'):
+          for name in ('index.html','login.html','register.html','dashboard.html','member.html'):
               parser = Scripts()
               parser.feed(Path(name).read_text(encoding='utf-8'))
               for i, script in enumerate(parser.scripts):
