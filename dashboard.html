@@ -87,15 +87,20 @@ main {
 }
 .actions a:last-child { background: #14283b; }
 .note { font-size: 12px; color: #667; }
+[hidden]{display:none!important}
+#authStatus{max-width:850px;margin:24px auto;padding:20px;background:white;border-radius:12px}
+#logoutButton{border:0;border-radius:9px;background:white;color:#14283b;padding:10px 18px;margin-top:14px;font-weight:bold;cursor:pointer}
 </style>
 </head>
 <body>
 <header>
   <h1>Enterprise360</h1>
   <p>Empowering Businesses. Enabling Growth.</p>
+  <button type="button" id="logoutButton" hidden>Log out</button>
 </header>
 
-<main>
+<p id="authStatus" role="status">Verifying your member session…</p>
+<main id="protectedDashboard" hidden>
   <section class="welcome">
     <h2 id="memberWelcome">Welcome to Your Business Hub</h2>
     <p>Manage your business, explore opportunities
@@ -200,6 +205,37 @@ main {
   </section>
 </main>
 
+<script type="module">
+import { supabase } from "./mzan-auth.js";
+const status = document.getElementById("authStatus");
+const dashboard = document.getElementById("protectedDashboard");
+const logout = document.getElementById("logoutButton");
+try {
+  const { data: { user }, error } = await supabase.auth.getUser();
+  if (error || !user) {
+    location.replace("login.html");
+  } else {
+    dashboard.hidden = false;
+    status.hidden = true;
+    logout.hidden = false;
+    logout.addEventListener("click", async () => {
+      logout.disabled = true;
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        logout.disabled = false;
+        alert("Could not log out. Please try again.");
+      } else {
+        location.replace("login.html");
+      }
+    });
+    supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_OUT") location.replace("login.html");
+    });
+  }
+} catch (error) {
+  status.textContent = "Could not verify your session. Please reload or try again later.";
+}
+</script>
 <script>
 (function () {
   try {
