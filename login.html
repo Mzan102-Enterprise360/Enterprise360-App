@@ -15,7 +15,7 @@ header p{margin:0;color:#c3d4df;line-height:1.5}
 main{max-width:440px;margin:35px auto;padding:20px}
 .card{background:white;padding:28px 22px;border-radius:18px;box-shadow:0 2px 8px #0001}
 h2{text-align:center}
-button{width:100%;padding:15px;margin-top:20px;background:#147b59;color:white;border:0;border-radius:10px;font-size:16px;font-weight:bold;cursor:pointer}
+label{display:block;margin-top:14px;font-weight:bold}input{width:100%;padding:13px;border:1px solid #b7c5ce;border-radius:9px;font-size:16px}button{width:100%;padding:15px;margin-top:20px;background:#147b59;color:white;border:0;border-radius:10px;font-size:16px;font-weight:bold;cursor:pointer}
 .note{font-size:13px;color:#526675;line-height:1.6}
 a{color:#147b59}
 #message{display:none;background:#e4f3eb;border-radius:10px;padding:15px;line-height:1.5}
@@ -33,18 +33,18 @@ a{color:#147b59}
 <h2>Member Login</h2>
 <p style="text-align:center">Welcome to MzanConnect</p>
 
-<p class="note">
-<strong>Demo mode:</strong> Secure member login is not yet available. Please do not enter passwords or personal credentials.
-</p>
-
-<button type="button" onclick="showNotice()">
-Check Login Availability
-</button>
+<form id="loginForm">
+<label for="email">Email address</label>
+<input id="email" type="email" autocomplete="email" required>
+<label for="password">Password</label>
+<input id="password" type="password" autocomplete="current-password" required>
+<button id="loginButton" type="submit">Log in securely</button>
+</form>
 
 <p id="message" role="status"></p>
 
 <p style="text-align:center">
-<a href="register.html">Preview Business Registration</a>
+<a href="register.html">Create an account</a>
 </p>
 
 <p style="text-align:center">
@@ -57,12 +57,35 @@ MzanConnect is being developed as a business opportunities and supplier developm
 </div>
 </main>
 
-<script>
-function showNotice(){
-const message=document.getElementById('message');
-message.textContent='Secure member accounts are not yet active. This demonstration does not create a login session or grant dashboard access.';
-message.style.display='block';
+<script type="module">
+import { supabase } from "./mzan-auth.js";
+const form = document.getElementById("loginForm");
+const button = document.getElementById("loginButton");
+const message = document.getElementById("message");
+const show = (text) => { message.textContent = text; message.style.display = "block"; };
+try {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) location.replace("dashboard.html");
+} catch (error) {
+  show("Login service unavailable. Please try again later.");
 }
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  button.disabled = true;
+  message.style.display = "none";
+  try {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: document.getElementById("email").value.trim(),
+      password: document.getElementById("password").value
+    });
+    if (error) show(error.message);
+    else location.replace("dashboard.html");
+  } catch (error) {
+    show("Could not contact the login service. Please try again.");
+  } finally {
+    button.disabled = false;
+  }
+});
 </script>
 </body>
 </html>
