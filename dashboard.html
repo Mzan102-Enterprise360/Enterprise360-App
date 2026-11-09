@@ -1,6 +1,32 @@
 
 <!DOCTYPE html>
 <html lang="en">
+<style>
+  body { visibility: hidden; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+<script>
+const mzanSupabase = window.supabase.createClient(
+  "https://akxzubckdebawqwwwaoe.supabase.co",
+  "sb_publishable_XEeBfPCzJ0MzGpHWHygeug_rGptbzno"
+);
+(async function protectDashboard() {
+  try {
+    const { data: { user }, error } =
+      await mzanSupabase.auth.getUser();
+
+    if (error || !user) {
+      window.location.replace("login.html");
+      return;
+    }
+
+    document.body.style.visibility = "visible";
+  } catch (error) {
+    window.location.replace("login.html");
+  }
+})();
+</script>
+  
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
