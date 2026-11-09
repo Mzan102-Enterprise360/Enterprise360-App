@@ -82,21 +82,25 @@ form.addEventListener("submit", async (event) => {
       password
     });
     if (error) throw error;
-    // For email-confirmed registrations, persist profile details after first login.
+    // A profile storage error must not prevent a valid member from signing in.
     if(data.user){
-      const {data:existing,error:readError}=await mzanSupabase
-        .from("business_profiles").select("user_id")
-        .eq("user_id",data.user.id).maybeSingle();
-      if(readError)throw readError;
-      if(!existing){
-        const meta=data.user.user_metadata||{};
-        const {error:saveError}=await mzanSupabase.from("business_profiles").insert({
-          user_id:data.user.id,
-          business_name:String(meta.business_name||"").slice(0,100),
-          contact_name:String(meta.contact_name||"").slice(0,100),
-          sector:String(meta.business_sector||"").slice(0,100)
-        });
-        if(saveError)throw saveError;
+      try{
+        const {data:existing,error:readError}=await mzanSupabase
+          .from("business_profiles").select("user_id")
+          .eq("user_id",data.user.id).maybeSingle();
+        if(readError)throw readError;
+        if(!existing){
+          const meta=data.user.user_metadata||{};
+          const {error:saveError}=await mzanSupabase.from("business_profiles").insert({
+            user_id:data.user.id,
+            business_name:String(meta.business_name||"").slice(0,100),
+            contact_name:String(meta.contact_name||"").slice(0,100),
+            sector:String(meta.business_sector||"").slice(0,100)
+          });
+          if(saveError)throw saveError;
+        }
+      }catch(profileError){
+        console.warn("Member profile setup can be completed from the dashboard.",profileError);
       }
     }
     window.location.replace("dashboard.html");
