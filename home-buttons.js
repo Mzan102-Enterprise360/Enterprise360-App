@@ -55,7 +55,7 @@
   };
 
   window.show(
-    ["business", "compliance", "opportunities"].includes(
+    ["home", "business", "compliance", "opportunities", "growth", "chat"].includes(
       window.location.hash.slice(1)
     )
       ? window.location.hash.slice(1)
