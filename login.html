@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,11 +14,16 @@ header p{margin:0;color:#c3d4df;line-height:1.5}
 main{max-width:440px;margin:35px auto;padding:20px}
 .card{background:white;padding:28px 22px;border-radius:18px;box-shadow:0 2px 8px #0001}
 h2{text-align:center}
+label{display:block;margin-top:18px;font-weight:bold}
+input{display:block;width:100%;padding:13px;margin-top:7px;border:1px solid #b9c8d1;border-radius:10px;font-size:16px}
 button{width:100%;padding:15px;margin-top:20px;background:#147b59;color:white;border:0;border-radius:10px;font-size:16px;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.6;cursor:wait}
 .note{font-size:13px;color:#526675;line-height:1.6}
 a{color:#147b59}
-#message{display:none;background:#e4f3eb;border-radius:10px;padding:15px;line-height:1.5}
+#message{display:none;background:#e4f3eb;border-radius:10px;padding:15px;line-height:1.5;margin-top:16px}
+#message.error{background:#ffe8e8;color:#8a2424}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 <header>
@@ -27,42 +31,64 @@ a{color:#147b59}
 <p>Business Opportunities &amp; Supplier Development</p>
 <p>Empowering Her. Uplifting Youth. Growing Mzansi.</p>
 </header>
-
 <main>
 <div class="card">
 <h2>Member Login</h2>
 <p style="text-align:center">Welcome to MzanConnect</p>
-
-<p class="note">
-<strong>Demo mode:</strong> Secure member login is not yet available. Please do not enter passwords or personal credentials.
-</p>
-
-<button type="button" onclick="showNotice()">
-Check Login Availability
-</button>
-
-<p id="message" role="status"></p>
-
+<form id="loginForm">
+<label for="email">Email address</label>
+<input id="email" type="email" autocomplete="email" required>
+<label for="password">Password</label>
+<input id="password" type="password" autocomplete="current-password" required>
+<button id="loginButton" type="submit">Log In</button>
+</form>
+<p id="message" role="status" aria-live="polite"></p>
 <p style="text-align:center">
-<a href="register.html">Preview Business Registration</a>
+<a href="register.html">Register Your Business or Entrepreneur Profile</a>
 </p>
-
 <p style="text-align:center">
 <a href="index.html">Back to MzanConnect Home</a>
 </p>
-
 <p class="note">
 MzanConnect is being developed as a business opportunities and supplier development platform, not a job recruitment portal.
 </p>
 </div>
 </main>
-
 <script>
-function showNotice(){
-const message=document.getElementById('message');
-message.textContent='Secure member accounts are not yet active. This demonstration does not create a login session or grant dashboard access.';
-message.style.display='block';
+const mzanSupabase = window.supabase.createClient(
+  "https://akxzubckdebawqwwwaoe.supabase.co",
+  "sb_publishable_XEeBfPCzJ0MzGpHWHygeug_rGptbzno"
+);
+const form = document.getElementById("loginForm");
+const button = document.getElementById("loginButton");
+const message = document.getElementById("message");
+
+function showMessage(text, isError = false) {
+  message.textContent = text;
+  message.className = isError ? "error" : "";
+  message.style.display = "block";
 }
+
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  button.disabled = true;
+  button.textContent = "Signing in...";
+  message.style.display = "none";
+  try {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const { error } = await mzanSupabase.auth.signInWithPassword({
+      email,
+      password
+    });
+    if (error) throw error;
+    window.location.replace("dashboard.html");
+  } catch (error) {
+    showMessage(error.message || "Unable to sign in. Please try again.", true);
+    button.disabled = false;
+    button.textContent = "Log In";
+  }
+});
 </script>
 </body>
 </html>
