@@ -138,8 +138,18 @@ form.addEventListener("submit", async function(event) {
 
     if (error) throw error;
 
-    if (data.session) {
-      showResult("Your account has been created. You can now open your dashboard.");
+    if (data.session && data.user) {
+      const {error:profileError}=await mzanSupabase.from("business_profiles").upsert({
+        user_id:data.user.id,
+        business_name:profile.business_name,
+        contact_name:profile.contact_name,
+        sector:profile.business_sector
+      },{onConflict:"user_id"});
+      if(profileError){
+        showResult("Account created, but your business profile could not be saved. Please contact support.",true);
+        return;
+      }
+      showResult("Your account and business profile have been created. You can now log in.");
     } else {
       showResult("Registration request received. If email confirmation is enabled, check your inbox and follow the confirmation link before logging in.");
     }
