@@ -77,11 +77,28 @@ form.addEventListener("submit", async (event) => {
   try {
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
-    const { error } = await mzanSupabase.auth.signInWithPassword({
+    const { data, error } = await mzanSupabase.auth.signInWithPassword({
       email,
       password
     });
     if (error) throw error;
+    // For email-confirmed registrations, persist profile details after first login.
+    if(data.user){
+      const {data:existing,error:readError}=await mzanSupabase
+        .from("business_profiles").select("user_id")
+        .eq("user_id",data.user.id).maybeSingle();
+      if(readError)throw readError;
+      if(!existing){
+        const meta=data.user.user_metadata||{};
+        const {error:saveError}=await mzanSupabase.from("business_profiles").insert({
+          user_id:data.user.id,
+          business_name:String(meta.business_name||"").slice(0,100),
+          contact_name:String(meta.contact_name||"").slice(0,100),
+          sector:String(meta.business_sector||"").slice(0,100)
+        });
+        if(saveError)throw saveError;
+      }
+    }
     window.location.replace("dashboard.html");
   } catch (error) {
     showMessage(error.message || "Unable to sign in. Please try again.", true);
