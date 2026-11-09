@@ -141,6 +141,30 @@ main{max-width:850px;margin:auto;padding:20px}
     console.warn("Demo business profile unavailable.");
   }
 
+  // Read the signed-in member's own profile from Supabase.
+  try {
+    const {data:{user}}=await client.auth.getUser();
+    const {data:profile,error:profileError}=await client
+      .from("business_profiles")
+      .select("business_name,sector,contact_name")
+      .eq("user_id",user.id)
+      .maybeSingle();
+    if(profileError)throw profileError;
+    if(profile){
+      const business=String(profile.business_name||"").trim();
+      const sector=String(profile.sector||"").trim();
+      document.getElementById("profileBusiness").textContent=business||"Not provided";
+      document.getElementById("profileSector").textContent=sector||"Not provided";
+      if(business)document.getElementById("memberWelcome").textContent="Welcome, "+business+"!";
+      const percent=Math.round([business,sector].filter(Boolean).length/2*100);
+      document.getElementById("profilePercent").textContent=percent+"%";
+      document.getElementById("profileBar").style.width=percent+"%";
+      document.querySelector(".panel .note").textContent="Profile loaded from your secure account.";
+    }
+  }catch(error){
+    console.warn("Secure profile could not be loaded.",error);
+  }
+
   const requirements=[
     "CIPC records",
     "SARS tax status",
