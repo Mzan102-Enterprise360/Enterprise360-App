@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MzanConnect | Manage Account</title>
+<style>
+*{box-sizing:border-box}body{font:16px system-ui,Arial;margin:0;background:#edf2f5;color:#14283b}
+header{background:#14283b;color:#fff;padding:20px}main{max-width:650px;margin:auto;padding:20px}
+.card{background:white;padding:22px;border-radius:15px;margin:14px 0}label{display:block;margin:14px 0 6px;font-weight:600}
+input{font:inherit;width:100%;padding:12px;border:1px solid #b9c8d1;border-radius:8px}
+input[type=checkbox]{width:auto;margin-right:12px}button{background:#147b59;color:white;border:0;border-radius:9px;padding:13px 20px;font:inherit;cursor:pointer}
+a{color:#147b59}#message{white-space:pre-wrap}body{visibility:hidden}
+</style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script></head>
+<body><header><h1>◈ MzanConnect</h1><p>Manage your secure business account</p></header>
+<main><p><a href="dashboard.html">← Back to dashboard</a></p><p id="message" role="status" aria-live="polite"></p>
+<section class="card" id="profilePanel" hidden><h2>My Business Profile</h2>
+<form id="profileForm"><label for="business">Business name</label><input id="business" maxlength="100" required>
+<label for="contact">Contact person</label><input id="contact" maxlength="100">
+<label for="sector">Business sector</label><input id="sector" maxlength="100">
+<label for="region">Region</label><input id="region" maxlength="100">
+<label for="description">Description</label><input id="description" maxlength="500">
+<p><button type="submit">Save business profile</button></p></form></section>
+<section class="card" id="compliancePanel" hidden><h2>My Compliance Checklist</h2>
+<p>Self-reported only; this does not verify official compliance.</p>
+<form id="complianceForm"><div id="checks"></div><p><button type="submit">Save checklist</button></p></form></section>
+</main><script>
+(async()=>{
+const message=document.getElementById('message');
+const showMessage=(text)=>{message.textContent=text};
+try{
+if(!window.supabase)throw Error('Authentication library could not load');
+const db=window.supabase.createClient('https://akxzubckdebawqwwwaoe.supabase.co','sb_publishable_XEeBfPCzJ0MzGpHWHygeug_rGptbzno');
+const {data:{user},error}=await db.auth.getUser();
+if(error||!user){location.replace('login.html');return}
+const compliance=new URLSearchParams(location.search).get('section')==='compliance';
+document.getElementById(compliance?'compliancePanel':'profilePanel').hidden=false;
+document.body.style.visibility='visible';
+if(!compliance){
+const {data,error:readError}=await db.from('business_profiles').select('business_name,contact_name,sector,region,description').eq('user_id',user.id).maybeSingle();
+if(readError)throw readError;
+for(const [field,id] of [['business_name','business'],['contact_name','contact'],['sector','sector'],['region','region'],['description','description']])document.getElementById(id).value=data?.[field]||'';
+document.getElementById('profileForm').addEventListener('submit',async e=>{
+e.preventDefault();showMessage('Saving...');
+const values={user_id:user.id,business_name:document.getElementById('business').value.trim(),contact_name:document.getElementById('contact').value.trim(),sector:document.getElementById('sector').value.trim(),region:document.getElementById('region').value.trim(),description:document.getElementById('description').value.trim()};
+const {error}=await db.from('business_profiles').upsert(values,{onConflict:'user_id'});
+showMessage(error?'Unable to save: '+error.message:'Business profile saved successfully.');
+});
+}else{
+const labels=['CIPC records','SARS tax status','CSD registration','B-BBEE documents','Relevant industry licences'];
+const {data,error:readError}=await db.from('compliance_items').select('item_key,completed').eq('user_id',user.id);
+if(readError)throw readError;
+const saved=Object.fromEntries((data||[]).map(x=>[x.item_key,x.completed]));
+const root=document.getElementById('checks');
+labels.forEach((name,i)=>{const label=document.createElement('label');const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.id='c'+i;checkbox.checked=saved['c'+i]===true;label.append(checkbox,document.createTextNode(name));root.appendChild(label)});
+document.getElementById('complianceForm').addEventListener('submit',async e=>{
+e.preventDefault();showMessage('Saving...');
+const rows=labels.map((_,i)=>({user_id:user.id,item_key:'c'+i,completed:document.getElementById('c'+i).checked}));
+const {error}=await db.from('compliance_items').upsert(rows,{onConflict:'user_id,item_key'});
+showMessage(error?'Unable to save: '+error.message:'Checklist saved successfully.');
+});
+}
+}catch(error){document.body.style.visibility='visible';showMessage('Unable to load account data: '+(error.message||'Unknown error'))}
+})();
+</script></body></html>
