@@ -179,6 +179,18 @@ main{max-width:850px;margin:auto;padding:20px}
   }catch(error){
     console.warn("Compliance demo data unavailable.");
   }
+  // Prefer server-side compliance records for signed-in members.
+  try{
+    const {data:{user}}=await client.auth.getUser();
+    const {data:items,error:itemsError}=await client.from("compliance_items")
+      .select("item_key,completed").eq("user_id",user.id);
+    if(itemsError)throw itemsError;
+    if(items && items.length){
+      items.forEach(item=>{if(/^c[0-4]$/.test(item.item_key))tasks[item.item_key]=item.completed===true;});
+    }
+  }catch(error){
+    console.warn("Compliance records unavailable.",error);
+  }
   const completed=requirements.filter((_,i)=>tasks["c"+i]===true).length;
   const percent=Math.round(completed/requirements.length*100);
   document.getElementById("compliancePercent").textContent=percent+"%";
