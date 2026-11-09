@@ -1,0 +1,42 @@
+name: MzanConnect static checks
+on:
+  pull_request:
+  push:
+    branches: [main, security/supabase-auth-guard]
+jobs:
+  static-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check inline JavaScript syntax
+        run: |
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          import subprocess, tempfile
+          class Scripts(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.inside = False
+                  self.scripts = []
+              def handle_starttag(self, tag, attrs):
+                  if tag == 'script':
+                      self.inside = not any(k == 'src' for k,v in attrs)
+                      if self.inside: self.scripts.append('')
+              def handle_endtag(self, tag):
+                  if tag == 'script': self.inside = False
+              def handle_data(self, data):
+                  if self.inside: self.scripts[-1] += data
+          for name in ('index.html','login.html','register.html','dashboard.html'):
+              parser = Scripts()
+              parser.feed(Path(name).read_text(encoding='utf-8'))
+              for i, script in enumerate(parser.scripts):
+                  with tempfile.NamedTemporaryFile(suffix='.js',mode='w',encoding='utf-8') as f:
+                      f.write(script)
+                      f.flush()
+                      subprocess.run(['node','--check',f.name],check=True)
+                  print(f'{name} script {i+1}: syntax OK')
+          PY
