@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#14283b">
+<title>MzanConnect | Billing &amp; Membership</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f6f8;color:#14283b;font-family:Arial,sans-serif;visibility:hidden}
+header{background:#14283b;color:#fff;padding:26px 18px;text-align:center}header h1{margin:0 0 8px}header p{margin:0;color:#d4e0e7}
+main{max-width:760px;margin:20px auto;padding:0 16px}.panel{background:white;border-radius:14px;padding:20px;margin-bottom:16px}
+.status{display:inline-block;background:#e4f4ec;color:#126344;padding:8px 12px;border-radius:20px;font-weight:bold}
+a.button{display:inline-block;background:#147b59;color:white;text-decoration:none;padding:12px 16px;border-radius:10px;font-weight:bold}
+small,.note{color:#5b6c77;line-height:1.5}ul{line-height:1.9}.disabled{border:1px solid #d8e0e5;border-radius:10px;background:#f5f7f8;padding:13px;color:#536570}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+<header><h1>💳 Billing &amp; Membership</h1><p>MzanConnect member billing centre</p></header>
+<main>
+<section class="panel"><h2>Your membership</h2><p id="status" role="status">Checking your membership...</p><p id="explanation" class="note"></p></section>
+<section class="panel"><h2>Membership plans</h2><p><strong>Founding Member — Free Pilot</strong></p><p>Free access for approved founding members during the pilot.</p><p class="disabled">Paid membership pricing and checkout are not yet available. No payment is required or collected on this page.</p></section>
+<section class="panel"><h2>Payments &amp; receipts</h2><p class="note">Online payments are not active. Verified payment history and downloadable receipts will be added after the payment gateway is implemented and tested.</p></section>
+<section class="panel"><h2>Need help?</h2><p><a href="support.html">Contact Member Support</a></p><a class="button" href="dashboard.html">← Back to dashboard</a></section>
+</main>
+<script>
+(async function(){
+  try{
+    if(!window.supabase)throw Error("Authentication unavailable");
+    const client=window.supabase.createClient("https://akxzubckdebawqwwwaoe.supabase.co","sb_publishable_XEeBfPCzJ0MzGpHWHygeug_rGptbzno");
+    const {data,error}=await client.auth.getUser();
+    if(error||!data.user){location.replace("login.html");return}
+    const {data:founder,error:founderError}=await client.from("founding_memberships").select("pilot_status").eq("user_id",data.user.id).maybeSingle();
+    if(founderError||founder?.pilot_status!=="active"){location.replace("dashboard.html");return}
+    document.getElementById("status").innerHTML='<span class="status">Founding Member — Free Pilot</span>';
+    document.getElementById("explanation").textContent="Your founding pilot membership does not require payment. Billing is in preparation only.";
+    document.body.style.visibility="visible";
+  }catch(e){location.replace("login.html")}
+})();
+</script>
+</body></html>
