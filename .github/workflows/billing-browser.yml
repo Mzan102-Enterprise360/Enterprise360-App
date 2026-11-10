@@ -1,0 +1,25 @@
+name: Billing browser checks
+on:
+  pull_request:
+    paths:
+      - 'billing.html'
+      - 'dashboard.html'
+      - 'tests/billing-browser.cjs'
+      - '.github/workflows/billing-browser.yml'
+  workflow_dispatch:
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright and Chromium
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Test billing navigation and access
+        run: node tests/billing-browser.cjs
