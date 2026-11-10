@@ -13,8 +13,10 @@ async function main(){
     for(const [signedIn,active,expected,owner] of [[true,true,'billing.html',false],[false,false,'login.html',false],[true,false,'dashboard.html',false],[true,false,'billing.html',true]]){
       const page=await browser.newPage();
       await page.route('**/supabase.min.js',async route=>route.fulfill({status:200,contentType:'text/javascript',body:clientMock(signedIn,active,owner)}));
+      page.on('pageerror',err=>console.error('Browser page error:',err.message));
+      page.on('console',msg=>{if(msg.type()==='error')console.error('Browser console:',msg.text())});
       await page.goto(base+'billing.html',{waitUntil:'domcontentloaded'});
-      await page.waitForFunction(expectedPath=>location.pathname.endsWith(expectedPath),expected,{timeout:10000});
+      await page.waitForFunction(expectedPath=>location.pathname.endsWith(expectedPath),expected,{timeout:10000}).catch(async e=>{console.error('Navigation diagnostic',{signedIn,active,owner,expected,actual:page.url(),body:await page.locator('body').innerText().catch(()=>'<unavailable>')});throw e});
       if(signedIn&&(active||owner)){
         await page.locator('body').waitFor({state:'visible'});
         assert.match(await page.locator('#status').innerText(),owner?/MzanConnect Owner/:/Founding Member/);
