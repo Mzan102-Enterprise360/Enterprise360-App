@@ -19,6 +19,7 @@ small,.note{color:#5b6c77;line-height:1.5}ul{line-height:1.9}.disabled{border:1p
 <main>
 <section class="panel"><h2>Your membership</h2><p id="status" role="status">Checking your membership...</p><p id="explanation" class="note"></p></section>
 <section class="panel"><h2>Membership plans</h2><p><strong>Founding Member — Free Pilot</strong></p><p>Free access for approved founding members during the pilot.</p><p class="disabled">Paid membership pricing and checkout are not yet available. No payment is required or collected on this page.</p></section>
+<section class="panel"><h2>Future monthly memberships</h2><p>Monthly paid memberships are being considered. Pricing is undecided, enrolment is closed, and no member has consented to a paid plan.</p><p class="disabled">Yoco currently supports individual checkout payments, not automatic recurring deductions. Future monthly invoices would require a fresh payment authorisation each month. No checkout, charges, stored payment methods or automatic renewals are enabled.</p><p>Founding members keep R0 pilot access. Any future paid plan will require a separate, clear opt-in and published terms.</p></section>
 <section class="panel"><h2>Payments &amp; receipts</h2><p class="note">Online payments are not active. Verified payment history and downloadable receipts will be added after the payment gateway is implemented and tested.</p></section>
 <section class="panel"><h2>Need help?</h2><p><a href="support.html">Contact Member Support</a></p><a class="button" href="dashboard.html">← Back to dashboard</a></section>
 </main>
@@ -29,9 +30,10 @@ small,.note{color:#5b6c77;line-height:1.5}ul{line-height:1.9}.disabled{border:1p
     const client=window.supabase.createClient("https://akxzubckdebawqwwwaoe.supabase.co","sb_publishable_XEeBfPCzJ0MzGpHWHygeug_rGptbzno");
     const {data,error}=await client.auth.getUser();
     if(error||!data.user){location.replace("login.html");return}
-    const {data:founder,error:founderError}=await client.from("founding_memberships").select("pilot_status").eq("user_id",data.user.id).maybeSingle();
-    if(founderError||founder?.pilot_status!=="active"){location.replace("dashboard.html");return}
-    document.getElementById("status").innerHTML='<span class="status">Founding Member — Free Pilot</span>';
+    const isOwner=data.user.app_metadata?.mzanconnect_role==="owner";
+    const {data:founder,error:founderError}=isOwner ? {data:null,error:null} : await client.from("founding_memberships").select("pilot_status").eq("user_id",data.user.id).maybeSingle();
+    if(!isOwner&&(founderError||founder?.pilot_status!=="active")){location.replace("dashboard.html");return}
+    document.getElementById("status").innerHTML=isOwner ? '<span class="status">MzanConnect Owner — Free Pilot</span>' : '<span class="status">Founding Member — Free Pilot</span>';
     document.getElementById("explanation").textContent="Your founding pilot membership does not require payment. Billing is in preparation only.";
     document.body.style.visibility="visible";
   }catch(e){location.replace("login.html")}

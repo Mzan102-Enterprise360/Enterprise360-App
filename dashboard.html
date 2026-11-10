@@ -101,13 +101,14 @@ main{max-width:850px;margin:auto;padding:20px}
       window.location.replace("login.html");
       return;
     }
-    const {data:founder,error:founderError}=await client.from("founding_memberships").select("pilot_status").eq("user_id",data.user.id).maybeSingle();
-    if(founderError||founder?.pilot_status!=="active"){
+    const isOwner=data.user.app_metadata?.mzanconnect_role==="owner";
+    const {data:founder,error:founderError}=isOwner ? {data:null,error:null} : await client.from("founding_memberships").select("pilot_status").eq("user_id",data.user.id).maybeSingle();
+    if(!isOwner&&(founderError||founder?.pilot_status!=="active")){
       await client.auth.signOut();
       window.location.replace("login.html");
       return;
     }
-    document.getElementById("profilePlan").textContent="Founding Member — Free Pilot";
+    document.getElementById("profilePlan").textContent=isOwner ? "MzanConnect Owner — Free Pilot" : "Founding Member — Free Pilot";
   }catch(error){
     window.location.replace("login.html");
     return;

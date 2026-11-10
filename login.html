@@ -106,7 +106,9 @@ form.addEventListener("submit", async (event) => {
         console.warn("Member profile setup can be completed from the dashboard.",profileError);
       }
     }
-    let approved=false;
+    // Owner status is issued by the server, not editable user metadata.
+    const isOwner=data.user.app_metadata?.mzanconnect_role==="owner";
+    let approved=isOwner;
     if(!approved){
       const {data:existingFounder,error:founderReadError}=await mzanSupabase.from("founding_memberships")
         .select("pilot_status").eq("user_id",data.user.id).maybeSingle();
