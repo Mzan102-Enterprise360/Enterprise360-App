@@ -4,20 +4,20 @@ const path = require('node:path');
 const { spawn } = require('node:child_process');
 const server = spawn('python3', ['-m', 'http.server', '8765', '--bind', '127.0.0.1'], { cwd: path.resolve(__dirname, '..'), stdio: 'ignore' });
 const base='http://127.0.0.1:8765/';
-const clientMock = (signedIn, active) => `window.supabase={createClient:()=>({
-  auth:{getUser:async()=>({data:{user:${signedIn ? '{id:"test-user"}' : 'null'}},error:null}),signOut:async()=>({error:null})},
+const clientMock = (signedIn, active, owner=false) => `window.supabase={createClient:()=>({
+  auth:{getUser:async()=>({data:{user:${signedIn ? '{id:"test-user",app_metadata:{mzanconnect_role:"'+(owner?'owner':'member')+'"}}' : 'null'}},error:null}),signOut:async()=>({error:null})},
   from:(table)=>({select:()=>({eq:()=>({maybeSingle:async()=>({data:table==="founding_memberships"?{pilot_status:"${active?'active':'inactive'}"}:{business_name:"Test Co",sector:"Services"},error:null}),then:(resolve)=>resolve({data:[],error:null})})})})})};`;
 async function main(){
   const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
   try{
-    for(const [signedIn,active,expected] of [[true,true,'billing.html'],[false,false,'login.html'],[true,false,'dashboard.html']]){
+    for(const [signedIn,active,expected,owner] of [[true,true,'billing.html',false],[false,false,'login.html',false],[true,false,'dashboard.html',false],[true,false,'billing.html',true]]){
       const page=await browser.newPage();
-      await page.route('**/supabase.min.js',async route=>route.fulfill({status:200,contentType:'text/javascript',body:clientMock(signedIn,active)}));
+      await page.route('**/supabase.min.js',async route=>route.fulfill({status:200,contentType:'text/javascript',body:clientMock(signedIn,active,owner)}));
       await page.goto(base+'billing.html',{waitUntil:'domcontentloaded'});
-      await page.waitForURL(url=>url.pathname.endsWith(expected),{timeout:10000});
-      if(signedIn&&active){
+      await page.waitForFunction(expectedPath=>location.pathname.endsWith(expectedPath),expected,{timeout:10000});
+      if(signedIn&&(active||owner)){
         await page.locator('body').waitFor({state:'visible'});
-        assert.match(await page.locator('#status').innerText(),/Founding Member/);
+        assert.match(await page.locator('#status').innerText(),owner?/MzanConnect Owner/:/Founding Member/);
         assert.match(await page.locator('main').innerText(),/No payment is required/);
         assert.equal(await page.locator('form').count(),0);
         await page.getByRole('link',{name:/Back to dashboard/}).click();
