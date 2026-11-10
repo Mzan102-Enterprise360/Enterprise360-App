@@ -37,6 +37,12 @@ p{line-height:1.45}
 .bubble{background:white;padding:10px;border-radius:12px;margin:8px 0;max-width:85%}
 .mine{background:#c6f3dc;margin-left:auto}
 #view{min-height:400px}
+.member-access-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 0 14px}
+.member-access-buttons a{display:flex;align-items:center;justify-content:center;text-align:center;min-height:48px;padding:12px 8px;border-radius:11px;color:#fff;text-decoration:none;font-weight:700;font-size:14px}
+.member-access-buttons a:first-child{background:#147b59}
+.member-access-buttons a:last-child{background:#14283b}
+@media(max-width:350px){.member-access-buttons{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -50,7 +56,7 @@ p{line-height:1.45}
 <small>A division of Mzan 102 (Pty) Ltd · Founding Pilot</small>
 </header>
 
-<main><section class="card" aria-label="Member access"><strong>Founding Member Pilot · Free (R0)</strong><p>Selected founding members can create an account, confirm their email and sign in using their private invitation code.</p><p><a href="register.html">Register with an invitation</a> · <a href="login.html">Member login</a> · <a href="dashboard.html">My secure dashboard</a></p><p class="muted">Use your secure dashboard for saved business information, compliance and support requests. The optional previews below are demonstrations and do not save to your member account.</p><p><a href="member.html">Secure business profile</a> · <a href="support.html">Member support</a></p></section><div id="view"></div></main>
+<main><div class="member-access-buttons" aria-label="Member registration and login"><a href="register.html">Join MzanConnect</a><a href="login.html">Member Login</a></div><section class="card" aria-label="Member access"><strong>Founding Member Pilot · Free (R0)</strong><p>Selected founding members can create an account, confirm their email and sign in using their private invitation code.</p><p><a href="register.html">Register with an invitation</a> · <a href="login.html">Member login</a> · <a href="dashboard.html">My secure dashboard</a></p><p class="muted">Use your secure dashboard for saved business information, compliance and support requests. The optional previews below are demonstrations and do not save to your member account.</p><p><a href="member.html">Secure business profile</a> · <a href="support.html">Member support</a></p></section><div id="view"></div></main>
 
 <nav>
 <button onclick="show('home')">⌂ Home</button>
