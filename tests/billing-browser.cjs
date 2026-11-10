@@ -31,7 +31,7 @@ async function main(){
     await page.route('**/supabase.min.js',async route=>route.fulfill({status:200,contentType:'text/javascript',body:clientMock(true,true)}));
     await page.goto(base+'dashboard.html',{waitUntil:'domcontentloaded'});
     await page.locator('body').waitFor({state:'visible'});
-    assert.equal(await page.locator('.grid .tile').count(),5);
+    assert.equal(await page.locator('.grid .tile').count(),6,'dashboard should show six navigation tiles including Bookkeeping');
     await page.getByRole('link',{name:/Billing & Membership/}).click();
     await page.waitForURL('**/billing.html');
     await page.locator('body').waitFor({state:'visible'});
