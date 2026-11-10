@@ -6,11 +6,11 @@ const server = spawn('python3', ['-m', 'http.server', '8765', '--bind', '127.0.0
 const base='http://127.0.0.1:8765/';
 const clientMock = (signedIn, active, owner=false) => `window.supabase={createClient:()=>({
   auth:{getUser:async()=>({data:{user:${signedIn ? '{id:"test-user",app_metadata:{mzanconnect_role:"'+(owner?'owner':'member')+'"}}' : 'null'}},error:null}),signOut:async()=>({error:null})},
-  from:(table)=>({select:()=>({eq:()=>({maybeSingle:async()=>({data:table==="founding_memberships"?{pilot_status:"${active?'active':'inactive'}"}:{business_name:"Test Co",sector:"Services"},error:null}),then:(resolve)=>resolve({data:[],error:null})})})})})};`;
+  from:(table)=>{const query={eq:()=>query,order:()=>query,limit:()=>query,maybeSingle:async()=>({data:table==="founding_memberships"?{pilot_status:"${active?'active':'inactive'}"}:{business_name:"Test Co",sector:"Services"},error:null}),then:(resolve)=>resolve({data:[],error:null})};return {select:()=>query}}})};`;
 async function main(){
   const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
   try{
-    for(const [signedIn,active,expected,owner] of [[true,true,'billing.html',false],[false,false,'login.html',false],[true,false,'login.html',false],[true,false,'billing.html',true]]){
+    for(const [signedIn,active,expected,owner] of [[true,true,'billing.html',false],[false,false,'login.html',false],[true,false,'dashboard.html',false],[true,false,'billing.html',true]]){
       const page=await browser.newPage();
       await page.route('**/supabase.min.js',async route=>route.fulfill({status:200,contentType:'text/javascript',body:clientMock(signedIn,active,owner)}));
       page.on('pageerror',err=>console.error('Browser page error:',err.message));
