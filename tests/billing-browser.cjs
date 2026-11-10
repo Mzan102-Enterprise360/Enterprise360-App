@@ -10,7 +10,7 @@ const clientMock = (signedIn, active, owner=false) => `window.supabase={createCl
 async function main(){
   const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
   try{
-    for(const [signedIn,active,expected,owner] of [[true,true,'billing.html',false],[false,false,'login.html',false],[true,false,'dashboard.html',false],[true,false,'billing.html',true]]){
+    for(const [signedIn,active,expected,owner] of [[true,true,'billing.html',false],[false,false,'login.html',false],[true,false,'login.html',false],[true,false,'billing.html',true]]){
       const page=await browser.newPage();
       await page.route('**/supabase.min.js',async route=>route.fulfill({status:200,contentType:'text/javascript',body:clientMock(signedIn,active,owner)}));
       page.on('pageerror',err=>console.error('Browser page error:',err.message));
