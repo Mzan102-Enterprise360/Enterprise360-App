@@ -31,7 +31,8 @@ const db=window.supabase.createClient('https://akxzubckdebawqwwwaoe.supabase.co'
 const {data:{user},error}=await db.auth.getUser();
 if(error||!user){location.replace('login.html');return}
 const {data:founder,error:founderError}=await db.from('founding_memberships').select('pilot_status').eq('user_id',user.id).maybeSingle();
-if(founderError||founder?.pilot_status!=='active'){await db.auth.signOut();location.replace('login.html');return}
+const isOwner=user.app_metadata?.mzanconnect_role==='owner';
+if(!isOwner&&(founderError||founder?.pilot_status!=='active')){await db.auth.signOut();location.replace('login.html');return}
 const compliance=new URLSearchParams(location.search).get('section')==='compliance';
 document.getElementById(compliance?'compliancePanel':'profilePanel').hidden=false;
 document.body.style.visibility='visible';
