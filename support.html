@@ -1,3 +1,179 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MzanConnect | Support Messages</title><style>body{font:16px system-ui;margin:0;background:#edf2f5;color:#14283b}header{background:#14283b;color:white;padding:22px}main{max-width:640px;margin:24px auto;padding:16px}.card{background:white;border-radius:14px;padding:20px}textarea{width:100%;min-height:110px;box-sizing:border-box;padding:12px;font:inherit}button{background:#147b59;color:white;border:0;border-radius:8px;padding:13px 20px;cursor:pointer}button:disabled{opacity:.5}.item{border-bottom:1px solid #ddd;padding:12px 0;white-space:pre-wrap;overflow-wrap:anywhere}small{color:#526675}a{color:#147b59}</style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script></head><body><header><h1>◈ MzanConnect</h1><p>Member support messages</p></header><main><p><a href="dashboard.html">← Back to secure dashboard</a></p><section class="card"><h2>Send a support request</h2><p>This securely saves your message to your member account. Replies are not yet available in this pilot.</p><form id="form"><label for="message">Your message</label><textarea id="message" maxlength="2000" required></textarea><p><button id="send" type="submit">Save support request</button></p></form><p id="status" role="status"></p><h3>Your previous requests</h3><div id="messages">Loading…</div></section></main><script>
-(async()=>{const status=document.getElementById('status'),messages=document.getElementById('messages'),form=document.getElementById('form'),send=document.getElementById('send');try{if(!window.supabase)throw Error('Unable to load authentication.');const db=window.supabase.createClient('https://akxzubckdebawqwwwaoe.supabase.co','sb_publishable_XEeBfPCzJ0MzGpHWHygeug_rGptbzno');const {data:{user},error}=await db.auth.getUser();if(error||!user){location.replace('login.html');return}const isOwner=user.app_metadata?.mzanconnect_role==='owner';if(!isOwner){const {data:membership,error:memberError}=await db.from('founding_memberships').select('pilot_status').eq('user_id',user.id).maybeSingle();if(memberError){throw Error('Unable to check membership.')}if(membership?.pilot_status!=='active'){location.replace('login.html');return}}async function refresh(){const {data,error}=await db.from('support_messages').select('message,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50);if(error){messages.textContent='Unable to load messages.';return}messages.replaceChildren();if(!data.length){messages.textContent='No support requests yet.';return}data.forEach(x=>{const p=document.createElement('div');p.className='item';const time=document.createElement('small');time.textContent=new Date(x.created_at).toLocaleString();const content=document.createElement('p');content.textContent=x.message;p.append(time,content);messages.append(p)})}await refresh();form.addEventListener('submit',async e=>{e.preventDefault();const message=document.getElementById('message').value.trim();if(!message)return;send.disabled=true;status.textContent='Saving…';const {error}=await db.from('support_messages').insert({user_id:user.id,message});status.textContent=error?'Could not save your request. Please try again.':'Support request saved to your account.';if(!error){form.reset();await refresh()}send.disabled=false})}catch(e){status.textContent='Support is temporarily unavailable.';messages.textContent='Please try again later.'}})();
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MzanConnect | Support Messages</title><style>body{font:16px system-ui;margin:0;background:#edf2f5;color:#14283b}header{background:#14283b;color:white;padding:22px}main{max-width:640px;margin:24px auto;padding:16px}.card{background:white;border-radius:14px;padding:20px}textarea{width:100%;min-height:110px;box-sizing:border-box;padding:12px;font:inherit}button{background:#147b59;color:white;border:0;border-radius:8px;padding:13px 20px;cursor:pointer}button:disabled{opacity:.5}.item{border-bottom:1px solid #ddd;padding:12px 0;white-space:pre-wrap;overflow-wrap:anywhere}small{color:#526675}a{color:#147b59}.reply{background:#e4f3eb;padding:12px;margin-top:10px;border-radius:8px}.reply-form{margin:12px 0}label{display:block;margin-bottom:6px}[hidden]{display:none!important}button{min-height:44px}button:focus-visible,textarea:focus-visible{outline:3px solid #d19800;outline-offset:3px}</style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script></head><body><header><h1>◈ MzanConnect</h1><p>Member support messages</p></header><main><p><a href="dashboard.html">← Back to secure dashboard</a></p><section class="card"><h2>Send a support request</h2><p>Send your question here and check below for the MzanConnect team's reply.</p><form id="form"><label for="message">Your message</label><textarea id="message" maxlength="2000" required></textarea><p><button id="send" type="submit" disabled>Save support request</button></p></form><p id="status" role="status"></p><h3 id="requestsTitle">Your requests and replies</h3><button id="refresh" type="button">Refresh requests</button><div id="messages" aria-live="polite">Loading…</div><button id="more" type="button" hidden>Load older requests</button></section></main><script>
+(async function initializeSupport() {
+  const status = document.getElementById('status');
+  const messages = document.getElementById('messages');
+  const form = document.getElementById('form');
+  const send = document.getElementById('send');
+  const refreshButton = document.getElementById('refresh');
+  const moreButton = document.getElementById('more');
+  const pageSize = 20;
+  let oldestId = null;
+  let loading = false;
+
+  try {
+    if (!window.supabase) throw new Error('Authentication unavailable');
+    const db = window.supabase.createClient(
+      'https://akxzubckdebawqwwwaoe.supabase.co',
+      'sb_publishable_XEeBfPCzJ0MzGpHWHygeug_rGptbzno'
+    );
+    const { data: { user }, error } = await db.auth.getUser();
+    if (error || !user) {
+      location.replace('login.html');
+      return;
+    }
+    const isOwner = user.app_metadata?.mzanconnect_role === 'owner';
+    if (!isOwner) {
+      const { data: membership, error: membershipError } = await db
+        .from('founding_memberships').select('pilot_status')
+        .eq('user_id', user.id).maybeSingle();
+      if (membershipError) throw membershipError;
+      if (membership?.pilot_status !== 'active') {
+        location.replace('login.html');
+        return;
+      }
+    }
+    if (isOwner) document.getElementById('requestsTitle').textContent = 'Member requests — owner inbox';
+
+    function showReply(container, reply) {
+      const heading = document.createElement('strong');
+      heading.textContent = 'MzanConnect reply';
+      const date = document.createElement('p');
+      date.textContent = new Date(reply.created_at).toLocaleString();
+      const text = document.createElement('p');
+      text.textContent = reply.message;
+      container.className = 'reply';
+      container.replaceChildren(heading, date, text);
+    }
+
+    function createReplyForm(request, container) {
+      const replyForm = document.createElement('form');
+      replyForm.className = 'reply-form';
+      const label = document.createElement('label');
+      label.htmlFor = 'reply-' + request.id;
+      label.textContent = 'Reply to request #' + request.id;
+      const input = document.createElement('textarea');
+      input.id = label.htmlFor;
+      input.required = true;
+      input.maxLength = 2000;
+      const submit = document.createElement('button');
+      submit.type = 'submit';
+      submit.textContent = 'Send reply';
+      const feedback = document.createElement('p');
+      feedback.setAttribute('role', 'status');
+      replyForm.append(label, input, submit, feedback);
+      replyForm.addEventListener('submit', async event => {
+        event.preventDefault();
+        const message = input.value.trim();
+        if (!message || submit.disabled) return;
+        submit.disabled = true;
+        refreshButton.disabled = true;
+        moreButton.disabled = true;
+        feedback.textContent = 'Saving reply…';
+        try {
+          const { error: saveError } = await db.from('support_replies')
+            .insert({ request_id: request.id, message });
+          // Read the unique saved response even if the insert response was lost
+          // or another owner tab replied at the same time.
+          const { data: saved, error: readError } = await db.from('support_replies')
+            .select('message,created_at').eq('request_id', request.id).maybeSingle();
+          if (saved && !readError) {
+            showReply(container, saved);
+          } else if (!saveError) {
+            feedback.textContent = 'Reply saved. Refresh requests to display it.';
+          } else {
+            throw saveError;
+          }
+        } catch {
+          feedback.textContent = 'Could not confirm the reply was saved. Your text is kept here. Try again.';
+          submit.disabled = false;
+        } finally {
+          refreshButton.disabled = loading;
+          moreButton.disabled = loading;
+        }
+      });
+      container.append(replyForm);
+    }
+
+    function renderRequest(request, reply) {
+      const item = document.createElement('div');
+      item.className = 'item';
+      const heading = document.createElement('strong');
+      heading.textContent = 'Request #' + request.id;
+      const date = document.createElement('p');
+      date.textContent = new Date(request.created_at).toLocaleString();
+      const text = document.createElement('p');
+      text.textContent = request.message;
+      const response = document.createElement('div');
+      item.append(heading, date, text, response);
+      if (reply) showReply(response, reply);
+      else if (isOwner) createReplyForm(request, response);
+      else response.textContent = 'Awaiting a reply from MzanConnect.';
+      return item;
+    }
+
+    async function loadRequests(append = false) {
+      if (loading) return;
+      loading = true;
+      refreshButton.disabled = true;
+      moreButton.disabled = true;
+      try {
+        let query = db.from('support_messages').select('id,message,created_at')
+          .order('id', { ascending: false }).limit(pageSize);
+        if (!isOwner) query = query.eq('user_id', user.id);
+        if (append && oldestId !== null) query = query.lt('id', oldestId);
+        const { data: requests, error: requestError } = await query;
+        if (requestError) throw requestError;
+        let replies = [];
+        if (requests.length) {
+          const { data, error: replyError } = await db.from('support_replies')
+            .select('request_id,message,created_at').in('request_id', requests.map(request => request.id));
+          if (replyError) throw replyError;
+          replies = data;
+        }
+        const repliesByRequest = new Map(replies.map(reply => [reply.request_id, reply]));
+        if (!append) messages.replaceChildren();
+        for (const request of requests) messages.append(renderRequest(request, repliesByRequest.get(request.id)));
+        if (!append && !requests.length) messages.textContent = 'No support requests yet.';
+        if (requests.length) oldestId = requests[requests.length - 1].id;
+        moreButton.hidden = requests.length < pageSize;
+      } catch {
+        status.textContent = 'Unable to load requests and replies. Tap Refresh requests to try again.';
+      } finally {
+        loading = false;
+        refreshButton.disabled = false;
+        moreButton.disabled = false;
+      }
+    }
+
+    refreshButton.addEventListener('click', () => {
+      status.textContent = '';
+      loadRequests();
+    });
+    moreButton.addEventListener('click', () => loadRequests(true));
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      const input = document.getElementById('message');
+      const message = input.value.trim();
+      if (!message || send.disabled) return;
+      send.disabled = true;
+      status.textContent = 'Saving…';
+      try {
+        const { error: saveError } = await db.from('support_messages').insert({ user_id: user.id, message });
+        if (saveError) throw saveError;
+        form.reset();
+        status.textContent = 'Support request saved to your account.';
+        await loadRequests();
+      } catch {
+        status.textContent = 'Could not confirm your request was saved. Refresh requests before trying again.';
+      } finally {
+        send.disabled = false;
+      }
+    });
+    send.disabled = false;
+    await loadRequests();
+  } catch {
+    status.textContent = 'Support is temporarily unavailable. Refresh the page to try again.';
+    messages.textContent = '';
+  }
+})();
 </script></body></html>
