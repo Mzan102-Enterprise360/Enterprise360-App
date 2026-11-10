@@ -30,7 +30,15 @@ main{max-width:850px;margin:auto;padding:20px}
 #logoutButton:disabled{opacity:.6}
 #logoutMessage{color:#ffe3e3;font-size:13px}
 @media(max-width:420px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.actions{flex-wrap:wrap}.actions a{min-width:130px}}
+.section-print{margin-bottom:12px}
+.section-print button{background:#147b59;color:#fff;border:0;border-radius:9px;padding:11px 14px;font-weight:bold;cursor:pointer}
 @media print {
+  .section-print{display:none!important}
+  body[data-print-section] .welcome,body[data-print-section] .panel{display:none!important}
+  body[data-print-section] .panel[data-report]{display:none!important}
+  body[data-print-section="profile"] .panel[data-report="profile"],
+  body[data-print-section="compliance"] .panel[data-report="compliance"],
+  body[data-print-section="readiness"] .panel[data-report="readiness"]{display:block!important}
   body{visibility:visible!important;background:#fff!important;color:#111!important;font-size:11pt}
   header{background:#fff!important;color:#111!important;padding:0 0 12px;text-align:left;border-bottom:2px solid #14283b}
   header p{color:#333!important}
@@ -52,11 +60,12 @@ main{max-width:850px;margin:auto;padding:20px}
 <p id="logoutMessage" role="status"></p>
 </header>
 <main>
-<section class="welcome">\n<div class="print-actions"><button id="printDashboard" type="button" style="padding:12px 16px;background:#147b59;color:white;border:0;border-radius:9px;font-weight:bold;cursor:pointer">🖨 Print / Save as PDF</button><p class="note-print note">Print your saved profile, compliance and readiness summary. On your phone, choose Save as PDF to download it.</p></div>
+<section class="welcome"><div class="print-actions"><button id="printDashboard" type="button" style="padding:12px 16px;background:#147b59;color:white;border:0;border-radius:9px;font-weight:bold;cursor:pointer">🖨 Print / Save as PDF</button><p class="note-print note">Print the full summary, or choose a section below to print only that information. On your phone, select Save as PDF.</p></div>
 <h2 id="memberWelcome">Welcome to Your Business Hub</h2>
 <p>Manage your business, explore opportunities and track your growth in one place.</p>
 </section>
-<section class="panel">
+<section class="panel" data-report="profile">
+<div class="section-print"><button type="button" data-print="profile">🖨 Print Business Profile</button></div>
 <h3>🏢 My Business Profile</h3>
 <p><strong>Business Name:</strong> <span id="profileBusiness">Not provided</span></p>
 <p><strong>Business Sector:</strong> <span id="profileSector">Not provided</span></p>
@@ -73,7 +82,8 @@ main{max-width:850px;margin:auto;padding:20px}
 <a class="tile" href="index.html#growth"><span>📈</span>Growth Passport<small>Track your progress</small></a>
 <a class="tile" href="billing.html"><span>💳</span>Billing &amp; Membership<small>Plans, payments and receipts</small></a>
 </div>
-<section class="panel">
+<section class="panel" data-report="compliance">
+<div class="section-print"><button type="button" data-print="compliance">🖨 Print Compliance</button></div>
 <h3>🛡️ My Compliance Progress</h3>
 <p>Checklist Completion: <strong id="compliancePercent">0%</strong></p>
 <div class="progress"><div id="complianceBar"></div></div>
@@ -82,7 +92,8 @@ main{max-width:850px;margin:auto;padding:20px}
 <p class="note">Self-reported checklist only. This does not verify official compliance.</p>
 <div class="actions"><a href="member.html?section=compliance&v=20261110b">Update Checklist</a></div>
 </section>
-<section class="panel">
+<section class="panel" data-report="readiness">
+<div class="section-print"><button type="button" data-print="readiness">🖨 Print Readiness</button></div>
 <h3>My Business Readiness</h3>
 <p>Overall readiness: <strong id="readinessPercent">0%</strong></p>
 <div class="progress"><div id="readinessBar" style="width:0%"></div></div>
@@ -125,7 +136,16 @@ main{max-width:850px;margin:auto;padding:20px}
     return;
   }
 
-  document.getElementById("printDashboard").addEventListener("click",()=>window.print());
+  const printReport=(section)=>{
+    if(section)document.body.dataset.printSection=section;
+    else delete document.body.dataset.printSection;
+    window.print();
+  };
+  document.getElementById("printDashboard").addEventListener("click",()=>printReport(null));
+  document.querySelectorAll("[data-print]").forEach(button=>{
+    button.addEventListener("click",()=>printReport(button.dataset.print));
+  });
+  window.addEventListener("afterprint",()=>{delete document.body.dataset.printSection;});
   logoutButton.addEventListener("click",async function(){
     logoutButton.disabled=true;
     logoutButton.textContent="Signing out...";
