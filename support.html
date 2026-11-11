@@ -1,10 +1,10 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MzanConnect | Support Messages</title><style>body{font:16px system-ui;margin:0;background:#edf2f5;color:#14283b}header{background:#14283b;color:white;padding:22px}main{max-width:640px;margin:24px auto;padding:16px}.card{background:white;border-radius:14px;padding:20px}textarea{width:100%;min-height:110px;box-sizing:border-box;padding:12px;font:inherit}button{background:#147b59;color:white;border:0;border-radius:8px;padding:13px 20px;cursor:pointer}button:disabled{opacity:.5}.item{border-bottom:1px solid #ddd;padding:12px 0;white-space:pre-wrap;overflow-wrap:anywhere}small{color:#526675}a{color:#147b59}</style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script></head><body><header><h1>◈ MzanConnect</h1><p>Member support messages</p></header><main><p><a href="dashboard.html">← Back to secure dashboard</a></p><section class="card"><h2>Send a support request</h2><p>This securely saves your message to your member account. Replies from the MzanConnect owner appear below the original request.</p><form id="form"><label for="message">Your message</label><textarea id="message" maxlength="2000" required></textarea><p><button id="send" type="submit">Save support request</button></p></form><p id="status" role="status"></p><h3>Your previous requests</h3><div id="messages" aria-live="polite">Loading…</div></section>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MzanConnect | Support Messages</title><style>body{font:16px system-ui;margin:0;background:#edf2f5;color:#14283b}header{background:#14283b;color:white;padding:22px}main{max-width:640px;margin:24px auto;padding:16px}.card{background:white;border-radius:14px;padding:20px}textarea{width:100%;min-height:110px;box-sizing:border-box;padding:12px;font:inherit}button{background:#147b59;color:white;border:0;border-radius:8px;padding:13px 20px;cursor:pointer}button:disabled{opacity:.5}.item{border-bottom:1px solid #ddd;padding:12px 0;white-space:pre-wrap;overflow-wrap:anywhere}small{color:#526675}a{color:#147b59}details>summary{cursor:pointer;font-weight:650;padding:10px 0}details form{margin-top:12px}.support-group{border-top:1px solid #dce5e9;margin-top:14px;padding-top:8px}.support-group small{font-weight:400}</style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script></head><body><header><h1>◈ MzanConnect</h1><p>Member support messages</p></header><main><p><a href="dashboard.html">← Back to secure dashboard</a></p><section class="card"><h2>Member Support</h2><button id="refreshSupport" type="button" disabled>Refresh support</button><details id="newRequest" class="support-group"><summary>Send a support request</summary><form id="form"><label for="message">Your message</label><textarea id="message" maxlength="2000" required></textarea><p><button id="send" type="submit">Save support request</button></p></form></details><p id="status" role="status"></p><details class="support-group"><summary>My request history</summary><div id="messages" aria-live="polite">Loading…</div></details></section>
 <section id="ownerInbox" class="card" hidden style="margin-top:16px">
 <h2>Owner support inbox</h2>
-<p>Open a request to reply. Members see the reply on their Member Support page.</p>
-<button id="refreshInbox" type="button">Refresh inbox</button>
+<p>Open a pending request to read it and reply.</p>
 <p id="inboxStatus" role="status"></p>
 <div id="inbox"></div>
+<details id="answeredRequests" class="support-group"><summary>Answered requests</summary><div id="answeredList">Open to load answered requests.</div></details>
 </section></main><script>
 (async () => {
   const status = document.getElementById('status');
@@ -13,6 +13,10 @@
   const send = document.getElementById('send');
   const inbox = document.getElementById('inbox');
   const inboxStatus = document.getElementById('inboxStatus');
+  const newRequest = document.getElementById('newRequest');
+  const answeredRequests = document.getElementById('answeredRequests');
+  const answeredList = document.getElementById('answeredList');
+  const refreshButton = document.getElementById('refreshSupport');
 
   function textElement(tag, content) {
     const element = document.createElement(tag);
@@ -41,14 +45,15 @@
     }
 
     function renderRequest(request, ownerView) {
-      const item = document.createElement('article');
-      item.className = 'item';
-      item.append(
-        textElement('small', new Date(request.created_at).toLocaleString()),
-        textElement('p', request.message)
-      );
       const reply = Array.isArray(request.support_replies)
         ? request.support_replies[0] : request.support_replies;
+      const item = document.createElement('details');
+      item.className = 'item';
+      const date = new Date(request.created_at).toLocaleString();
+      item.append(
+        textElement('summary', (reply ? 'Answered' : 'Awaiting reply') + ' · ' + date),
+        textElement('p', request.message)
+      );
 
       if (reply) {
         item.append(textElement('strong', 'Owner reply'), textElement('p', reply.message));
@@ -72,13 +77,10 @@
             const { error } = await db.from('support_replies').insert({
               request_id: request.id, message, replied_by: user.id
             });
-            if (error?.code === '23505') {
-              await refreshInbox();
-              return;
-            }
-            if (error) throw error;
-            replyForm.replaceWith(textElement('strong', 'Owner reply'), textElement('p', message));
-            if (request.user_id === user.id) await refreshRequests();
+            if (error && error.code !== '23505') throw error;
+            item.remove();
+            status.textContent = error ? 'This request has already been answered.' : 'Reply saved.';
+            await refreshSupport();
           } catch {
             feedback.textContent = 'Could not save the reply. Please try again.';
           } finally {
@@ -86,16 +88,15 @@
           }
         });
         item.append(replyForm);
-      } else {
-        item.append(textElement('small', 'Awaiting reply'));
       }
       return item;
     }
 
     const fields = 'id,user_id,message,created_at,support_replies(message,created_at)';
-    async function refreshRequests() {
+    async function refreshRequests(version) {
       const { data, error } = await db.from('support_messages').select(fields)
         .eq('user_id', user.id).order('created_at', { ascending: false }).limit(50);
+      if (version !== refreshVersion) return;
       if (error) {
         messages.textContent = 'Unable to load your requests. Please refresh.';
         return;
@@ -104,29 +105,56 @@
       if (!data.length) messages.textContent = 'No support requests yet.';
     }
 
-    async function refreshInbox() {
-      const button = document.getElementById('refreshInbox');
-      button.disabled = true;
-      inboxStatus.textContent = 'Loading inbox…';
+    async function refreshInbox(version) {
+      const { data, error } = await db.from('support_messages').select(fields)
+        .is('support_replies', null).order('created_at', { ascending: false }).limit(50);
+      if (version !== refreshVersion) return;
+      if (error) {
+        inboxStatus.textContent = 'Unable to refresh the inbox. Try again.';
+        return;
+      }
+      inbox.replaceChildren(...data.map(request => renderRequest(request, true)));
+      inboxStatus.textContent = data.length ? 'Showing pending requests.' : 'No pending requests.';
+    }
+
+    async function refreshAnswered(version) {
+      const { data, error } = await db.from('support_messages').select(fields)
+        .not('support_replies', 'is', null).order('created_at', { ascending: false }).limit(50);
+      if (version !== refreshVersion) return;
+      if (error) {
+        answeredList.textContent = 'Unable to load answered requests. Try refreshing.';
+        return;
+      }
+      answeredList.replaceChildren(...data.map(request => renderRequest(request, false)));
+      if (!data.length) answeredList.textContent = 'No answered requests yet.';
+    }
+
+    let refreshVersion = 0;
+    async function refreshSupport() {
+      const version = ++refreshVersion;
+      refreshButton.disabled = true;
       try {
-        const { data, error } = await db.from('support_messages').select(fields)
-          .order('created_at', { ascending: false }).limit(50);
-        if (error) throw error;
-        inbox.replaceChildren(...data.map(request => renderRequest(request, true)));
-        inboxStatus.textContent = data.length ? 'Showing latest requests.' : 'No support requests yet.';
+        const tasks = [refreshRequests(version)];
+        if (isOwner) {
+          tasks.push(refreshInbox(version));
+          if (answeredRequests.open) tasks.push(refreshAnswered(version));
+        }
+        await Promise.all(tasks);
       } catch {
-        inboxStatus.textContent = 'Unable to load the inbox. Try refreshing.';
+        status.textContent = 'Could not refresh support. Please try again.';
       } finally {
-        button.disabled = false;
+        if (version === refreshVersion) refreshButton.disabled = false;
       }
     }
 
-    await refreshRequests();
     if (isOwner) {
       document.getElementById('ownerInbox').hidden = false;
-      document.getElementById('refreshInbox').addEventListener('click', refreshInbox);
-      await refreshInbox();
+      answeredRequests.addEventListener('toggle', () => {
+        if (answeredRequests.open) void refreshSupport();
+      });
     }
+    refreshButton.addEventListener('click', refreshSupport);
+    await refreshSupport();
 
     form.addEventListener('submit', async event => {
       event.preventDefault();
@@ -139,8 +167,8 @@
         if (error) throw error;
         status.textContent = 'Support request saved to your account.';
         form.reset();
-        await refreshRequests();
-        if (isOwner) await refreshInbox();
+        newRequest.open = false;
+        await refreshSupport();
       } catch {
         status.textContent = 'Could not save your request. Please try again.';
       } finally {
