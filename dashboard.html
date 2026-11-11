@@ -79,7 +79,7 @@ main{max-width:850px;margin:auto;padding:20px}
 <a class="tile" href="member.html?v=20261110b"><span>🏢</span>My Business<small>Business profile</small></a>
 <a class="tile" href="member.html?section=compliance&v=20261110b"><span>🛡️</span>Compliance<small>Business requirements</small></a>
 <a class="tile" href="index.html#opportunities"><span>💼</span>Opportunities<small>Funding and tenders</small></a>
-<a class="tile" href="index.html#growth"><span>📈</span>Growth Passport<small>Track your progress</small></a>
+<a class="tile" href="member.html?section=growth"><span>📈</span>Growth Passport<small>Track your progress</small></a>
 <a class="tile" href="bookkeeping.html"><span>📒</span>My Bookkeeping<small>Income, expenses and reports</small></a>
 <a class="tile" href="billing.html"><span>💳</span>Billing &amp; Membership<small>Plans, payments and receipts</small></a>
 </div>
@@ -131,7 +131,7 @@ main{max-width:850px;margin:auto;padding:20px}
       window.location.replace("login.html");
       return;
     }
-    document.getElementById("profilePlan").textContent=isOwner ? "MzanConnect Owner — Free Pilot" : "Founding Member — Free Pilot";
+    document.getElementById("profilePlan").textContent=isOwner ? "MzanConnect Owner" : "Founding Member — Free Pilot";
   }catch(error){
     window.location.replace("login.html");
     return;

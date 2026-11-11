@@ -71,7 +71,8 @@ a{color:#147b59}
 <p class="note">Paid plans will be offered later. No payment is required during this pilot.</p>
 
 <label for="email">Your Own Email Address</label>
-<input id="email" type="email" required autocomplete="email">\n<p class="note">Use an email address you can open to confirm your registration. Never share your password or invitation code publicly.</p>
+<input id="email" type="email" required autocomplete="email">
+<p class="note">Use an email address you can open to confirm your registration. Never share your password or invitation code publicly.</p>
 
 <label for="password">Create Password</label>
 <input id="password" type="password" required minlength="8" autocomplete="new-password">
@@ -84,6 +85,16 @@ a{color:#147b59}
 <p style="text-align:center">
 Already registered? <a href="login.html">Log In</a>
 </p>
+
+<details>
+<summary>Didn’t receive your confirmation email?</summary>
+<form id="confirmationResend">
+<label for="resendEmail">Registration email address</label>
+<input id="resendEmail" type="email" required autocomplete="email">
+<button id="resendButton" type="submit">Resend confirmation email</button>
+<p id="resendResult" class="note" role="status" aria-live="polite"></p>
+</form>
+</details>
 
 <p class="note">
 MzanConnect is a business opportunities and supplier development platform, not a job recruitment portal. Registration does not guarantee funding, tenders or business opportunities.
@@ -100,6 +111,11 @@ const mzanSupabase = window.supabase.createClient(
 const form = document.getElementById("registration");
 const button = document.getElementById("submitButton");
 const result = document.getElementById("result");
+const resendForm = document.getElementById("confirmationResend");
+const resendEmail = document.getElementById("resendEmail");
+const resendButton = document.getElementById("resendButton");
+const resendResult = document.getElementById("resendResult");
+const emailRedirectTo = new URL("login.html", window.location.href).href;
 
 function showResult(text, isError = false) {
   result.textContent = text;
@@ -130,7 +146,7 @@ form.addEventListener("submit", async function(event) {
       password,
       options: {
         data: profile,
-        emailRedirectTo: new URL("login.html", window.location.href).href
+        emailRedirectTo
       }
     });
 
@@ -149,7 +165,8 @@ form.addEventListener("submit", async function(event) {
       }
       showResult("Account created. Confirm your email if required, then log in with your founding invitation code.");
     } else {
-      showResult("Registration request received. Check your email for a confirmation link, then log in with your founding invitation code.");
+      resendEmail.value = email;
+      showResult("Registration request received. Check your inbox and spam folder. If the link doesn’t arrive, use Resend confirmation email below. If you’ve already confirmed your email, choose Log In.");
     }
 
     form.reset();
@@ -158,6 +175,25 @@ form.addEventListener("submit", async function(event) {
   } finally {
     button.disabled = false;
     button.textContent = "Create My Account";
+  }
+});
+resendForm.addEventListener("submit", async function(event) {
+  event.preventDefault();
+  resendButton.disabled = true;
+  resendResult.textContent = "Requesting confirmation email…";
+
+  try {
+    const { error } = await mzanSupabase.auth.resend({
+      type: "signup",
+      email: resendEmail.value.trim(),
+      options: { emailRedirectTo }
+    });
+    if (error) throw error;
+    resendResult.textContent = "If your account still needs confirmation, check your inbox and spam folder for a new link. If you’ve already confirmed your email, choose Log In.";
+  } catch {
+    resendResult.textContent = "The confirmation request could not be completed. Check the address and try again in a few minutes.";
+  } finally {
+    resendButton.disabled = false;
   }
 });
 </script>

@@ -7,7 +7,7 @@ header{background:#14283b;color:#fff;padding:20px}main{max-width:650px;margin:au
 .card{background:white;padding:22px;border-radius:15px;margin:14px 0}label{display:block;margin:14px 0 6px;font-weight:600}
 input{font:inherit;width:100%;padding:12px;border:1px solid #b9c8d1;border-radius:8px}
 input[type=checkbox]{width:auto;margin-right:12px}button{background:#147b59;color:white;border:0;border-radius:9px;padding:13px 20px;font:inherit;cursor:pointer}
-a{color:#147b59}#message{white-space:pre-wrap}body{visibility:hidden}
+button:disabled{opacity:.55}a{color:#147b59}#message{white-space:pre-wrap}body{visibility:hidden}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script></head>
 <body><header><h1>◈ MzanConnect</h1><p>Manage your secure business account</p></header>
 <main><p><a href="dashboard.html">← Back to dashboard</a></p><p id="message" role="status" aria-live="polite"></p>
@@ -21,6 +21,9 @@ a{color:#147b59}#message{white-space:pre-wrap}body{visibility:hidden}
 <section class="card" id="compliancePanel" hidden><h2>My Compliance Checklist</h2>
 <p>Self-reported only; this does not verify official compliance.</p>
 <form id="complianceForm"><div id="checks"></div><p><button type="submit">Save checklist</button></p></form></section>
+<section class="card" id="growthPanel" hidden><h2>Business Growth Passport</h2>
+<p>Track your business development milestones. Your progress is saved to your account.</p>
+<form id="growthForm"><div id="growthChecks"></div><p><button type="submit">Save milestones</button></p></form></section>
 </main><script>
 (async()=>{
 const message=document.getElementById('message');
@@ -40,10 +43,23 @@ if(!isOwner){
     return;
   }
 }
-const compliance=new URLSearchParams(location.search).get('section')==='compliance';
-document.getElementById(compliance?'compliancePanel':'profilePanel').hidden=false;
-document.body.style.visibility='visible';
-if(!compliance){
+const section = new URLSearchParams(location.search).get('section');
+const checklists = {
+  compliance: {
+    panel: 'compliancePanel', form: 'complianceForm', root: 'checks', prefix: 'c',
+    labels: ['CIPC records', 'SARS tax status', 'CSD registration', 'B-BBEE documents', 'Relevant industry licences'],
+    savedMessage: 'Checklist saved successfully.'
+  },
+  growth: {
+    panel: 'growthPanel', form: 'growthForm', root: 'growthChecks', prefix: 'g',
+    labels: ['Complete business assessment', 'Review compliance', 'Prepare funding documents', 'Identify procurement opportunities', 'Complete monthly business review'],
+    savedMessage: 'Growth milestones saved successfully.'
+  }
+};
+const checklist = Object.hasOwn(checklists, section) ? checklists[section] : null;
+document.getElementById(checklist?.panel || 'profilePanel').hidden = false;
+document.body.style.visibility = 'visible';
+if(!checklist){
 const {data,error:readError}=await db.from('business_profiles').select('business_name,contact_name,sector,region,description').eq('user_id',user.id).maybeSingle();
 if(readError)throw readError;
 for(const [field,id] of [['business_name','business'],['contact_name','contact'],['sector','sector'],['region','region'],['description','description']])document.getElementById(id).value=data?.[field]||'';
@@ -54,17 +70,42 @@ const {error}=await db.from('business_profiles').upsert(values,{onConflict:'user
 showMessage(error?'Unable to save: '+error.message:'Business profile saved successfully.');
 });
 }else{
-const labels=['CIPC records','SARS tax status','CSD registration','B-BBEE documents','Relevant industry licences'];
-const {data,error:readError}=await db.from('compliance_items').select('item_key,completed').eq('user_id',user.id);
-if(readError)throw readError;
-const saved=Object.fromEntries((data||[]).map(x=>[x.item_key,x.completed]));
-const root=document.getElementById('checks');
-labels.forEach((name,i)=>{const label=document.createElement('label');const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.id='c'+i;checkbox.checked=saved['c'+i]===true;label.append(checkbox,document.createTextNode(name));root.appendChild(label)});
-document.getElementById('complianceForm').addEventListener('submit',async e=>{
-e.preventDefault();showMessage('Saving...');
-const rows=labels.map((_,i)=>({user_id:user.id,item_key:'c'+i,completed:document.getElementById('c'+i).checked}));
-const {error}=await db.from('compliance_items').upsert(rows,{onConflict:'user_id,item_key'});
-showMessage(error?'Unable to save: '+error.message:'Checklist saved successfully.');
+const items = checklist.labels.map((label, index) => ({ label, key: checklist.prefix + index }));
+const { data, error: readError } = await db.from('compliance_items')
+  .select('item_key,completed').eq('user_id', user.id).in('item_key', items.map(item => item.key));
+if (readError) throw readError;
+const saved = new Map(data.map(item => [item.item_key, item.completed]));
+const root = document.getElementById(checklist.root);
+for (const item of items) {
+  const label = document.createElement('label');
+  const checkbox = document.createElement('input');
+  checkbox.type = 'checkbox';
+  checkbox.id = item.key;
+  checkbox.checked = saved.get(item.key) === true;
+  label.append(checkbox, document.createTextNode(item.label));
+  root.appendChild(label);
+}
+const form = document.getElementById(checklist.form);
+const save = form.querySelector('button[type="submit"]');
+form.addEventListener('submit', async event => {
+  event.preventDefault();
+  if (save.disabled) return;
+  save.disabled = true;
+  showMessage('Saving...');
+  try {
+    const rows = items.map(item => ({
+      user_id: user.id,
+      item_key: item.key,
+      completed: document.getElementById(item.key).checked
+    }));
+    const { error } = await db.from('compliance_items').upsert(rows, { onConflict: 'user_id,item_key' });
+    if (error) throw error;
+    showMessage(checklist.savedMessage);
+  } catch (error) {
+    showMessage('Unable to save: ' + error.message);
+  } finally {
+    save.disabled = false;
+  }
 });
 }
 }catch(error){document.body.style.visibility='visible';showMessage('Unable to load account data: '+(error.message||'Unknown error'))}
