@@ -87,7 +87,7 @@ One Connection. Endless Possibilities.
 </p>
 
 <div class="card">
-<span class="pill">Business Growth Hub · Demo</span>
+<span class="pill">Business Growth Hub</span>
 <h3>${esc(state.business||'Connecting Business to Opportunity')}</h3>
 <p>Discover business funding, tenders, mining supplier registration, procurement information and enterprise development programmes.</p>
 <p><strong>For entrepreneurs, women, youth, SMMEs and business suppliers.</strong></p>
@@ -110,7 +110,7 @@ Business checklist
 Funding & tenders
 </button>
 
-<button class="tile" onclick="show('growth')">
+<button class="tile" onclick="location.href='member.html?section=growth'">
 ↗<h3>Growth Passport</h3>
 Development goals
 </button>
@@ -170,70 +170,68 @@ ${state.messages.map(x=>`
 
 if(page==='opportunities')html=`
 <h2>Funding &amp; Tender Opportunities</h2>
-
+<p>Search official sources for funding, tenders, supplier registration and business development. Check each source for current listings, requirements and deadlines.</p>
 <div class="card">
-<h3>Discover Business Opportunities</h3>
-<p>Explore funding, tenders, RFQs, grants and business development programmes to help your enterprise grow.</p>
-<p class="muted">MzanConnect is currently in demo mode. Check official sources for verified opportunities and closing dates.</p>
-</div>
-
-<div class="card">
-<h3>Official South African Opportunities</h3>
-<p>Find government tenders, RFQs, funding and business support programmes.</p>
-
-<p><a href="https://www.etenders.gov.za/" target="_blank" rel="noopener noreferrer">Government Tenders and RFQs</a></p>
-
-<p><a href="https://www.sedfa.org.za/" target="_blank" rel="noopener noreferrer">Small Business Funding and Support</a></p>
-
-<p><a href="https://www.cidb.org.za/" target="_blank" rel="noopener noreferrer">Construction Industry Development Board</a></p>
-
-<p class="muted">Check official websites for current opportunities, requirements and closing dates.</p>
-</div>
-
-<div class="card">
-<h3>Northern Cape Mining Opportunities</h3>
-<p>Explore official mining supplier registration and procurement information.</p>
-
-<p><a href="https://www.angloamericankumba.com/suppliers" target="_blank" rel="noopener noreferrer">Kumba Iron Ore - Suppliers</a></p>
-
-<p><a href="https://www.kudumane.com/apply-to-be-a-prospective-supplier/" target="_blank" rel="noopener noreferrer">Kudumane - Suppliers</a></p>
-
-<p><a href="https://www.seio.co.za/become-a-supplier/" target="_blank" rel="noopener noreferrer">Sedibeng Iron Ore - Suppliers</a></p>
-
-<p><a href="https://www.vedanta-zincinternational.com/procure/registration" target="_blank" rel="noopener noreferrer">Vedanta - Supplier Registration</a></p>
-
-<p class="muted">Supplier information links only. These are not confirmed open tenders. Check official websites for current opportunities.</p>
-</div>
-
-<div class="card">
-<label for="opportunitySearch">Search Opportunities</label>
-<input id="opportunitySearch" type="search" placeholder="Search funding, tenders or training">
-
+<form onsubmit="event.preventDefault();filterOpportunities()">
+<label for="opportunitySearch">Search official sources</label>
+<input id="opportunitySearch" type="search" placeholder="Try mining, funding or Kumba" oninput="filterOpportunities()">
 <label for="opportunityCategory">Opportunity Category</label>
-<select id="opportunityCategory">
+<select id="opportunityCategory" onchange="filterOpportunities()">
 <option value="all">All Categories</option>
 <option value="funding">Funding</option>
 <option value="tender">Tenders</option>
 <option value="rfq">RFQs</option>
 <option value="grant">Grants</option>
 <option value="training">Training</option>
+<option value="supplier">Supplier Registration</option>
+<option value="mining">Mining</option>
 </select>
-
-<button type="button" onclick="filterOpportunities()">🔍 Search</button>
+<button type="submit">Search</button>
+</form>
+<p id="opportunityResults" role="status">7 official sources found.</p>
 </div>
-
+<article class="card opportunity-item" data-categories="tender rfq">
+<h3><a href="https://www.etenders.gov.za/Home/" target="_blank" rel="noopener noreferrer">National Treasury eTenders</a></h3>
+<p>Search public sector tenders and requests for quotations.</p>
+</article>
+<article class="card opportunity-item" data-categories="funding grant training">
+<h3><a href="https://www.sedfa.org.za/" target="_blank" rel="noopener noreferrer">SEDFA</a></h3>
+<p>Find small business funding, grants where available, and enterprise training.</p>
+</article>
+<article class="card opportunity-item" data-categories="supplier tender">
+<h3><a href="https://www.cidb.org.za/" target="_blank" rel="noopener noreferrer">Construction Industry Development Board</a></h3>
+<p>Find contractor registration and construction procurement information.</p>
+</article>
+<article class="card opportunity-item" data-categories="supplier mining">
+<h3><a href="https://www.angloamericankumba.com/suppliers" target="_blank" rel="noopener noreferrer">Kumba Iron Ore</a></h3>
+<p>Access supplier information and procurement guidance.</p>
+</article>
+<article class="card opportunity-item" data-categories="supplier mining tender rfq">
+<h3><a href="https://www.kudumane.com/apply-to-be-a-prospective-supplier/" target="_blank" rel="noopener noreferrer">Kudumane Manganese Resources</a></h3>
+<p>Apply as a prospective supplier for future quotes and tenders.</p>
+</article>
+<article class="card opportunity-item" data-categories="supplier mining">
+<h3><a href="https://www.seio.co.za/become-a-supplier/" target="_blank" rel="noopener noreferrer">Sedibeng Iron Ore</a></h3>
+<p>Find supplier registration information.</p>
+</article>
+<article class="card opportunity-item" data-categories="supplier mining">
+<h3><a href="https://www.vedanta-zincinternational.com/procure/registration" target="_blank" rel="noopener noreferrer">Vedanta Zinc International</a></h3>
+<p>Register interest in joining the supplier network.</p>
+</article>
+<details class="card"><summary>View sample opportunities</summary>
 ${[
 ['Funding example','Small business expansion support','Example only — not a live funding call'],
 ['Tender example','Local supplier procurement','Example only — not a live tender'],
 ['Training example','Financial management workshop','Example only — not a live event']
 ].map(x=>`
-<div class="card opportunity-item">
+<div class="card">
 <span class="pill">${x[0]}</span>
 <h3>${x[1]}</h3>
 <p>${x[2]}</p>
 <button class="secondary" onclick="location.href='support.html'">Ask for assistance</button>
 </div>
-`).join('')}`;
+`).join('')}
+</details>`;
 
 if(page==='compliance')html=`
 <h2>Compliance Checklist</h2>
@@ -257,8 +255,8 @@ ${x}
 `).join('')}`;
 
 if(page==='growth')html=`
-<h2>Business Growth Passport</h2>
-<p>Mark your business development milestones.</p>
+<h2>Growth Passport Preview</h2>
+<p>These sample milestones are saved on this device. <a href="member.html?section=growth">Open your account’s Growth Passport</a> to save progress to your account.</p>
 
 ${[
 'Complete business assessment',
@@ -310,15 +308,21 @@ c=>({
 }
 
 function filterOpportunities(){
-const search=document.getElementById('opportunitySearch').value.toLowerCase().trim();
-const category=document.getElementById('opportunityCategory').value;
+const terms = document.getElementById('opportunitySearch').value.toLowerCase().trim().split(/\s+/).filter(Boolean);
+const category = document.getElementById('opportunityCategory').value;
+let matches = 0;
 
-document.querySelectorAll('.opportunity-item').forEach(card=>{
-const text=card.textContent.toLowerCase();
-const matchesSearch=text.includes(search);
-const matchesCategory=category==='all'||card.querySelector('.pill').textContent.toLowerCase().includes(category);
-card.style.display=matchesSearch&&matchesCategory?'':'none';
-});
+for (const card of document.querySelectorAll('.opportunity-item')) {
+  const categories = card.dataset.categories.split(' ');
+  const text = (card.textContent + ' ' + card.dataset.categories).toLowerCase();
+  const visible = (category === 'all' || categories.includes(category)) && terms.every(term => text.includes(term));
+  card.hidden = !visible;
+  if (visible) matches++;
+}
+
+document.getElementById('opportunityResults').textContent =
+  matches === 0 ? 'No official sources match. Try a different search or category.' :
+  matches === 1 ? '1 official source found.' : matches + ' official sources found.';
 }
 
 function send(){
