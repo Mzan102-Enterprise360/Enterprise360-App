@@ -11,6 +11,7 @@ main{max-width:760px;margin:20px auto;padding:0 16px}.panel{background:white;bor
 .status{display:inline-block;background:#e4f4ec;color:#126344;padding:8px 12px;border-radius:20px;font-weight:bold}
 a.button{display:inline-block;background:#147b59;color:white;text-decoration:none;padding:12px 16px;border-radius:10px;font-weight:bold}
 small,.note{color:#5b6c77;line-height:1.5}ul{line-height:1.9}.disabled{border:1px solid #d8e0e5;border-radius:10px;background:#f5f7f8;padding:13px;color:#536570}
+@media print{header,.no-print,main>.panel:not(#receiptPrint){display:none!important}body{visibility:visible!important;background:#fff;color:#111}main{margin:0;padding:0}#receiptPrint{display:block!important;box-shadow:none;border-radius:0}@page{size:A4;margin:15mm}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 </head>
@@ -21,6 +22,8 @@ small,.note{color:#5b6c77;line-height:1.5}ul{line-height:1.9}.disabled{border:1p
 <section class="panel"><h2>Membership plans</h2><p><strong>Founding Member — Free Pilot: R0</strong></p><p>Free access for approved founding members during the pilot.</p><ul><li><strong>Starter — R199/month</strong></li><li><strong>Growth — R399/month</strong></li><li><strong>Premium — R499/month</strong></li></ul><p class="disabled">These are proposed future prices in South African rand (ZAR), displayed for information only. Yoco checkout is not yet enabled. No payment is required or collected here.</p></section>
 <section class="panel"><h2>Future monthly memberships</h2><p>Monthly paid memberships are being considered. The proposed prices are shown above; paid enrolment is not yet open, and no member has consented to a paid plan.</p><p class="disabled">Yoco currently supports individual checkout payments, not automatic recurring deductions. Future monthly invoices would require a fresh payment authorisation each month. No checkout, charges, stored payment methods or automatic renewals are enabled.</p><p>Founding members keep R0 pilot access. Any future paid plan will require a separate, clear opt-in and published terms.</p></section>
 <section class="panel"><h2>Payments &amp; receipts</h2><p class="note">Online payments are not active. Verified payment history and downloadable receipts will be added after the payment gateway is implemented and tested.</p></section>
+<section class="panel"><h2>Verified payments &amp; receipts</h2><p class="note" id="paymentNotice">Loading your payment records...</p><div id="paymentHistory"></div></section>
+<section class="panel" id="receiptPrint" hidden><h2>◈ MzanConnect — Payment Receipt</h2><div id="receiptDetails"></div><p class="note">Receipt issued for a verified payment. Keep for your records.</p><button class="no-print" id="printReceipt" type="button">Print / Save receipt as PDF</button><button class="no-print" id="closeReceipt" type="button">Close receipt</button></section>
 <section class="panel"><h2>Need help?</h2><p><a href="support.html">Contact Member Support</a></p><a class="button" href="dashboard.html">← Back to dashboard</a></section>
 </main>
 <script>
@@ -36,6 +39,31 @@ small,.note{color:#5b6c77;line-height:1.5}ul{line-height:1.9}.disabled{border:1p
     document.getElementById("status").innerHTML=isOwner ? '<span class="status">MzanConnect Owner — Free Pilot</span>' : '<span class="status">Founding Member — Free Pilot</span>';
     document.getElementById("explanation").textContent="Your founding pilot membership does not require payment. Billing is in preparation only.";
     document.body.style.visibility="visible";
+    const history=document.getElementById("paymentHistory"), notice=document.getElementById("paymentNotice");
+    const {data:payments,error:paymentError}=await client.from("membership_payments").select("id,amount_cents,currency,status,verified_at,merchant_reference,created_at").eq("user_id",data.user.id).order("created_at",{ascending:false}).limit(100);
+    if(paymentError){notice.textContent="Payment records are temporarily unavailable.";return}
+    notice.textContent=payments.length?"Only server-verified payments can have receipts.":"No verified payments or receipts yet.";
+    const money=cents=>new Intl.NumberFormat("en-ZA",{style:"currency",currency:"ZAR"}).format(cents/100);
+    for(const payment of payments){
+      const line=document.createElement("p");
+      line.textContent=new Date(payment.created_at).toLocaleDateString("en-ZA")+" — "+money(payment.amount_cents)+" — "+payment.status;
+      if(payment.status==="paid" && payment.verified_at){
+        const {data:receipt,error:receiptError}=await client.from("membership_receipts").select("receipt_number,issued_at").eq("payment_id",payment.id).eq("user_id",data.user.id).maybeSingle();
+        if(!receiptError && receipt){
+          const btn=document.createElement("button");btn.type="button";btn.textContent="View / Print Receipt";
+          btn.addEventListener("click",()=>{
+            const details=document.getElementById("receiptDetails");details.replaceChildren();
+            for(const [label,value] of [["Receipt number",receipt.receipt_number],["Issued",new Date(receipt.issued_at).toLocaleString("en-ZA")],["Amount",money(payment.amount_cents)],["Currency",payment.currency],["Payment reference",payment.merchant_reference],["Status","Verified paid"]]){
+              const p=document.createElement("p"),strong=document.createElement("strong");strong.textContent=label+": ";p.append(strong,document.createTextNode(String(value)));details.appendChild(p);
+            }
+            document.getElementById("receiptPrint").hidden=false;document.getElementById("receiptPrint").scrollIntoView();
+          });line.append(" ",btn);
+        }
+      }
+      history.appendChild(line);
+    }
+    document.getElementById("printReceipt").addEventListener("click",()=>window.print());
+    document.getElementById("closeReceipt").addEventListener("click",()=>{document.getElementById("receiptPrint").hidden=true});
   }catch(e){location.replace("login.html")}
 })();
 </script>
