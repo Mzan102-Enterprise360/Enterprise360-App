@@ -9,7 +9,7 @@
 header{background:#14283b;color:#fff;padding:26px 18px;text-align:center}header h1{margin:0 0 8px}header p{margin:0;color:#d4e0e7}
 main{max-width:760px;margin:20px auto;padding:0 16px}.panel{background:white;border-radius:14px;padding:20px;margin-bottom:16px}
 .status{display:inline-block;background:#e4f4ec;color:#126344;padding:8px 12px;border-radius:20px;font-weight:bold}
-a.button{display:inline-block;background:#147b59;color:white;text-decoration:none;padding:12px 16px;border-radius:10px;font-weight:bold}
+button,select{font:inherit;padding:9px 12px;margin:4px 0}button:disabled{opacity:.55}a.button{display:inline-block;background:#147b59;color:white;text-decoration:none;padding:12px 16px;border-radius:10px;font-weight:bold}
 small,.note{color:#5b6c77;line-height:1.5}ul{line-height:1.9}.disabled{border:1px solid #d8e0e5;border-radius:10px;background:#f5f7f8;padding:13px;color:#536570}
 @media print{body:has(#receiptPrint:not([hidden])) header,body:has(#receiptPrint:not([hidden])) main>.panel:not(#receiptPrint),.no-print{display:none!important}body{visibility:visible!important;background:#fff;color:#111}main{margin:0;padding:0}#receiptPrint:not([hidden]){display:block!important;box-shadow:none;border-radius:0}@page{size:A4;margin:15mm}}
 </style>
@@ -22,6 +22,15 @@ small,.note{color:#5b6c77;line-height:1.5}ul{line-height:1.9}.disabled{border:1p
 <section class="panel"><h2>Membership plans</h2><p><strong>Founding Member — Free Pilot: R0</strong></p><p>Free access for approved founding members during the pilot.</p><ul><li><strong>Starter — R199/month</strong></li><li><strong>Growth — R399/month</strong></li><li><strong>Premium — R499/month</strong></li></ul><p class="disabled">These are proposed future prices in South African rand (ZAR), displayed for information only. Yoco checkout is not yet enabled. No payment is required or collected here.</p></section>
 <section class="panel"><h2>Future monthly memberships</h2><p>Founding members keep free access. Paid enrolment will open after checkout is tested.</p></section>
 <section class="panel"><h2>Verified payments &amp; receipts</h2><p class="note" id="paymentNotice" role="status">Loading your payment records...</p><div id="paymentHistory"></div></section>
+<section class="panel" id="yocoSandbox" hidden>
+<h2>Yoco test checkout</h2>
+<p class="note">Owner only. Use a Yoco test card. Test payments do not charge a real card or activate a membership.</p>
+<label for="testPlan">Plan to test</label>
+<select id="testPlan"><option value="starter">Starter — R199</option><option value="growth">Growth — R399</option><option value="premium">Premium — R499</option></select>
+<button id="startTestCheckout" type="button">Start test checkout</button>
+<p id="testCheckoutStatus" role="status"></p>
+<div id="testPaymentHistory"></div>
+</section>
 <section class="panel" id="receiptPrint" hidden><h2>◈ MzanConnect — Payment Receipt</h2><div id="receiptDetails"></div><p class="note">Receipt issued for a verified payment. Keep for your records.</p><button class="no-print" id="printReceipt" type="button">Print / Save receipt as PDF</button><button class="no-print" id="closeReceipt" type="button">Close receipt</button></section>
 <section class="panel"><h2>Need help?</h2><p><a href="support.html">Contact Member Support</a></p><a class="button" href="dashboard.html">← Back to dashboard</a></section>
 </main>
@@ -39,6 +48,40 @@ small,.note{color:#5b6c77;line-height:1.5}ul{line-height:1.9}.disabled{border:1p
     document.getElementById("explanation").textContent=isOwner ? "Owner access does not require payment." : "No payment is required for founding membership.";
     document.body.style.visibility="visible";
     const history = document.getElementById("paymentHistory");
+    const testHistory = document.getElementById("testPaymentHistory");
+    if (isOwner) {
+      document.getElementById("yocoSandbox").hidden = false;
+      const testPlan = document.getElementById("testPlan");
+      const startTest = document.getElementById("startTestCheckout");
+      const testStatus = document.getElementById("testCheckoutStatus");
+      const returned = new URLSearchParams(location.search).get("test");
+      if (returned === "returned") testStatus.textContent = "Yoco returned you to Billing. Refresh to check for a verified test receipt.";
+      if (returned === "cancelled" || returned === "failed") testStatus.textContent = "The test checkout did not complete.";
+      const attempts = new Map();
+      startTest.addEventListener("click", async () => {
+        startTest.disabled = true;
+        testPlan.disabled = true;
+        testStatus.textContent = "Opening Yoco test checkout…";
+        try {
+          const plan = testPlan.value;
+          if (!attempts.has(plan)) attempts.set(plan, crypto.randomUUID());
+          const { data, error } = await client.functions.invoke("mzan-yoco-sandbox", {
+            body: { plan, attempt: attempts.get(plan) }
+          });
+          if (error) {
+            const details = await error.context?.json?.().catch(() => null);
+            throw new Error(details?.error || "Unable to open the test checkout. Please try again.");
+          }
+          const url = new URL(data.redirect_url);
+          if (url.origin !== "https://c.yoco.com" || url.username || url.password) throw new Error("Yoco returned an invalid link.");
+          location.assign(url.href);
+        } catch (error) {
+          testStatus.textContent = error.message;
+          startTest.disabled = false;
+          testPlan.disabled = false;
+        }
+      });
+    }
     const notice = document.getElementById("paymentNotice");
     const receiptPanel = document.getElementById("receiptPrint");
     document.getElementById("printReceipt").addEventListener("click", () => window.print());
@@ -46,20 +89,21 @@ small,.note{color:#5b6c77;line-height:1.5}ul{line-height:1.9}.disabled{border:1p
 
     try {
       const { data: payments, error: paymentError } = await client.from("membership_payments")
-        .select("amount_cents,currency,status,verified_at,merchant_reference,created_at,membership_receipts(receipt_number,issued_at)")
+        .select("amount_cents,currency,status,verified_at,merchant_reference,created_at,is_test,membership_receipts(receipt_number,issued_at)")
         .eq("user_id", data.user.id)
         .order("created_at", { ascending: false })
         .limit(100);
       if (paymentError) throw paymentError;
-      notice.textContent = payments.length ? "Receipts are available for verified payments." : "No payment records yet.";
+      notice.textContent = payments.some(payment => !payment.is_test) ? "Receipts are available for verified payments." : "No payment records yet.";
 
       const money = new Intl.NumberFormat("en-ZA", { style: "currency", currency: "ZAR" });
       for (const payment of payments) {
+        if (payment.is_test && !isOwner) continue;
         const line = document.createElement("p");
         const amount = money.format(payment.amount_cents / 100);
         const date = new Date(payment.created_at).toLocaleDateString("en-ZA");
         const verified = payment.status === "complete" && Boolean(payment.verified_at);
-        const status = verified ? "Verified paid" : payment.status === "complete" ? "Awaiting verification" : payment.status;
+        const status = verified ? (payment.is_test ? "Verified test payment" : "Verified paid") : payment.status === "complete" ? "Awaiting verification" : payment.status;
         line.textContent = date + " · " + amount + " · " + status;
 
         const related = payment.membership_receipts;
@@ -71,6 +115,11 @@ small,.note{color:#5b6c77;line-height:1.5}ul{line-height:1.9}.disabled{border:1p
           button.addEventListener("click", () => {
             const details = document.getElementById("receiptDetails");
             details.replaceChildren();
+            if (payment.is_test) {
+              const label = document.createElement("p");
+              label.textContent = "TEST RECEIPT — no money was collected.";
+              details.appendChild(label);
+            }
             for (const [label, value] of [
               ["Receipt number", receipt.receipt_number],
               ["Issued", new Date(receipt.issued_at).toLocaleString("en-ZA")],
@@ -90,7 +139,7 @@ small,.note{color:#5b6c77;line-height:1.5}ul{line-height:1.9}.disabled{border:1p
           });
           line.append(" ", button);
         }
-        history.appendChild(line);
+        (payment.is_test ? testHistory : history).appendChild(line);
       }
     } catch {
       notice.textContent = "Payment records are temporarily unavailable. Refresh to try again.";

@@ -90,6 +90,10 @@ async function checkVerifiedReceipts(browser){
     body:`const user={id:'owner-test',app_metadata:{mzanconnect_role:'owner'}};
     window.supabase={createClient:()=>({
       auth:{getUser:async()=>({data:{user}})},
+      functions:{invoke:async (name, options)=>{
+        window.checkoutRequest={name,body:options.body};
+        return {data:{redirect_url:'https://example.com/wrong-host'}}
+      }},
       from(table){
         if(table!=='membership_payments')throw Error('Unexpected payment query');
         return {
@@ -103,7 +107,8 @@ async function checkVerifiedReceipts(browser){
             return {data:[
               {...common,status:'complete',verified_at:created_at,membership_receipts:receipt},
               {...common,status:'complete',verified_at:null,membership_receipts:receipt},
-              {...common,status:'pending',verified_at:created_at,membership_receipts:receipt}
+              {...common,status:'pending',verified_at:created_at,membership_receipts:receipt},
+              {...common,status:'complete',verified_at:created_at,is_test:true,membership_receipts:{...receipt,receipt_number:'TEST-SANDBOX-RECEIPT'}}
             ]}
           }
         }
@@ -112,7 +117,7 @@ async function checkVerifiedReceipts(browser){
   }));
   await page.addInitScript(()=>{window.print=()=>{window.printed=true}});
   await page.goto(base+'billing.html');
-  const buttons=page.getByRole('button',{name:'View / Print Receipt'});
+  const buttons=page.locator('#paymentHistory').getByRole('button',{name:'View / Print Receipt'});
   await buttons.first().waitFor();
   assert.equal(await buttons.count(),1);
   await buttons.first().click();
@@ -121,11 +126,21 @@ async function checkVerifiedReceipts(browser){
   assert.equal(await page.evaluate(()=>window.printed),true);
   await page.getByRole('button',{name:'Close receipt'}).click();
   assert.equal(await page.locator('#receiptPrint').isVisible(),false);
+  await page.locator('#testPaymentHistory').getByRole('button',{name:'View / Print Receipt'}).click();
+  await page.getByText('TEST RECEIPT — no money was collected.').waitFor();
+  await page.getByLabel('Plan to test').selectOption('premium');
+  await page.getByRole('button',{name:'Start test checkout'}).click();
+  await page.getByText('Yoco returned an invalid link.').waitFor();
+  const request=await page.evaluate(()=>window.checkoutRequest);
+  assert.equal(request.name,'mzan-yoco-sandbox');
+  assert.equal(request.body.plan,'premium');
+  assert.match(request.body.attempt,/^[a-f0-9-]{36}$/i);
   await page.close();
   console.log('PASS: verified receipt opens and prints, pending or unverified payments have no receipt');
 }
 
 async function main(){
+  await import('./yoco-sandbox.mjs');
   const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
   try{
     for(const [signedIn,active,expected,owner] of [[true,true,'billing.html',false],[false,false,'login.html',false],[true,false,'login.html',false],[true,false,'billing.html',true]]){
@@ -140,6 +155,7 @@ async function main(){
         assert.match(await page.locator('#status').innerText(),owner?/MzanConnect Owner/:/Founding Member/);
         assert.match(await page.locator('main').innerText(),/No payment is required/);
         assert.equal(await page.locator('form').count(),0);
+        assert.equal(await page.locator('#yocoSandbox').isVisible(),owner);
         await page.getByRole('link',{name:/Back to dashboard/}).click();
         await page.waitForURL('**/dashboard.html');
       }
