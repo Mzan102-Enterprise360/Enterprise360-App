@@ -141,6 +141,7 @@ async function checkVerifiedReceipts(browser){
 
 async function main(){
   await import('./yoco-sandbox.mjs');
+  await import('./yoco-live.mjs');
   const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||undefined,headless:true,args:['--no-sandbox']});
   try{
     for(const [signedIn,active,expected,owner] of [[true,true,'billing.html',false],[false,false,'login.html',false],[true,false,'billing.html',false],[true,false,'billing.html',true]]){
@@ -153,7 +154,7 @@ async function main(){
       if(signedIn){
         await page.locator('body').waitFor({state:'visible'});
         assert.match(await page.locator('#status').innerText(),owner?/MzanConnect Owner/:active?/Founding Member/:/MzanConnect Member/);
-        assert.match(await page.locator('main').innerText(),/No payment is required/);
+        if(active)assert.match(await page.locator('main').innerText(),/No payment is required/);
         assert.equal(await page.locator('form').count(),0);
         assert.equal(await page.locator('#yocoSandbox').isVisible(),owner);
         await page.getByRole('link',{name:/Back to dashboard/}).click();

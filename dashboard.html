@@ -127,6 +127,16 @@ main{max-width:850px;margin:auto;padding:20px}
     const isOwner=data.user.app_metadata?.mzanconnect_role==="owner";
     const {data:founder,error:founderError}=isOwner ? {data:null,error:null} : await client.from("founding_memberships").select("pilot_status").eq("user_id",data.user.id).maybeSingle();
     document.getElementById("profilePlan").textContent=isOwner ? "MzanConnect Owner" : !founderError && founder?.pilot_status==="active" ? "Founding Member — Free" : "MzanConnect Member";
+    if(!isOwner && founder?.pilot_status!=="active"){
+      try{
+        const {data:subscriptions,error:subscriptionError}=await client.from("membership_subscriptions").select("plan_code,current_period_end").eq("user_id",data.user.id).eq("status","active").gt("current_period_end",new Date().toISOString()).order("current_period_end",{ascending:false}).limit(1);
+        if(!subscriptionError && subscriptions?.[0]){
+          const current=subscriptions[0];
+          const name={starter:"Starter",growth:"Growth",premium:"Premium"}[current.plan_code]||"Paid";
+          document.getElementById("profilePlan").textContent=name+" — Active until "+new Date(current.current_period_end).toLocaleDateString("en-ZA");
+        }
+      }catch{ /* Membership detail can be retried in Billing. */ }
+    }
   }catch(error){
     window.location.replace("login.html");
     return;

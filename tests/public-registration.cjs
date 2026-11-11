@@ -12,9 +12,10 @@ module.exports = async function checkPublicRegistration(browser, base) {
         signInWithPassword:async()=>({data:{user}}),
         signOut:async()=>({error:null})
       },
+      functions:{invoke:async(name,args)=>{window.liveRequest={name,body:args.body};return {data:{redirect_url:"https://untrusted.example/checkout"}}}},
       rpc:async(name,args)=>{sessionStorage.setItem('claimed',args.p_code);return {data:true}},
       from(table){return {
-        select(){return this},eq(){return this},order(){return this},gte(){return this},lt(){return this},
+        select(){return this},eq(){return this},order(){return this},gte(){return this},gt(){return this},lt(){return this},
         in:async()=>({data:[]}),limit:async()=>({data:[]}),
         maybeSingle:async()=>({data:table==='founding_memberships'?null:{user_id:user.id,business_name:'Public Business',sector:'Services'}}),
         then(resolve){resolve({data:[]})},
@@ -41,6 +42,13 @@ module.exports = async function checkPublicRegistration(browser, base) {
   await page.locator('body').waitFor({state:'visible'});
   assert.equal(await page.locator('#profilePlan').innerText(),'MzanConnect Member');
   assert.equal(await page.evaluate(()=>sessionStorage.getItem('claimed')),null);
+  await page.goto(base+'billing.html');
+  await page.waitForFunction(()=>!document.querySelector('[data-plan="starter"]').disabled);
+  await page.locator('[data-plan="growth"]').click();
+  await page.getByText('Invalid checkout link.').waitFor();
+  const liveRequest=await page.evaluate(()=>window.liveRequest);
+  assert.equal(liveRequest.name,'mzan-yoco-live');
+  assert.equal(liveRequest.body.plan,'growth');
   await page.goto(base+'member.html');
   await page.locator('#profilePanel').waitFor({state:'visible'});
   await page.locator('#business').fill('Updated Public Business');

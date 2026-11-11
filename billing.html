@@ -14,13 +14,22 @@ small,.note{color:#5b6c77;line-height:1.5}ul{line-height:1.9}.disabled{border:1p
 @media print{body:has(#receiptPrint:not([hidden])) header,body:has(#receiptPrint:not([hidden])) main>.panel:not(#receiptPrint),.no-print{display:none!important}body{visibility:visible!important;background:#fff;color:#111}main{margin:0;padding:0}#receiptPrint:not([hidden]){display:block!important;box-shadow:none;border-radius:0}@page{size:A4;margin:15mm}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+<script src="live-billing.js"></script>
 </head>
 <body>
 <header><h1>💳 Billing &amp; Membership</h1><p>MzanConnect member billing centre</p></header>
 <main>
 <section class="panel"><h2>Your membership</h2><p id="status" role="status">Checking your membership...</p><p id="explanation" class="note"></p></section>
-<section class="panel"><h2>Membership plans</h2><p><strong>Founding Member — Free: R0</strong></p><p>The original seven founding memberships retain free access. Registration is now open to everyone.</p><ul><li><strong>Starter — R199/month</strong></li><li><strong>Growth — R399/month</strong></li><li><strong>Premium — R499/month</strong></li></ul><p class="disabled">These are proposed future prices in South African rand (ZAR), displayed for information only. Yoco checkout is not yet enabled. No payment is required or collected here.</p></section>
-<section class="panel"><h2>Future monthly memberships</h2><p>Founding members keep free access. Paid plans are not yet enabled. No payment is collected at registration.</p></section>
+<section class="panel"><h2>Membership plans</h2><p><strong>Founding Member — Free: R0</strong></p><p>The original seven founding memberships retain free access. Registration is now open to everyone.</p><ul><li><strong>Starter — R199/month</strong></li><li><strong>Growth — R399/month</strong></li><li><strong>Premium — R499/month</strong></li></ul><p class="disabled">Prices are in South African rand (ZAR). Each payment covers one month. Payments use secure Yoco checkout and do not renew automatically.</p></section>
+<section class="panel" id="liveCheckout" hidden>
+<h2>Choose your monthly membership</h2>
+<p>Pay once for one month. You will not be charged automatically again.</p>
+<button type="button" data-plan="starter" disabled>Pay R199 — Starter</button>
+<button type="button" data-plan="growth" disabled>Pay R399 — Growth</button>
+<button type="button" data-plan="premium" disabled>Pay R499 — Premium</button>
+<p id="liveCheckoutStatus" role="status"></p>
+</section>
+<section class="panel"><button type="button" id="refreshPayments">Refresh payment status</button><p class="note">Receipts appear after Yoco confirms payment. Returning from checkout alone does not confirm payment.</p></section>
 <section class="panel"><h2>Verified payments &amp; receipts</h2><p class="note" id="paymentNotice" role="status">Loading your payment records...</p><div id="paymentHistory"></div></section>
 <section class="panel" id="yocoSandbox" hidden>
 <h2>Yoco test checkout</h2>
@@ -44,8 +53,10 @@ small,.note{color:#5b6c77;line-height:1.5}ul{line-height:1.9}.disabled{border:1p
     const isOwner=data.user.app_metadata?.mzanconnect_role==="owner";
     const {data:founder,error:founderError}=isOwner ? {data:null,error:null} : await client.from("founding_memberships").select("pilot_status").eq("user_id",data.user.id).maybeSingle();
     document.getElementById("status").innerHTML=isOwner ? '<span class="status">MzanConnect Owner</span>' : !founderError && founder?.pilot_status==="active" ? '<span class="status">Founding Member — Free</span>' : '<span class="status">MzanConnect Member</span>';
-    document.getElementById("explanation").textContent=isOwner ? "Owner access does not require payment." : !founderError && founder?.pilot_status==="active" ? "No payment is required for founding membership." : "Your account is registered. No payment is required now; paid plans are not yet enabled.";
+    document.getElementById("explanation").textContent=isOwner ? "Owner access does not require payment." : !founderError && founder?.pilot_status==="active" ? "No payment is required for founding membership." : "Your account is registered. Choose a monthly plan below when you are ready to pay.";
     document.body.style.visibility="visible";
+    document.getElementById("refreshPayments").addEventListener("click",()=>location.reload());
+    void initializeLiveBilling(client,data.user,founderError?null:founder);
     const history = document.getElementById("paymentHistory");
     const testHistory = document.getElementById("testPaymentHistory");
     if (isOwner) {
