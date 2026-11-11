@@ -18,8 +18,6 @@ try{
 if(!window.supabase)throw Error('Authentication library unavailable');
 const db=window.supabase.createClient('https://akxzubckdebawqwwwaoe.supabase.co','sb_publishable_XEeBfPCzJ0MzGpHWHygeug_rGptbzno');
 const {data:{user},error}=await db.auth.getUser();if(error||!user){location.replace('login.html');return}
-const owner=user.app_metadata?.mzanconnect_role==='owner';
-if(!owner){const {data:membership,error:me}=await db.from('founding_memberships').select('pilot_status').eq('user_id',user.id).maybeSingle();if(me||membership?.pilot_status!=='active'){location.replace('login.html');return}}
 document.body.style.visibility='visible';
 async function load(){
 const month=$('month').value;if(!/^\d{4}-\d{2}$/.test(month))return;

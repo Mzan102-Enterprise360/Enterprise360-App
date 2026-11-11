@@ -19,8 +19,8 @@ small,.note{color:#5b6c77;line-height:1.5}ul{line-height:1.9}.disabled{border:1p
 <header><h1>💳 Billing &amp; Membership</h1><p>MzanConnect member billing centre</p></header>
 <main>
 <section class="panel"><h2>Your membership</h2><p id="status" role="status">Checking your membership...</p><p id="explanation" class="note"></p></section>
-<section class="panel"><h2>Membership plans</h2><p><strong>Founding Member — Free Pilot: R0</strong></p><p>Free access for approved founding members during the pilot.</p><ul><li><strong>Starter — R199/month</strong></li><li><strong>Growth — R399/month</strong></li><li><strong>Premium — R499/month</strong></li></ul><p class="disabled">These are proposed future prices in South African rand (ZAR), displayed for information only. Yoco checkout is not yet enabled. No payment is required or collected here.</p></section>
-<section class="panel"><h2>Future monthly memberships</h2><p>Founding members keep free access. Paid enrolment will open after checkout is tested.</p></section>
+<section class="panel"><h2>Membership plans</h2><p><strong>Founding Member — Free: R0</strong></p><p>The original seven founding memberships retain free access. Registration is now open to everyone.</p><ul><li><strong>Starter — R199/month</strong></li><li><strong>Growth — R399/month</strong></li><li><strong>Premium — R499/month</strong></li></ul><p class="disabled">These are proposed future prices in South African rand (ZAR), displayed for information only. Yoco checkout is not yet enabled. No payment is required or collected here.</p></section>
+<section class="panel"><h2>Future monthly memberships</h2><p>Founding members keep free access. Paid plans are not yet enabled. No payment is collected at registration.</p></section>
 <section class="panel"><h2>Verified payments &amp; receipts</h2><p class="note" id="paymentNotice" role="status">Loading your payment records...</p><div id="paymentHistory"></div></section>
 <section class="panel" id="yocoSandbox" hidden>
 <h2>Yoco test checkout</h2>
@@ -43,9 +43,8 @@ small,.note{color:#5b6c77;line-height:1.5}ul{line-height:1.9}.disabled{border:1p
     if(error||!data.user){location.replace("login.html");return}
     const isOwner=data.user.app_metadata?.mzanconnect_role==="owner";
     const {data:founder,error:founderError}=isOwner ? {data:null,error:null} : await client.from("founding_memberships").select("pilot_status").eq("user_id",data.user.id).maybeSingle();
-    if(!isOwner&&(founderError||founder?.pilot_status!=="active")){location.replace("dashboard.html");return}
-    document.getElementById("status").innerHTML=isOwner ? '<span class="status">MzanConnect Owner</span>' : '<span class="status">Founding Member — Free Pilot</span>';
-    document.getElementById("explanation").textContent=isOwner ? "Owner access does not require payment." : "No payment is required for founding membership.";
+    document.getElementById("status").innerHTML=isOwner ? '<span class="status">MzanConnect Owner</span>' : !founderError && founder?.pilot_status==="active" ? '<span class="status">Founding Member — Free</span>' : '<span class="status">MzanConnect Member</span>';
+    document.getElementById("explanation").textContent=isOwner ? "Owner access does not require payment." : !founderError && founder?.pilot_status==="active" ? "No payment is required for founding membership." : "Your account is registered. No payment is required now; paid plans are not yet enabled.";
     document.body.style.visibility="visible";
     const history = document.getElementById("paymentHistory");
     const testHistory = document.getElementById("testPaymentHistory");
@@ -148,3 +147,4 @@ small,.note{color:#5b6c77;line-height:1.5}ul{line-height:1.9}.disabled{border:1p
 })();
 </script>
 </body></html>
+

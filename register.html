@@ -63,16 +63,16 @@ a{color:#147b59}
 <option>Other</option>
 </select>
 
-<p class="note"><strong>Invitation-only founding pilot:</strong> Seven selected members receive free access (R0). No payment details are required. Keep your invitation code for your first login after confirming your email.</p>
+<p class="note"><strong>Registration is open:</strong> Business owners and aspiring entrepreneurs can join without an invitation code. The original founding members keep their free access.</p>
 <label for="package">Membership Package</label>
 <select id="package" required>
-<option value="Founding Member - Free Pilot">Founding Member - Free Pilot (R0)</option>
+<option value="Member">MzanConnect Member</option>
 </select>
-<p class="note">Paid plans will be offered later. No payment is required during this pilot.</p>
+<p class="note">No payment is collected at registration. Paid plans are not yet available.</p>
 
 <label for="email">Your Own Email Address</label>
 <input id="email" type="email" required autocomplete="email">
-<p class="note">Use an email address you can open to confirm your registration. Never share your password or invitation code publicly.</p>
+<p class="note">Use an email address you can open to confirm your registration. Never share your password publicly.</p>
 
 <label for="password">Create Password</label>
 <input id="password" type="password" required minlength="8" autocomplete="new-password">
@@ -163,7 +163,7 @@ form.addEventListener("submit", async function(event) {
         showResult("Account created, but your business profile could not be saved. Please contact support.",true);
         return;
       }
-      showResult("Account created. Confirm your email if required, then log in with your founding invitation code.");
+      showResult("Account created. Confirm your email if required, then log in to your dashboard. No invitation code is needed.");
     } else {
       resendEmail.value = email;
       showResult("Registration request received. Check your inbox and spam folder. If the link doesn’t arrive, use Resend confirmation email below. If you’ve already confirmed your email, choose Log In.");
@@ -199,3 +199,4 @@ resendForm.addEventListener("submit", async function(event) {
 </script>
 </body>
 </html>
+

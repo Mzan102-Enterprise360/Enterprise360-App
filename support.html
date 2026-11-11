@@ -34,16 +34,6 @@
     }
 
     const isOwner = user.app_metadata?.mzanconnect_role === 'owner';
-    if (!isOwner) {
-      const { data: membership, error: memberError } = await db.from('founding_memberships')
-        .select('pilot_status').eq('user_id', user.id).maybeSingle();
-      if (memberError) throw Error('Unable to check membership.');
-      if (membership?.pilot_status !== 'active') {
-        location.replace('login.html');
-        return;
-      }
-    }
-
     function renderRequest(request, ownerView) {
       const reply = Array.isArray(request.support_replies)
         ? request.support_replies[0] : request.support_replies;
@@ -181,3 +171,4 @@
   }
 })();
 </script></body></html>
+
