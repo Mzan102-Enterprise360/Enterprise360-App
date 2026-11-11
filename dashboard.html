@@ -126,12 +126,7 @@ main{max-width:850px;margin:auto;padding:20px}
     }
     const isOwner=data.user.app_metadata?.mzanconnect_role==="owner";
     const {data:founder,error:founderError}=isOwner ? {data:null,error:null} : await client.from("founding_memberships").select("pilot_status").eq("user_id",data.user.id).maybeSingle();
-    if(!isOwner&&(founderError||founder?.pilot_status!=="active")){
-      await client.auth.signOut();
-      window.location.replace("login.html");
-      return;
-    }
-    document.getElementById("profilePlan").textContent=isOwner ? "MzanConnect Owner" : "Founding Member — Free Pilot";
+    document.getElementById("profilePlan").textContent=isOwner ? "MzanConnect Owner" : !founderError && founder?.pilot_status==="active" ? "Founding Member — Free" : "MzanConnect Member";
   }catch(error){
     window.location.replace("login.html");
     return;
@@ -229,3 +224,4 @@ main{max-width:850px;margin:auto;padding:20px}
 </script>
 </body>
 </html>
+

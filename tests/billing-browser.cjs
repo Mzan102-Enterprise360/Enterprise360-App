@@ -141,18 +141,18 @@ async function checkVerifiedReceipts(browser){
 
 async function main(){
   await import('./yoco-sandbox.mjs');
-  const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||undefined,headless:true,args:['--no-sandbox']});
   try{
-    for(const [signedIn,active,expected,owner] of [[true,true,'billing.html',false],[false,false,'login.html',false],[true,false,'login.html',false],[true,false,'billing.html',true]]){
+    for(const [signedIn,active,expected,owner] of [[true,true,'billing.html',false],[false,false,'login.html',false],[true,false,'billing.html',false],[true,false,'billing.html',true]]){
       const page=await browser.newPage();
       await page.route('**/supabase.min.js',async route=>route.fulfill({status:200,contentType:'text/javascript',body:clientMock(signedIn,active,owner)}));
       page.on('pageerror',err=>console.error('Browser page error:',err.message));
       page.on('console',msg=>{if(msg.type()==='error')console.error('Browser console:',msg.text())});
       await page.goto(base+'billing.html',{waitUntil:'domcontentloaded'});
       await page.waitForFunction(expectedPath=>location.pathname.endsWith(expectedPath),expected,{timeout:10000}).catch(async e=>{console.error('Navigation diagnostic',{signedIn,active,owner,expected,actual:page.url(),body:await page.locator('body').innerText().catch(()=>'<unavailable>')});throw e});
-      if(signedIn&&(active||owner)){
+      if(signedIn){
         await page.locator('body').waitFor({state:'visible'});
-        assert.match(await page.locator('#status').innerText(),owner?/MzanConnect Owner/:/Founding Member/);
+        assert.match(await page.locator('#status').innerText(),owner?/MzanConnect Owner/:active?/Founding Member/:/MzanConnect Member/);
         assert.match(await page.locator('main').innerText(),/No payment is required/);
         assert.equal(await page.locator('form').count(),0);
         assert.equal(await page.locator('#yocoSandbox').isVisible(),owner);
@@ -170,10 +170,12 @@ async function main(){
     await page.waitForURL('**/billing.html');
     await page.locator('body').waitFor({state:'visible'});
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'mobile horizontal overflow');
-    console.log('PASS: authenticated billing, signed-out redirect, inactive-founder redirect, dashboard navigation, mobile layout, no checkout');
+    console.log('PASS: authenticated billing, signed-out redirect, public-member access, dashboard navigation, mobile layout, no checkout');
     await page.close();
     await checkDashboardFeatures(browser);
     await checkVerifiedReceipts(browser);
+    await require('./public-registration.cjs')(browser,base);
   }finally{await browser.close()}
 }
 (async()=>{try{await new Promise(r=>setTimeout(r,1000));await main()}catch(e){console.error(e);process.exitCode=1}finally{server.kill()}})();
+
