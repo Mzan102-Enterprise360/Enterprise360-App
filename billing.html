@@ -19,8 +19,8 @@ small,.note{color:#5b6c77;line-height:1.5}ul{line-height:1.9}.disabled{border:1p
 <header><h1>💳 Billing &amp; Membership</h1><p>MzanConnect member billing centre</p></header>
 <main>
 <section class="panel"><h2>Your membership</h2><p id="status" role="status">Checking your membership...</p><p id="explanation" class="note"></p></section>
-<section class="panel"><h2>Membership plans</h2><p><strong>Founding Member — Free: R0</strong></p><p>The original seven founding memberships retain free access. Registration is now open to everyone.</p><ul><li><strong>Starter — R199/month</strong></li><li><strong>Growth — R399/month</strong></li><li><strong>Premium — R499/month</strong></li></ul><p class="disabled">These are proposed future prices in South African rand (ZAR), displayed for information only. Yoco checkout is not yet enabled. No payment is required or collected here.</p></section>
-<section class="panel"><h2>Future monthly memberships</h2><p>Founding members keep free access. Paid plans are not yet enabled. No payment is collected at registration.</p></section>
+<section class="panel"><h2>Membership plans</h2><p><strong>Founding Member — Free: R0</strong></p><p>The original seven founding memberships retain free access. Registration is now open to everyone.</p><ul><li><strong>Starter — R199/month</strong></li><li><strong>Growth — R399/month</strong></li><li><strong>Premium — R499/month</strong></li></ul><p class="disabled">No payment is required for owners or the original seven founding members. Live Yoco checkout will only be available to eligible paid members after payment readiness checks pass.</p></section>
+<section class="panel" id="liveMembership"><h2>Paid membership checkout</h2><p>One month of access; no automatic renewal. Activation follows verified payment.</p><label for="livePlan">Plan</label> <select id="livePlan"><option value="starter">Starter — R199</option><option value="growth">Growth — R399</option><option value="premium">Premium — R499</option></select> <button id="startLiveCheckout" type="button" disabled>Continue to Yoco checkout</button><p id="liveCheckoutStatus" role="status">Checking live payment availability…</p></section>
 <section class="panel"><h2>Verified payments &amp; receipts</h2><p class="note" id="paymentNotice" role="status">Loading your payment records...</p><div id="paymentHistory"></div></section>
 <section class="panel" id="yocoSandbox" hidden>
 <h2>Yoco test checkout</h2>
@@ -46,6 +46,34 @@ small,.note{color:#5b6c77;line-height:1.5}ul{line-height:1.9}.disabled{border:1p
     document.getElementById("status").innerHTML=isOwner ? '<span class="status">MzanConnect Owner</span>' : !founderError && founder?.pilot_status==="active" ? '<span class="status">Founding Member — Free</span>' : '<span class="status">MzanConnect Member</span>';
     document.getElementById("explanation").textContent=isOwner ? "Owner access does not require payment." : !founderError && founder?.pilot_status==="active" ? "No payment is required for founding membership." : "Your account is registered. No payment is required now; paid plans are not yet enabled.";
     document.body.style.visibility="visible";
+    const liveSection=document.getElementById("liveMembership"),liveButton=document.getElementById("startLiveCheckout"),livePlan=document.getElementById("livePlan"),liveStatus=document.getElementById("liveCheckoutStatus");
+    if(isOwner||(!founderError&&founder?.pilot_status==="active"))liveSection.hidden=true;
+    else {
+      const returned=new URLSearchParams(location.search).get("payment");
+      if(returned==="returned")liveStatus.textContent="Returned from Yoco. Your membership activates only after payment verification. Refresh to check receipts.";
+      if(returned==="cancelled"||returned==="failed")liveStatus.textContent="Checkout was cancelled or failed. No membership activated.";
+      try{
+        const response=await fetch("https://akxzubckdebawqwwwaoe.supabase.co/functions/v1/mzan-yoco-live/status",{cache:"no-store"});
+        if(!response.ok)throw Error("Readiness check failed");
+        const ready=await response.json();
+        if(ready.ready===true){liveButton.disabled=false;if(!returned)liveStatus.textContent="Yoco live checkout is available. A real payment requires your approval on Yoco.";}
+        else if(!returned)liveStatus.textContent="Live checkout is not ready. No payment can be collected here.";
+      }catch{if(!returned)liveStatus.textContent="Unable to verify live payment readiness. Checkout remains disabled.";}
+      const attempts=new Map();
+      liveButton.addEventListener("click",async()=>{
+        liveButton.disabled=true;livePlan.disabled=true;liveStatus.textContent="Opening secure checkout…";
+        try{
+          const plan=livePlan.value;
+          if(!attempts.has(plan))attempts.set(plan,crypto.randomUUID());
+          const {data:checkout,error}=await client.functions.invoke("mzan-yoco-live",{body:{plan,attempt:attempts.get(plan)}});
+          if(error){let detail=null;try{detail=await error.context?.json?.()}catch{}throw Error(detail?.error||"Checkout unavailable.");}
+          const target=new URL(checkout.redirect_url);
+          if(target.origin!=="https://c.yoco.com"||target.username||target.password)throw Error("Invalid checkout destination.");
+          location.assign(target.href);
+        }catch(e){liveStatus.textContent=e.message||"Checkout unavailable.";liveButton.disabled=false;livePlan.disabled=false;}
+      });
+    }
+
     const history = document.getElementById("paymentHistory");
     const testHistory = document.getElementById("testPaymentHistory");
     if (isOwner) {
