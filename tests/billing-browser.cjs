@@ -6,7 +6,7 @@ const server = spawn('python3', ['-m', 'http.server', '8765', '--bind', '127.0.0
 const base='http://127.0.0.1:8765/';
 const clientMock = (signedIn, active, owner=false) => `window.supabase={createClient:()=>({
   auth:{getUser:async()=>({data:{user:${signedIn ? '{id:"test-user",app_metadata:{mzanconnect_role:"'+(owner?'owner':'member')+'"}}' : 'null'}},error:null}),signOut:async()=>({error:null})},
-  from:(table)=>({select:()=>({eq:()=>({maybeSingle:async()=>({data:table==="founding_memberships"?{pilot_status:"${active?'active':'inactive'}"}:{business_name:"Test Co",sector:"Services"},error:null}),then:(resolve)=>resolve({data:[],error:null})})})})})};`;
+  from:(table)=>({select:()=>({eq:()=>({maybeSingle:async()=>({data:table==="founding_memberships"?{pilot_status:"${active?'active':'inactive'}"}:{business_name:"Test Co",sector:"Services"},error:null}),order:()=>({limit:async()=>({data:[],error:null})}),then:(resolve)=>resolve({data:[],error:null})})})})})};`;
 async function checkDashboardFeatures(browser){
   const page=await browser.newPage({viewport:{width:390,height:844},serviceWorkers:'block'});
   const pageErrors=[];
@@ -83,6 +83,48 @@ async function checkDashboardFeatures(browser){
   console.log('PASS: owner Growth Passport saves and reloads, compliance stays separate, official sources filter, and confirmation resend handles success and failure');
 }
 
+async function checkVerifiedReceipts(browser){
+  const page=await browser.newPage();
+  await page.route('**/supabase.min.js',route=>route.fulfill({
+    status:200,contentType:'text/javascript',
+    body:`const user={id:'owner-test',app_metadata:{mzanconnect_role:'owner'}};
+    window.supabase={createClient:()=>({
+      auth:{getUser:async()=>({data:{user}})},
+      from(table){
+        if(table!=='membership_payments')throw Error('Unexpected payment query');
+        return {
+          select(fields){if(!fields.includes('membership_receipts('))throw Error('Missing receipts');return this},
+          eq(field,value){if(field!=='user_id'||value!==user.id)throw Error('Wrong account');return this},
+          order(){return this},
+          async limit(){
+            const created_at='2026-11-11T09:00:00Z';
+            const common={amount_cents:19900,currency:'ZAR',created_at,merchant_reference:'TEST-PAYMENT'};
+            const receipt={receipt_number:'TEST-VERIFIED-RECEIPT',issued_at:created_at};
+            return {data:[
+              {...common,status:'complete',verified_at:created_at,membership_receipts:receipt},
+              {...common,status:'complete',verified_at:null,membership_receipts:receipt},
+              {...common,status:'pending',verified_at:created_at,membership_receipts:receipt}
+            ]}
+          }
+        }
+      }
+    })};`
+  }));
+  await page.addInitScript(()=>{window.print=()=>{window.printed=true}});
+  await page.goto(base+'billing.html');
+  const buttons=page.getByRole('button',{name:'View / Print Receipt'});
+  await buttons.first().waitFor();
+  assert.equal(await buttons.count(),1);
+  await buttons.first().click();
+  await page.getByText('TEST-VERIFIED-RECEIPT',{exact:false}).waitFor();
+  await page.getByRole('button',{name:'Print / Save receipt as PDF'}).click();
+  assert.equal(await page.evaluate(()=>window.printed),true);
+  await page.getByRole('button',{name:'Close receipt'}).click();
+  assert.equal(await page.locator('#receiptPrint').isVisible(),false);
+  await page.close();
+  console.log('PASS: verified receipt opens and prints, pending or unverified payments have no receipt');
+}
+
 async function main(){
   const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
   try{
@@ -115,6 +157,7 @@ async function main(){
     console.log('PASS: authenticated billing, signed-out redirect, inactive-founder redirect, dashboard navigation, mobile layout, no checkout');
     await page.close();
     await checkDashboardFeatures(browser);
+    await checkVerifiedReceipts(browser);
   }finally{await browser.close()}
 }
 (async()=>{try{await new Promise(r=>setTimeout(r,1000));await main()}catch(e){console.error(e);process.exitCode=1}finally{server.kill()}})();
