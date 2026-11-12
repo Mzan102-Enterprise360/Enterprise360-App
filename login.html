@@ -109,13 +109,6 @@ form.addEventListener("submit", async (event) => {
         console.warn("Member profile setup can be completed from the dashboard.",profileError);
       }
     }
-    // Founding codes preserve the original benefit; they are not a login requirement.
-    const inviteCode=document.getElementById("inviteCode").value.trim().toUpperCase();
-    if(inviteCode){
-      const {data:claimed,error:codeError}=await mzanSupabase.rpc("claim_founding_code",{p_code:inviteCode});
-      if(codeError)throw new Error("Founding invitation verification is unavailable. Leave the optional code blank to log in, or try again later.");
-      if(claimed!==true)throw new Error("This founding code could not be claimed. Check it, or leave the optional code blank to log in as a member.");
-    }
     window.location.replace("dashboard.html");
   } catch (error) {
     showMessage(error.message || "Unable to sign in. Please try again.", true);
