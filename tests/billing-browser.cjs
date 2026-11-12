@@ -152,8 +152,8 @@ async function main(){
       await page.waitForFunction(expectedPath=>location.pathname.endsWith(expectedPath),expected,{timeout:10000}).catch(async e=>{console.error('Navigation diagnostic',{signedIn,active,owner,expected,actual:page.url(),body:await page.locator('body').innerText().catch(()=>'<unavailable>')});throw e});
       if(signedIn){
         await page.locator('body').waitFor({state:'visible'});
-        assert.match(await page.locator('#status').innerText(),owner?/MzanConnect Owner/:active?/Founding Member/:/MzanConnect Member/);
-        assert.match(await page.locator('main').innerText(),/No payment is required/);
+        assert.match(await page.locator('#status').innerText(),owner?/MzanConnect Owner/:/MzanConnect Member/);
+        assert.match(await page.locator('main').innerText(),/Owner access does not require payment|Paid membership activation requires a verified Yoco payment/);
         assert.equal(await page.locator('form').count(),0);
         assert.equal(await page.locator('#yocoSandbox').isVisible(),owner);
         await page.getByRole('link',{name:/Back to dashboard/}).click();
