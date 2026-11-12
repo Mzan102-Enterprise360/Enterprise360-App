@@ -19,7 +19,7 @@ small,.note{color:#5b6c77;line-height:1.5}ul{line-height:1.9}.disabled{border:1p
 <header><h1>💳 Billing &amp; Membership</h1><p>MzanConnect member billing centre</p></header>
 <main>
 <section class="panel"><h2>Your membership</h2><p id="status" role="status">Checking your membership...</p><p id="explanation" class="note"></p></section>
-<section class="panel"><h2>Membership plans</h2><p><strong>Founding Member — Free: R0</strong></p><p>The original seven founding memberships retain free access. Registration is now open to everyone.</p><ul><li><strong>Starter — R199/month</strong></li><li><strong>Growth — R399/month</strong></li><li><strong>Premium — R499/month</strong></li></ul><p class="disabled">No payment is required for owners or the original seven founding members. Live Yoco checkout will only be available to eligible paid members after payment readiness checks pass.</p></section>
+<section class="panel"><h2>Membership plans</h2><p>Registration is open to everyone.</p><ul><li><strong>Starter — R199/month</strong></li><li><strong>Growth — R399/month</strong></li><li><strong>Premium — R499/month</strong></li></ul><p class="disabled">Owner access does not require payment. Live Yoco checkout will be available after payment readiness checks pass.</p></section>
 <section class="panel" id="liveMembership"><h2>Paid membership checkout</h2><p>One month of access; no automatic renewal. Activation follows verified payment.</p><label for="livePlan">Plan</label> <select id="livePlan"><option value="starter">Starter — R199</option><option value="growth">Growth — R399</option><option value="premium">Premium — R499</option></select> <button id="startLiveCheckout" type="button" disabled>Continue to Yoco checkout</button><p id="liveCheckoutStatus" role="status">Checking live payment availability…</p></section>
 <section class="panel"><h2>Verified payments &amp; receipts</h2><p class="note" id="paymentNotice" role="status">Loading your payment records...</p><div id="paymentHistory"></div></section>
 <section class="panel" id="yocoSandbox" hidden>
@@ -42,12 +42,11 @@ small,.note{color:#5b6c77;line-height:1.5}ul{line-height:1.9}.disabled{border:1p
     const {data,error}=await client.auth.getUser();
     if(error||!data.user){location.replace("login.html");return}
     const isOwner=data.user.app_metadata?.mzanconnect_role==="owner";
-    const {data:founder,error:founderError}=isOwner ? {data:null,error:null} : await client.from("founding_memberships").select("pilot_status").eq("user_id",data.user.id).maybeSingle();
-    document.getElementById("status").innerHTML=isOwner ? '<span class="status">MzanConnect Owner</span>' : !founderError && founder?.pilot_status==="active" ? '<span class="status">Founding Member — Free</span>' : '<span class="status">MzanConnect Member</span>';
-    document.getElementById("explanation").textContent=isOwner ? "Owner access does not require payment." : !founderError && founder?.pilot_status==="active" ? "No payment is required for founding membership." : "Your account is registered. No payment is required now; paid plans are not yet enabled.";
+    document.getElementById("status").innerHTML=isOwner ? '<span class="status">MzanConnect Owner</span>' : '<span class="status">MzanConnect Member</span>';
+    document.getElementById("explanation").textContent=isOwner ? "Owner access does not require payment." : "Your account is registered. Paid membership activation requires a verified Yoco payment.";
     document.body.style.visibility="visible";
     const liveSection=document.getElementById("liveMembership"),liveButton=document.getElementById("startLiveCheckout"),livePlan=document.getElementById("livePlan"),liveStatus=document.getElementById("liveCheckoutStatus");
-    if(isOwner||(!founderError&&founder?.pilot_status==="active"))liveSection.hidden=true;
+    if(isOwner)liveSection.hidden=true;
     else {
       const returned=new URLSearchParams(location.search).get("payment");
       if(returned==="returned")liveStatus.textContent="Returned from Yoco. Your membership activates only after payment verification. Refresh to check receipts.";
