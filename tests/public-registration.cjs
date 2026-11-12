@@ -12,11 +12,10 @@ module.exports = async function checkPublicRegistration(browser, base) {
         signInWithPassword:async()=>({data:{user}}),
         signOut:async()=>({error:null})
       },
-      rpc:async(name,args)=>{sessionStorage.setItem('claimed',args.p_code);return {data:true}},
       from(table){return {
         select(){return this},eq(){return this},order(){return this},gte(){return this},lt(){return this},
         in:async()=>({data:[]}),limit:async()=>({data:[]}),
-        maybeSingle:async()=>({data:table==='founding_memberships'?null:{user_id:user.id,business_name:'Public Business',sector:'Services'}}),
+        maybeSingle:async()=>({data:{user_id:user.id,business_name:'Public Business',sector:'Services'}}),
         then(resolve){resolve({data:[]})},
         insert:async row=>{if(row.user_id!==user.id)throw Error('Wrong user');sessionStorage.setItem(table,JSON.stringify(row));return {}},
         upsert:async row=>{sessionStorage.setItem(table,JSON.stringify(row));return {}}
@@ -65,11 +64,9 @@ module.exports = async function checkPublicRegistration(browser, base) {
   await page.goto(base+'login.html');
   await page.locator('#email').fill('test@example.invalid');
   await page.locator('#password').fill('TestPassword-123');
-  await page.locator('details summary').click();
-  await page.locator('#inviteCode').fill('MZAN-'+ 'A'.repeat(32));
   await page.locator('#loginButton').click();
   await page.waitForURL('**/dashboard.html');
-  assert.equal(await page.evaluate(()=>sessionStorage.getItem('claimed')),'MZAN-'+ 'A'.repeat(32));
+  assert.equal(await page.locator('#inviteCode').count(),0);
   await page.locator('#logoutButton').click();
   await page.waitForURL('**/login.html');
   assert.deepEqual(errors,[]);
@@ -81,5 +78,5 @@ module.exports = async function checkPublicRegistration(browser, base) {
     await signedOut.waitForURL('**/login.html');
   }
   await signedOut.close();
-  console.log('PASS: public signup, no-code login, member pages, support, optional founding code, logout and signed-out protection');
+  console.log('PASS: public signup, no-code login, member pages, support, retired invitation removed, logout and signed-out protection');
 };
