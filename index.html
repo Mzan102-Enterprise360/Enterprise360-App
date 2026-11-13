@@ -64,6 +64,12 @@ nav{padding:5px 2px env(safe-area-inset-bottom)}
 nav button{min-height:44px;padding:8px 5px}
 .member-access-buttons{margin-bottom:10px}
 }
+/* Screenshot-led compact opportunity navigation */
+@media screen {
+#view .opportunity-return{padding:7px 9px!important;margin-bottom:10px}
+#view .opportunity-return button{min-height:46px!important;padding:9px 12px!important;font-size:16px!important}
+#view .opportunity-intro{margin:7px 0 12px;line-height:1.45}
+}
 </style>
 </head>
 <body>
@@ -167,7 +173,7 @@ ${state.messages.map(x=>`
 </div>`;
 
 if(page==='opportunities')html=`
-<div class="card" style="padding:12px 14px"><button type="button" onclick="returnToDashboard()" style="width:100%;text-align:center;background:#147b59;color:white;min-height:48px;font-size:16px" aria-label="Return to member dashboard">← Back to Dashboard</button></div>
+<div class="card opportunity-return"><button type="button" onclick="returnToDashboard()" style="width:100%;text-align:center;background:#147b59;color:white;min-height:48px;font-size:16px" aria-label="Return to member dashboard">← Back to Dashboard</button></div>
 <h2>Funding &amp; Tender Opportunities</h2>
 <p>Search official sources for funding, tenders, supplier registration and business development. Check each source for current listings, requirements and deadlines.</p>
 <div class="card">
