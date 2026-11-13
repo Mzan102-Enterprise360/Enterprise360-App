@@ -9,6 +9,13 @@
 header{background:#14283b;color:#fff;padding:26px 18px;text-align:center}header h1{margin:0 0 8px}header p{margin:0;color:#d4e0e7}
 main{max-width:760px;margin:20px auto;padding:0 16px 28px}.panel{background:white;border-radius:16px;padding:22px;margin-bottom:16px;box-shadow:0 2px 12px rgba(20,40,59,.06)}.panel h2{margin-top:0}.plans{list-style:none;padding:0;display:grid;gap:10px}.plans li{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#f3f8f8;border:1px solid #d9e9e6;border-radius:12px;padding:14px}.plans span{font-weight:700;color:#126b5a}.plans strong{white-space:nowrap}@media(max-width:430px){.plans li{align-items:flex-start;flex-direction:column;gap:4px}}
 .status{display:inline-block;background:#e4f4ec;color:#126344;padding:8px 12px;border-radius:20px;font-weight:bold}
+.membership-price{display:flex;align-items:baseline;gap:10px;padding:4px 0;color:#116a71}
+.membership-price strong{font-size:clamp(30px,7vw,40px);line-height:1.15}
+.membership-price span{font-size:15px;font-weight:600;color:#435967}
+.membership-benefits{margin:6px 0 9px;padding-left:22px;line-height:1.4!important;font-size:14px}
+.membership-benefits li{padding:2px 0}
+#businessServicesNotice .button{min-height:44px;box-sizing:border-box}
+
 button,select{font:inherit;padding:11px 13px;margin:6px 0;border-radius:9px}button{cursor:pointer}button:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid #0d9c94;outline-offset:3px}#startLiveCheckout{background:#147b59;color:#fff;border:0;font-weight:700;min-height:44px}#livePlan{min-height:44px;max-width:100%;width:100%;border:1px solid #b9c8ce}button:disabled{opacity:.55}a.button{display:inline-block;background:#147b59;color:white;text-decoration:none;padding:12px 16px;border-radius:10px;font-weight:bold}
 small,.note{color:#5b6c77;line-height:1.5}ul{line-height:1.9}.disabled{border:1px solid #d8e0e5;border-radius:10px;background:#f5f7f8;padding:13px;color:#536570}
 @media print{body:has(#receiptPrint:not([hidden])) header,body:has(#receiptPrint:not([hidden])) main>.panel:not(#receiptPrint),.no-print{display:none!important}body{visibility:visible!important;background:#fff;color:#111}main{margin:0;padding:0}#receiptPrint:not([hidden]){display:block!important;box-shadow:none;border-radius:0}@page{size:A4;margin:15mm}}
@@ -72,17 +79,30 @@ main{padding:7px 10px 16px!important}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 </head>
 <body>
-<header><p class="header-brand">◈ MzanConnect</p><h1>Billing &amp; Membership</h1><p>View your membership plans, payment status and receipts.</p></header>
+<header><p class="header-brand">◈ MzanConnect</p><h1>Billing &amp; Membership</h1><p>One R199 monthly membership, with additional business services quoted separately.</p></header>
 <main><div class="dashboard-return"><a href="dashboard.html" aria-label="Back to dashboard">← Back to Dashboard</a></div>
 <section class="panel"><h2>Your membership</h2><p id="status" role="status">Checking your membership...</p><p id="explanation" class="note"></p></section>
-<section class="panel"><h2>Choose your plan</h2><ul class="plans"><li><span>Starter</span><strong>R199 / month</strong></li><li><span>Growth</span><strong>R399 / month</strong></li><li><span>Premium</span><strong>R499 / month</strong></li></ul><p class="note">Membership is paid one month at a time. No automatic renewal.</p></section>
-<section class="panel" id="liveMembership"><h2>Secure checkout</h2><p class="note">Your membership starts after your payment is confirmed.</p><label for="livePlan">Plan</label> <select id="livePlan"><option value="starter">Starter — R199</option><option value="growth">Growth — R399</option><option value="premium">Premium — R499</option></select> <button id="startLiveCheckout" type="button" disabled>Continue to Yoco checkout</button><p id="liveCheckoutStatus" role="status">Checking payment availability…</p></section>
+<section class="panel" id="membershipOffer"><h2>One Membership. All Business Tools.</h2>
+<div class="membership-price"><strong>R199</strong><span>per month</span></div>
+<p class="note">One straightforward membership gives you access to the existing MzanConnect business tools:</p>
+<ul class="membership-benefits">
+<li>Explore business funding, tenders and supplier opportunities</li>
+<li>My Business profile and compliance checklist</li>
+<li>Bookkeeping, Growth Passport and printable business reports</li>
+<li>Member Support and service-request tracking</li>
+</ul>
+<p class="note"><strong>Pay for one month at a time.</strong> No automatic renewal.</p></section>
+<section class="panel" id="businessServicesNotice"><h2>Business Services — Quoted Separately</h2>
+<p class="note">Need a business plan, company profile, CIPC or CSD registration assistance, CIDB support or SARS guidance? Request help through Business Support. We will explain the service fee and any official charges before you agree to proceed.</p>
+<p class="note"><strong>These services are not included in the R199 membership.</strong></p>
+<p><a href="business-support.html" class="button">Request a business service</a></p>
+</section>
+<section class="panel" id="liveMembership"><h2>Secure Membership Checkout</h2><p class="note">R199 for one month. Your membership starts after your payment is verified.</p><input type="hidden" id="livePlan" value="starter"><button id="startLiveCheckout" type="button" disabled>Pay R199 securely with Yoco</button><p id="liveCheckoutStatus" role="status">Checking payment availability…</p></section>
 <section class="panel"><h2>Payment history &amp; receipts</h2><p class="note" id="paymentNotice" role="status">Loading your payment records...</p><div id="paymentHistory"></div></section>
 <section class="panel" id="yocoSandbox" hidden>
 <h2>Yoco test checkout</h2>
 <p class="note">Owner only. Use a Yoco test card. Test payments do not charge a real card or activate a membership.</p>
-<label for="testPlan">Plan to test</label>
-<select id="testPlan"><option value="starter">Starter — R199</option><option value="growth">Growth — R399</option><option value="premium">Premium — R499</option></select>
+<input type="hidden" id="testPlan" value="starter"><p class="note">Test the single R199 membership checkout.</p>
 <button id="startTestCheckout" type="button">Start test checkout</button>
 <p id="testCheckoutStatus" role="status"></p>
 <div id="testPaymentHistory"></div>
