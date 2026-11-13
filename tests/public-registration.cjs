@@ -68,12 +68,12 @@ module.exports = async function checkPublicRegistration(browser, base) {
   await page.waitForURL('**/dashboard.html');
   assert.equal(await page.locator('#inviteCode').count(),0);
   await page.locator('#logoutButton').click();
-  await page.waitForURL('**/login.html');
+  await page.waitForURL('**/index.html');
   assert.deepEqual(errors,[]);
   await page.close();
   const signedOut=await browser.newPage();
   await signedOut.route('**/supabase.min.js',route=>route.fulfill({contentType:'text/javascript',body:'window.supabase={createClient:()=>({auth:{getUser:async()=>({data:{user:null}})}})}'}));
-  for(const file of ['dashboard.html','member.html','bookkeeping.html','support.html','billing.html']){
+  for(const file of ['dashboard.html','member.html','bookkeeping.html','support.html','billing.html','business-report.html']){
     await signedOut.goto(base+file);
     await signedOut.waitForURL('**/login.html');
   }
