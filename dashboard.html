@@ -142,7 +142,7 @@ main{max-width:850px;margin:auto;padding:20px}
     try{
       const {error}=await client.auth.signOut();
       if(error)throw error;
-      window.location.replace("login.html");
+      window.location.replace("index.html");
     }catch(error){
       logoutMessage.textContent="Unable to sign out. Please try again.";
       logoutButton.disabled=false;
