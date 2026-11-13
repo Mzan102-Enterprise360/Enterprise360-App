@@ -20,6 +20,18 @@ header{background:linear-gradient(115deg,#14283b 0%,#163d50 75%,#116a6a 100%);pa
 header .header-brand{margin:0 0 12px;font-size:16px;font-weight:700;color:#d4e6eb}
 header h1{margin:0 0 8px;font-size:clamp(24px,5vw,32px);line-height:1.2;color:#fff}
 header p:not(.header-brand){margin:0;color:#dce8eb;line-height:1.45;font-size:15px}
+/* Compact screen spacing while retaining comfortable form controls */
+@media screen {
+header{padding:15px 16px 17px}
+header .header-brand{margin-bottom:6px}
+header h1{margin-bottom:5px}
+main{padding:14px}
+.card{padding:16px;margin:10px 0}
+.dashboard-return{padding:10px 12px;margin-bottom:12px;border-radius:12px}
+.dashboard-return a,.actions .dashboard-return a{min-height:48px;padding:10px 12px;font-size:16px}
+label{margin:11px 0 5px}
+input{min-height:44px}
+}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script></head>
 <body><header><p class="header-brand">◈ MzanConnect</p><h1 id="sectionTitle">My Business</h1><p id="sectionDescription">Manage and update your business profile.</p></header>
 <main><div class="dashboard-return"><a href="dashboard.html" aria-label="Back to dashboard">← Back to Dashboard</a></div><p id="message" role="status" aria-live="polite"></p>
