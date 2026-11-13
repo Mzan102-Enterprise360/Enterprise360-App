@@ -38,7 +38,14 @@ textarea{min-height:85px;resize:vertical}
 .request-record p{margin:3px 0 5px;font-size:13px;color:#415865}
 .request-record small{display:block;font-size:12px;color:#516876;margin:4px 0}
 .request-record label{font-size:12px;margin-top:5px}
-.request-record select{max-width:280px}
+.status-actions-label{font-weight:700;margin:10px 0 5px!important;color:#14283b!important}
+.status-actions{display:flex;flex-wrap:wrap;gap:7px;margin:5px 0}
+.status-actions button{min-height:42px;padding:8px 10px;background:#eef4f5;color:#14283b;border:1px solid #9db9bf;flex:1 1 130px;max-width:195px;font-size:13px}
+.status-actions button[aria-pressed="true"]{background:#116a71;color:white;border-color:#116a71;font-weight:800}
+.status-actions button:disabled{cursor:default;opacity:1}
+.status-actions button:disabled[aria-pressed="false"]{opacity:.5}
+.status-feedback{font-weight:700;color:#126763!important;font-size:12px!important;margin:6px 0 2px!important}
+.status-feedback:empty{display:none}
 .mini-action{margin:7px 6px 3px 0;min-height:36px;padding:6px 12px}
 details summary{cursor:pointer;font-weight:700;min-height:35px;padding:8px 0}
 details a{display:block;padding:6px 0;color:#086c70}
@@ -73,8 +80,8 @@ details a{display:block;padding:6px 0;color:#086c70}
 <button type="submit" id="submitServiceRequest">Send service request</button>
 <p class="hint">Requesting a quote does not commit you to payment. Service fees and any government charges will be explained before you agree to proceed.</p>
 </form></section>
-<section id="serviceSignedIn" class="card" hidden><h2 class="box-title">My service requests</h2><small id="serviceAccount"></small><div id="myServiceRequests" aria-live="polite">Loading your requests…</div></section>
-<section id="serviceOwnerPanel" class="card" hidden><h2 class="box-title">Owner service inbox</h2><p class="hint">Private to the MzanConnect owner. Review requests and update their status; contact members using their registered email.</p><div id="ownerServiceRequests">Loading service requests…</div></section>
+<section id="serviceSignedIn" class="card" hidden><h2 class="box-title">My service requests</h2><p class="hint">Track your request: Submitted to owner → In progress → Completed. Reload this page for the latest status.</p><small id="serviceAccount"></small><div id="myServiceRequests" aria-live="polite">Loading your requests…</div></section>
+<section id="serviceOwnerPanel" class="card" hidden><h2 class="box-title">Owner service inbox</h2><p class="hint">Private owner view. For each request, tap Submitted to owner, In progress or Completed to save its status. Members see the status when they reopen their requests.</p><div id="ownerServiceRequests">Loading service requests…</div></section>
 <details class="card"><summary>Official websites — for reference or self-service</summary>
 <a href="https://www.bizportal.gov.za/" target="_blank" rel="noopener noreferrer">CIPC BizPortal ↗</a>
 <a href="https://secure.csd.gov.za/" target="_blank" rel="noopener noreferrer">Central Supplier Database ↗</a>
@@ -82,6 +89,6 @@ details a{display:block;padding:6px 0;color:#086c70}
 <a href="https://www.cidb.org.za/" target="_blank" rel="noopener noreferrer">CIDB ↗</a></details>
 <p class="notice">MzanConnect is an independent business assistance service, not a government agency. Some processes require the applicant's direct participation, formal authority, or a registered professional. Never share passwords or OTPs with us.</p>
 </main>
-<script defer src="business-service-requests.js?v=2"></script>
+<script defer src="business-service-requests.js?v=3"></script>
 <script defer src="legal-notices.js?v=1"></script><script defer src="voice-accessibility.js?v=6"></script><script defer src="app-shell.js?v=1"></script>
 </body></html>
