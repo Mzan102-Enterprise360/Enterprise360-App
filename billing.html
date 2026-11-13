@@ -12,6 +12,16 @@ main{max-width:760px;margin:20px auto;padding:0 16px 28px}.panel{background:whit
 .membership-price{display:flex;align-items:baseline;gap:10px;padding:4px 0;color:#116a71}
 .membership-price strong{font-size:clamp(30px,7vw,40px);line-height:1.15}
 .membership-price span{font-size:15px;font-weight:600;color:#435967}
+#monthlyMembership{border:1px solid #d6e7e3}
+#monthlyMembership .membership-price{margin:3px 0 10px}
+#monthlyMembership .note{margin:9px 0}
+#monthlyMembership #status{margin:13px 0 3px;font-weight:700}
+#monthlyMembership #explanation:empty{display:none}
+#monthlyMembership .service-note{border-top:1px solid #dce8e7;padding-top:11px;margin-top:15px}
+#liveMembership button{width:100%;max-width:360px}
+.receipts-panel summary{cursor:pointer;color:#14283b;font-weight:700;min-height:44px;padding:8px 0}
+.receipts-panel summary:focus-visible{outline:3px solid #0d9c94;outline-offset:3px}
+
 .membership-benefits{margin:6px 0 9px;padding-left:22px;line-height:1.4!important;font-size:14px}
 .membership-benefits li{padding:2px 0}
 #businessServicesNotice .button{min-height:44px;box-sizing:border-box}
@@ -79,28 +89,35 @@ main{padding:7px 10px 16px!important}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 </head>
 <body>
-<header><p class="header-brand">◈ MzanConnect</p><h1>Billing &amp; Membership</h1><p>One R199 monthly membership, with additional business services quoted separately.</p></header>
-<main><div class="dashboard-return"><a href="dashboard.html" aria-label="Back to dashboard">← Back to Dashboard</a></div>
-<section class="panel"><h2>Your membership</h2><p id="status" role="status">Checking your membership...</p><p id="explanation" class="note"></p></section>
-<section class="panel" id="membershipOffer"><h2>One Membership. All Business Tools.</h2>
-<div class="membership-price"><strong>R199</strong><span>per month</span></div>
-<p class="note">One straightforward membership gives you access to the existing MzanConnect business tools:</p>
-<ul class="membership-benefits">
-<li>Explore business funding, tenders and supplier opportunities</li>
-<li>My Business profile and compliance checklist</li>
-<li>Bookkeeping, Growth Passport and printable business reports</li>
-<li>Member Support and service-request tracking</li>
-</ul>
-<p class="note"><strong>Pay for one month at a time.</strong> No automatic renewal.</p></section>
-<section class="panel" id="businessServicesNotice"><h2>Business Services — Quoted Separately</h2>
-<p class="note">Need a business plan, company profile, CIPC or CSD registration assistance, CIDB support or SARS guidance? Request help through Business Support. We will explain the service fee and any official charges before you agree to proceed.</p>
-<p class="note"><strong>These services are not included in the R199 membership.</strong></p>
-<p><a href="business-support.html" class="button">Request a business service</a></p>
+<header><p class="header-brand">◈ MzanConnect</p><h1>Billing &amp; Membership</h1><p>One simple monthly subscription.</p></header>
+<main>
+<div class="dashboard-return"><a href="dashboard.html" aria-label="Back to dashboard">← Back to Dashboard</a></div>
+<section class="panel" id="monthlyMembership">
+  <h2>MzanConnect Membership</h2>
+  <div class="membership-price"><strong>R199</strong><span>per month</span></div>
+  <p class="note"><strong>One payment covers one month.</strong> No automatic renewal.</p>
+  <p class="note">Access Explore, My Business, Compliance, Bookkeeping, Growth Passport, printing and Member Support.</p>
+  <p id="status" role="status">Checking your membership…</p>
+  <p id="explanation" class="note"></p>
+  <div id="liveMembership">
+    <input type="hidden" id="livePlan" value="starter">
+    <button id="startLiveCheckout" type="button" disabled>Pay R199 securely with Yoco</button>
+    <p id="liveCheckoutStatus" class="note" role="status">Checking secure payment availability…</p>
+  </div>
+  <p class="note service-note">Business plans, business profiles and other professional services are quoted and paid separately through Business Support.</p>
 </section>
-<section class="panel" id="liveMembership"><h2>Secure Membership Checkout</h2><p class="note">R199 for one month. Your membership starts after your payment is verified.</p><input type="hidden" id="livePlan" value="starter"><button id="startLiveCheckout" type="button" disabled>Pay R199 securely with Yoco</button><p id="liveCheckoutStatus" role="status">Checking payment availability…</p></section>
-<section class="panel" id="paymentRecordsPanel"><h2>Payment history &amp; receipts</h2><p class="note" id="paymentNotice" role="status">Loading your payment records...</p><div id="paymentHistory"></div></section>
-<section class="panel" id="receiptPrint" hidden><h2>◈ MzanConnect — Payment Receipt</h2><div id="receiptDetails"></div><p class="note">Receipt issued for a verified payment. Keep for your records.</p><button class="no-print" id="printReceipt" type="button">Print / Save receipt as PDF</button><button class="no-print" id="closeReceipt" type="button">Close receipt</button></section>
-<section class="panel"><h2>Need assistance?</h2><p><a href="support.html">Contact Member Support</a></p></section>
+<details class="panel receipts-panel" id="paymentRecordsPanel" hidden>
+  <summary>My verified payment receipts</summary>
+  <p class="note" id="paymentNotice" role="status">Loading payment records…</p>
+  <div id="paymentHistory"></div>
+</details>
+<section class="panel" id="receiptPrint" hidden>
+  <h2>◈ MzanConnect — Payment Receipt</h2>
+  <div id="receiptDetails"></div>
+  <p class="note">Receipt issued for a verified payment. Keep it for your records.</p>
+  <button class="no-print" id="printReceipt" type="button">Print / Save receipt as PDF</button>
+  <button class="no-print" id="closeReceipt" type="button">Close receipt</button>
+</section>
 </main>
 <script>
 (async function(){
@@ -110,8 +127,8 @@ main{padding:7px 10px 16px!important}
     const {data,error}=await client.auth.getUser();
     if(error||!data.user){location.replace("login.html");return}
     const isOwner=data.user.app_metadata?.mzanconnect_role==="owner";
-    document.getElementById("status").innerHTML=isOwner ? '<span class="status">MzanConnect Owner</span>' : '<span class="status">MzanConnect Member</span>';
-    document.getElementById("explanation").textContent=isOwner ? "Owner access does not require payment." : "Your account is registered. Paid membership activation requires a verified Yoco payment.";
+    document.getElementById("status").innerHTML=isOwner ? '<span class="status">Owner membership — no payment required</span>' : '<span class="status">Monthly membership: R199</span>';
+    document.getElementById("explanation").textContent=isOwner ? "Your owner account already has access." : "Your monthly membership begins only after Yoco verifies your payment.";
     document.body.style.visibility="visible";
     const liveSection=document.getElementById("liveMembership"),liveButton=document.getElementById("startLiveCheckout"),livePlan=document.getElementById("livePlan"),liveStatus=document.getElementById("liveCheckoutStatus");
     if(isOwner)liveSection.hidden=true;
@@ -157,10 +174,12 @@ main{padding:7px 10px 16px!important}
         .order("created_at", { ascending: false })
         .limit(100);
       if (paymentError) throw paymentError;
-      const visiblePayments=payments.filter(payment=>!payment.is_test);
-      notice.textContent = visiblePayments.length
-        ? "Membership payment history. Receipts appear only after payment verification."
-        : "No membership payments recorded yet.";
+      const visiblePayments=payments.filter(payment=>{
+        const receipt=Array.isArray(payment.membership_receipts)?payment.membership_receipts[0]:payment.membership_receipts;
+        return !payment.is_test && payment.status==="complete" && Boolean(payment.verified_at) && Boolean(receipt);
+      });
+      if(!isOwner && visiblePayments.length)document.getElementById("paymentRecordsPanel").hidden=false;
+      notice.textContent=visiblePayments.length?"Verified membership receipts":"No verified membership receipts yet.";
 
       const money = new Intl.NumberFormat("en-ZA", { style: "currency", currency: "ZAR" });
       for (const payment of visiblePayments) {
