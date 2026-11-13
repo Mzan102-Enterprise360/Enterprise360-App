@@ -5,6 +5,6 @@ const footer=document.createElement('footer');footer.id='mzan-legal-footer';foot
 const line=document.createElement('div');line.textContent='© 2026 Mzan 102 (Pty) Ltd · MzanConnect · All rights reserved.';
 const links=document.createElement('div');
 for(const [name,url] of [['Privacy & POPIA','privacy.html'],['Copyright & Credits','copyright.html']]){const a=document.createElement('a');a.href=new URL(url,document.baseURI).href;a.textContent=name;links.append(a);}
-const credit=document.createElement('div');credit.textContent='Inspired by Phenyo Gladwin Lumatha · Constructed by QueenMaur with AI assistance.';
+const credit=document.createElement('div');credit.textContent='Inspired by Phenyo Gladwin Lumatha · Designed and constructed by QueenMaur.';
 footer.append(line,links,credit);document.body.append(footer);
 })();
