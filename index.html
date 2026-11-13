@@ -74,28 +74,42 @@ header #opportunityHeaderDescription{color:#e0edf0;font-size:14px;line-height:1.
 #view .opportunity-intro{margin:7px 0 12px;line-height:1.45}
 }
 
-/* Branded mobile-first welcome cover: visual only, existing routes preserved */
-.welcome-cover{position:relative;overflow:hidden;isolation:isolate;border-radius:22px;background:linear-gradient(145deg,#10273b 0%,#174458 55%,#087f84 100%);color:#fff;padding:30px 22px 25px;box-shadow:0 15px 35px rgba(13,51,68,.17);margin-bottom:15px}
-.cover-orb{position:absolute;border-radius:50%;pointer-events:none;z-index:-1}.cover-orb-one{width:240px;height:240px;right:-100px;top:-105px;border:34px solid rgba(139,245,217,.13)}.cover-orb-two{width:180px;height:180px;left:-100px;bottom:-100px;background:rgba(46,203,185,.12)}
-.cover-content{position:relative;max-width:520px;margin:auto;text-align:center}
-.cover-eyebrow{font-size:11px;font-weight:800;letter-spacing:.19em;color:#aaf0e4}
-.cover-mark{font-size:30px;color:#b9ffdd;margin:7px auto 3px}
-.welcome-cover h1{font-size:clamp(30px,7vw,43px);line-height:1.14;letter-spacing:-.035em;margin:6px 0 13px;font-weight:800}
-.welcome-cover h1 em{font-style:normal;color:#8cf1d8}
-.cover-lead{font-size:15px;line-height:1.55;max-width:340px;margin:0 auto 12px;color:#e6f5f5}
-.cover-tagline{font-size:12px;font-weight:750;letter-spacing:.025em;color:#aaf0e4;margin-bottom:19px}
-.cover-actions{margin-bottom:10px}
-.cover-actions a:first-child{background:#19a688;color:#fff}.cover-actions a:last-child{background:#fff;color:#143344}
-.cover-actions a{min-height:49px;transition:transform .2s,box-shadow .2s}
+/* Premium responsive home cover. All existing app routes and functions retained. */
+.welcome-cover{position:relative;overflow:hidden;isolation:isolate;border-radius:22px;background:radial-gradient(ellipse at 78% 18%,#1a6770 0%,transparent 42%),linear-gradient(145deg,#0d2438 0%,#123c4b 66%,#125b60 100%);color:#fff;padding:20px 19px 23px;margin-bottom:18px;box-shadow:0 15px 36px rgba(11,40,53,.2)}
+.cover-light{position:absolute;width:380px;height:380px;right:-240px;top:-170px;background:radial-gradient(circle,rgba(134,241,207,.2),transparent 68%);pointer-events:none}
+.cover-content{position:relative;max-width:540px;margin:auto}
+.cover-topline{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:800;letter-spacing:.11em;color:#e7fffb}
+.cover-brand-icon{display:grid;place-items:center;width:28px;height:28px;border:1px solid #80d9cb;border-radius:9px;color:#9cf1d9;font-size:18px}
+.cover-topline-rule{flex:1;height:1px;background:rgba(201,242,235,.25)}
+.cover-edition{font-size:9px;color:#a2d7d4;letter-spacing:.1em}
+.cover-illustration{position:relative;width:172px;height:142px;margin:8px auto 4px;display:grid;place-items:center}
+.cover-ring{position:absolute;border:1px solid rgba(154,238,218,.3);border-radius:50%;transform:rotate(-20deg)}
+.cover-ring-outer{width:163px;height:118px}.cover-ring-inner{width:126px;height:126px;border-style:dashed;border-color:rgba(154,238,218,.17)}
+.cover-center{display:flex;align-items:center;justify-content:center;width:79px;height:79px;border-radius:22px;background:linear-gradient(145deg,#f6fffd,#bcebe1);color:#16434a;font-size:43px;font-weight:850;box-shadow:0 10px 35px #041e2c6b;transform:rotate(-7deg)}
+.cover-center span{font-size:15px;color:#159a86;align-self:flex-start;margin:13px 0 0 1px}
+.cover-node{position:absolute;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:#1c7275;color:#eafff8;border:1px solid #74c5bc;box-shadow:0 6px 18px #071e2966;font-size:19px}
+.cover-node-one{top:12px;right:9px}.cover-node-two{bottom:5px;right:21px}.cover-node-three{bottom:19px;left:3px}
+.cover-copy{text-align:center}
+.cover-kicker{color:#a1e9d7;font-size:10px;font-weight:800;letter-spacing:.17em;margin:3px 0 7px}
+.welcome-cover h1{font-size:clamp(30px,7.5vw,43px);line-height:1.11;letter-spacing:-.035em;margin:0 0 11px;font-weight:850}
+.welcome-cover h1 em{font-style:normal;color:#8ff0d5}
+.cover-lead{font-size:14px;line-height:1.55;max-width:355px;margin:0 auto 10px;color:#e1f2f0}
+.cover-tagline{font-size:12px;font-weight:750;color:#a5e9db;margin:0 0 17px}
+.cover-actions{margin:0 0 9px;gap:9px}.cover-actions a{min-height:49px;gap:5px;border-radius:11px;font-size:13px}
+.cover-actions a:first-child{background:#1cb398;color:#062f33}.cover-actions a:last-child{background:#fff;color:#123b48}
 .cover-actions a:focus-visible,.cover-explore:focus-visible{outline:3px solid #ffcc70;outline-offset:3px}
-.cover-explore{width:100%;background:transparent;border:1px solid #9bd5d2;color:#fff;min-height:45px;font-size:14px}
-.home-discovery{text-align:center;padding:4px 0 9px}.home-discovery h2{font-size:18px;margin:4px 0 12px}
+.cover-explore{width:100%;min-height:46px;border:1px solid rgba(193,243,235,.75);background:rgba(255,255,255,.07);color:#fff;font-size:13px;font-weight:750}
+.home-discovery{padding:0 0 10px}.discovery-heading{text-align:center;margin-bottom:12px}
+.discovery-heading>span{font-size:10px;letter-spacing:.15em;color:#0c7a7d;font-weight:800}
+.home-discovery h2{font-size:19px;line-height:1.3;max-width:340px;margin:5px auto 0;color:#142e3d}
 .home-feature-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
-.home-feature{background:#fff;border:1px solid #dce9e9;border-radius:13px;padding:12px 7px;display:flex;align-items:center;flex-direction:column;gap:5px;min-width:0}
-.home-feature>span{color:#087f8c;font-size:23px}.home-feature strong{font-size:12px;line-height:1.3}.home-feature small{font-size:11px;color:#61717b;line-height:1.3}
-.home-disclaimer{font-size:11px;color:#61717b;margin:13px 0}
-@media(max-width:390px){.welcome-cover{padding:24px 14px 20px}.home-feature-grid{gap:5px}.home-feature{padding:10px 5px}}
-@media(prefers-reduced-motion:no-preference){.welcome-cover{animation:cover-in .5s ease-out both}@keyframes cover-in{from{opacity:.6;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}}
+.home-feature{background:#fff;border:1px solid #dce9e9;border-radius:13px;padding:12px 6px;display:flex;align-items:center;flex-direction:column;gap:6px;text-align:center;box-shadow:0 4px 13px #153d4810}
+.feature-icon{width:33px;height:33px;display:grid;place-items:center;background:#e1f6ef;color:#0a7b79;border-radius:10px;font-size:21px;font-weight:800}
+.home-feature strong{font-size:13px;color:#143747}.home-feature small{font-size:11px;color:#61717b;line-height:1.35}
+.home-disclaimer{text-align:center;font-size:11px;color:#61717b;line-height:1.5;margin:13px 4px}
+@media(min-width:700px){main{max-width:760px}.welcome-cover{padding:25px 34px}.cover-content{max-width:620px}.cover-illustration{width:210px;height:150px}.cover-lead{max-width:470px}.home-feature{padding:18px 10px}}
+@media(max-width:360px){.welcome-cover{padding:17px 12px 20px}.cover-edition{font-size:8px}.home-feature-grid{gap:5px}.home-feature{padding:10px 3px}.home-feature strong{font-size:12px}}
+@media(prefers-reduced-motion:no-preference){.welcome-cover{animation:cover-appear .45s ease-out both}@keyframes cover-appear{from{opacity:.65;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}}
 </style>
 </head>
 <body>
@@ -141,25 +155,32 @@ let html='';
 
 if(page==='home')html=`
 <section class="welcome-cover" aria-labelledby="coverTitle">
-  <div class="cover-orb cover-orb-one" aria-hidden="true"></div><div class="cover-orb cover-orb-two" aria-hidden="true"></div>
+  <div class="cover-light" aria-hidden="true"></div>
   <div class="cover-content">
-    <span class="cover-eyebrow">WELCOME TO MZANCONNECT</span>
-    <div class="cover-mark" aria-hidden="true">✦</div>
-    <h1 id="coverTitle">Your business.<br><em>New possibilities.</em></h1>
-    <p class="cover-lead">Discover opportunities. Build your business. Move forward with confidence.</p>
-    <p class="cover-tagline">One Connection. Endless Possibilities.</p>
-    <div class="member-access-buttons cover-actions" aria-label="Member registration and login"><a href="register.html">Join MzanConnect</a><a href="login.html">Member Login</a></div>
-    <button type="button" class="cover-explore" onclick="show('opportunities')" aria-label="Explore funding, tenders and supplier opportunities">Explore Opportunities <span aria-hidden="true">→</span></button>
+    <div class="cover-topline"><span class="cover-brand-icon" aria-hidden="true">✦</span><span>MZANCONNECT</span><span class="cover-topline-rule" aria-hidden="true"></span><span class="cover-edition">BUSINESS GROWTH HUB</span></div>
+    <div class="cover-illustration" aria-hidden="true">
+      <div class="cover-ring cover-ring-outer"></div><div class="cover-ring cover-ring-inner"></div>
+      <div class="cover-center">M<span>✦</span></div>
+      <div class="cover-node cover-node-one">↗</div><div class="cover-node cover-node-two">✓</div><div class="cover-node cover-node-three">✧</div>
+    </div>
+    <div class="cover-copy">
+      <p class="cover-kicker">YOUR NEXT CHAPTER STARTS HERE</p>
+      <h1 id="coverTitle">Big dreams.<br><em>Real opportunities.</em></h1>
+      <p class="cover-lead">One place to discover opportunities, build your business and move forward with confidence.</p>
+      <p class="cover-tagline">One Connection. Endless Possibilities.</p>
+      <div class="member-access-buttons cover-actions" aria-label="Member registration and login"><a href="register.html">Join MzanConnect <span aria-hidden="true">↗</span></a><a href="login.html">Member Login <span aria-hidden="true">→</span></a></div>
+      <button type="button" class="cover-explore" onclick="show('opportunities')" aria-label="Explore funding, tenders and supplier opportunities">Explore Opportunities <span aria-hidden="true">→</span></button>
+    </div>
   </div>
 </section>
 <section class="home-discovery" aria-label="What you can do on MzanConnect">
-  <h2>Where will your business go next?</h2>
+  <div class="discovery-heading"><span>BUILT FOR YOUR AMBITION</span><h2>Everything your business needs to move forward.</h2></div>
   <div class="home-feature-grid">
-    <div class="home-feature"><span aria-hidden="true">◈</span><strong>Find opportunities</strong><small>Funding, tenders and suppliers</small></div>
-    <div class="home-feature"><span aria-hidden="true">▣</span><strong>Grow with support</strong><small>Business tools and guidance</small></div>
-    <div class="home-feature"><span aria-hidden="true">✓</span><strong>Stay organised</strong><small>Compliance and bookkeeping</small></div>
+    <div class="home-feature"><span class="feature-icon" aria-hidden="true">↗</span><strong>Discover</strong><small>Funding, tenders & suppliers</small></div>
+    <div class="home-feature"><span class="feature-icon" aria-hidden="true">◇</span><strong>Develop</strong><small>Business tools & support</small></div>
+    <div class="home-feature"><span class="feature-icon" aria-hidden="true">✓</span><strong>Manage</strong><small>Compliance & bookkeeping</small></div>
   </div>
-  <p class="home-disclaimer">Built for entrepreneurs, women, youth and SMMEs. MzanConnect is not a job application portal.</p>
+  <p class="home-disclaimer">For entrepreneurs, women, youth and SMMEs across South Africa. Business opportunities platform — not a job application portal.</p>
 </section>`;
 
 if(page==='business')html=`
