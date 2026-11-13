@@ -65,7 +65,8 @@ nav button{min-height:44px;padding:8px 5px}
 .member-access-buttons{margin-bottom:10px}
 }
 /* Contextual opportunities heading in navy header; avoid repeated page title */
-header .brand-extra[hidden]{display:none!important}
+header .brand-extra[hidden],header #opportunityHeaderDescription[hidden]{display:none!important}
+header #opportunityHeaderDescription{color:#e0edf0;font-size:14px;line-height:1.4;margin:7px 0 0;max-width:650px}
 /* Screenshot-led compact opportunity navigation */
 @media screen {
 #view .opportunity-return{padding:7px 9px!important;margin-bottom:10px}
@@ -80,6 +81,7 @@ header .brand-extra[hidden]{display:none!important}
 <strong id="pageHeading" style="font-size:23px">◈ MzanConnect</strong><br>
 
 <small id="pageSubtitle">One Connection. Endless Possibilities.</small><br>
+<p id="opportunityHeaderDescription" hidden>Search official sources for funding, tenders, supplier registration and business development. Check each source for current listings, requirements and deadlines.</p>
 
 <small class="brand-extra">Empowering Her. Uplifting Youth. Growing Mzansi.</small><br class="brand-extra">
 <small class="brand-extra">A division of Mzan 102 (Pty) Ltd</small>
@@ -109,7 +111,8 @@ const el=document.getElementById('view');
 function show(page){
 const opportunityPage=page==='opportunities';
 document.getElementById('pageHeading').textContent=opportunityPage?'Funding & Tender Opportunities':'◈ MzanConnect';
-document.getElementById('pageSubtitle').textContent=opportunityPage?'Find funding, tenders and supplier opportunities':'One Connection. Endless Possibilities.';
+document.getElementById('pageSubtitle').textContent=opportunityPage?'Official sources and supplier opportunities':'One Connection. Endless Possibilities.';
+document.getElementById('opportunityHeaderDescription').hidden=!opportunityPage;
 for(const item of document.querySelectorAll('.brand-extra'))item.hidden=opportunityPage;
 let html='';
 
@@ -180,7 +183,6 @@ ${state.messages.map(x=>`
 
 if(page==='opportunities')html=`
 <div class="card opportunity-return"><button type="button" onclick="returnToDashboard()" style="width:100%;text-align:center;background:#147b59;color:white;min-height:48px;font-size:16px" aria-label="Return to member dashboard">← Back to Dashboard</button></div>
-<p class="opportunity-intro">Search official sources for funding, tenders, supplier registration and business development. Check each source for current listings, requirements and deadlines.</p>
 <div class="card">
 <form onsubmit="event.preventDefault();filterOpportunities()">
 <label for="opportunitySearch">Search official sources</label>
