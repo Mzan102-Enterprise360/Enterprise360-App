@@ -14,6 +14,12 @@
 body{margin:0}
 header{background:#14283b;color:white;padding:20px 18px}
 header small{color:#c3d4df}
+header .page-context{margin-top:12px;padding:12px;border-left:3px solid #55c9bd;background:#ffffff13;border-radius:8px}
+header .page-context strong{display:block;font-size:17px}
+header .page-context span{display:block;color:#d5e6e9;font-size:13px;margin-top:4px}
+.opportunity-item[hidden]{display:none!important}
+.opportunity-item a{overflow-wrap:anywhere}
+.opportunity-note{font-size:13px;color:#526772}
 main{max-width:650px;margin:auto;padding:16px 16px 90px}
 .card{background:white;border-radius:15px;padding:17px;margin-bottom:12px;box-shadow:0 1px 4px #0001}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -60,6 +66,7 @@ button.tile:focus-visible,button:focus-visible{outline:3px solid #12a3a8;outline
 
 <small>Empowering Her. Uplifting Youth. Growing Mzansi.</small><br>
 <small>A division of Mzan 102 (Pty) Ltd</small>
+<div id="pageContext" class="page-context" hidden aria-live="polite"></div>
 </header>
 
 <main><div id="view"></div></main>
@@ -154,7 +161,7 @@ ${state.messages.map(x=>`
 if(page==='opportunities')html=`
 <div class="card" style="padding:12px 14px"><button type="button" onclick="returnToDashboard()" style="width:100%;text-align:center;background:#147b59;color:white;min-height:48px;font-size:16px" aria-label="Return to member dashboard">← Back to Dashboard</button></div>
 <h2>Funding &amp; Tender Opportunities</h2>
-<p>Search official sources for funding, tenders, supplier registration and business development. Check each source for current listings, requirements and deadlines.</p>
+<p>Find trusted places to search for funding, tenders and supplier registration. These are official source links, not verified live vacancies or tender listings.</p>
 <div class="card">
 <form onsubmit="event.preventDefault();filterOpportunities()">
 <label for="opportunitySearch">Search official sources</label>
@@ -173,6 +180,7 @@ if(page==='opportunities')html=`
 <button type="submit">Search</button>
 </form>
 <p id="opportunityResults" role="status">7 official sources found.</p>
+<p class="opportunity-note">Source directory only. Open each official website to confirm current opportunities, eligibility and deadlines. MzanConnect does not accept tender applications.</p>
 </div>
 <article class="card opportunity-item" data-categories="tender rfq">
 <h3><a href="https://www.etenders.gov.za/Home/" target="_blank" rel="noopener noreferrer">National Treasury eTenders</a></h3>
@@ -202,7 +210,7 @@ if(page==='opportunities')html=`
 <h3><a href="https://www.vedanta-zincinternational.com/procure/registration" target="_blank" rel="noopener noreferrer">Vedanta Zinc International</a></h3>
 <p>Register interest in joining the supplier network.</p>
 </article>
-<details class="card"><summary>View sample opportunities</summary>
+<details class="card"><summary>View illustrative examples (not open opportunities)</summary>
 ${[
 ['Funding example','Small business expansion support','Example only — not a live funding call'],
 ['Tender example','Local supplier procurement','Example only — not a live tender'],
@@ -275,6 +283,11 @@ Reset demo
 </button>`;
 
 el.innerHTML=html;
+const context=document.getElementById("pageContext");
+const descriptions={opportunities:["Funding & Tender Opportunities","Discover official sources. Verify requirements and deadlines before applying."],compliance:["Compliance Checklist","Track your business documents and readiness."],business:["My Business","Manage your business information."],growth:["Growth Passport","Follow your business development milestones."],chat:["Business Support Preview","Explore the demonstration chat features."]};
+const current=descriptions[page];
+context.hidden=!current;
+context.innerHTML=current?`<strong>${current[0]}</strong><span>${current[1]}</span>`:"";
 window.scrollTo(0,0);
 }
 
