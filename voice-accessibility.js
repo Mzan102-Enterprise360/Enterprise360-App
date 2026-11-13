@@ -32,7 +32,7 @@ const host=document.createElement('aside');host.id='mzan-voice-tools';host.setAt
 const panel=document.createElement('div');panel.id='mzan-voice-panel';panel.hidden=true;
 const title=document.createElement('strong');title.textContent='Spoken guidance';
 const info=document.createElement('p');info.id='mzan-voice-status';info.setAttribute('role','status');info.setAttribute('aria-live','polite');
-info.textContent=supported?'Tap Listen to hear calm, clear guidance. Available voices depend on your device. You can pause or stop at any time.':'Voice reading is unavailable in this browser. You can use your phone screen reader.';
+info.textContent=supported?'Listen for guidance on this page. Pause or stop whenever you wish.':'Voice reading is unavailable in this browser. You can use your phone screen reader.';
 const actions=document.createElement('div');actions.className='mzan-actions';
 function button(label,fn){const b=document.createElement('button');b.type='button';b.textContent=label;b.addEventListener('click',fn);actions.append(b);return b;}
 const toggle=document.createElement('button');toggle.type='button';toggle.textContent='🔊';toggle.setAttribute('aria-label','Open spoken page guidance');toggle.setAttribute('aria-expanded','false');
@@ -50,18 +50,95 @@ function preferredVoice(){
 function stop(){if(supported){synth.cancel();current=null;}pause.textContent='⏸ Pause';info.textContent='Stopped.';}
 function visible(el){if(el.closest('[hidden],[aria-hidden="true"],#mzan-voice-tools,form,[data-private],.receipt,[autocomplete="cc-number"]'))return false;const s=getComputedStyle(el);return s.display!=='none'&&s.visibility==='visible'&&el.getClientRects().length>0;}
 function textForPage(){
-const root=document.querySelector('main')||document.body;
-const heading=document.querySelector('h1');
-const parts=[heading&&visible(heading)?heading.textContent.trim():document.title];
-const heard=new Set();
-function clearSpeech(t){
- return t.replace(/[↗✓○•]/g,' ').replace(/&/g,' and ').replace(/\s+/g,' ').replace(/\s+([,.!?])/g,'$1').trim();
+ const page=location.pathname.split('/').pop()||'index.html';
+ const shown=id=>{const el=document.getElementById(id);return !!(el&&!el.closest('[hidden]')&&getComputedStyle(el).display!=='none');};
+ if(page==='index.html'){
+  const view=document.getElementById('view');
+  if(view?.querySelector('#opportunitySearch')){
+   const category=document.getElementById('opportunityCategory');
+   const selected=category?.selectedOptions?.[0]?.textContent?.trim();
+   return 'You are exploring business funding, tenders, and supplier opportunities. Begin with a keyword or choose a category'+(selected&&selected!=='All Categories'?', currently '+selected.toLowerCase():'')+'. Review the sources shown, then open the relevant official website to confirm requirements and deadlines. For hands-on assistance, select Business Support below.';
+  }
+  if(view?.querySelector('.welcome-cover')){
+   return 'MzanConnect brings business opportunities and practical support together. If this is your first visit, choose Join MzanConnect to create your account. Already a member? Choose Member Login. You can also use Explore to find opportunities, or Business Support to request help with your business.';
+  }
+  if(view?.querySelector('#business')){
+   return 'This is a local business profile preview. Enter your business name and sector, then save the demo information on this device. To manage your registered business details securely, open My Business from your member dashboard.';
+  }
+  if(view?.querySelector('.chat')){
+   return 'You are viewing the demonstration chat. Enter a question if you would like to try the example. Messages here are stored on your device and are not sent to MzanConnect staff. For personal assistance, use Member Support in your dashboard.';
+  }
+  if(view?.querySelector('#compliance')||view?.querySelector('h2')?.textContent?.includes('Compliance Checklist')){
+   return 'This is a sample compliance checklist. Review each requirement and tick the items you have completed. To save your actual business compliance records, open the Compliance section from your member dashboard.';
+  }
+  if(view?.querySelector('h2')?.textContent?.includes('Growth Passport')){
+   return 'This is a preview of business growth milestones. Review the suggested steps, then open Growth Passport through your dashboard to save your progress to your account.';
+  }
+  return 'Use the available options to explore the business tools on this page. Your dashboard contains your personal business information and member support.';
+ }
+ if(page==='business-support.html'){
+  if(shown('serviceRequestPanel')){
+   const service=document.getElementById('selectedService')?.textContent?.trim();
+   return 'You are requesting '+(service||'business assistance')+'. Enter your business name if you have one, then briefly describe the help you need. Review the consent statement and select Send service request. You can follow the progress under My service requests.';
+  }
+  if(shown('serviceSignIn')){
+   return 'Choose the business service you need. To keep your request private, please sign in to your account, or select Join MzanConnect if you are new. Return here to submit your request.';
+  }
+  if(shown('serviceOwnerPanel')){
+   return 'You are in Business Support. Members can request company registration, business plans, profiles, and compliance assistance. As the owner, review new enquiries in your private inbox below. Mark each request as submitted, in progress, or completed. When the work is ready, upload the finished PDF or Word document to that request so the member can download it.';
+  }
+  return 'Business Support makes it easier to get practical assistance. Choose the service you need, then select Request assistance. Tell us what you would like help with and submit your enquiry. You can check its progress and collect completed documents under My service requests.';
+ }
+ if(page==='dashboard.html'){
+  return 'This is your member dashboard. Start with My Business to review or update your profile. Use Compliance and Bookkeeping to organise your records, and Growth Passport to follow your business goals. For account questions, open Member Support. You can print individual reports when needed.';
+ }
+ if(page==='member.html'){
+  if(shown('compliancePanel')){
+   return 'You are viewing your business compliance checklist. Review each requirement, update the items you have completed, then select Save checklist. This records your progress; it does not replace official compliance verification.';
+  }
+  if(shown('growthPanel')){
+   return 'You are viewing your Growth Passport. Review the business milestones, update your progress, and save your changes. You can return later to continue where you left off.';
+  }
+  return 'This is My Business. Review your business name, contact details, sector, region, and description. Make any changes you need, then select Save business profile. Your information will be linked to your member account.';
+ }
+ if(page==='billing.html'){
+  if(shown('receiptPrint')){
+   return 'Your payment receipt is displayed. Review the details carefully. You can print the receipt or save a PDF for your records, then close it to return to Billing and Membership.';
+  }
+  if(shown('testCheckoutSection')||shown('testSection')){
+   return 'You are viewing Billing and Membership. Your owner account also has a separate test checkout. Test payments do not charge a card or activate a real membership. You can review available plans and any verified test receipts here.';
+  }
+  return 'This is Billing and Membership. Review your current plan, the available membership options, and your payment history. To purchase a plan, choose the option you want and continue to the secure Yoco checkout. A real payment happens only when you approve it.';
+ }
+ if(page==='support.html'){
+  if(shown('ownerInbox')){
+   return 'This is Member Support. You can send your own enquiry, or review requests in the owner inbox below. Open a pending message to read it, then write and save a reply. Members can view replies in their request history.';
+  }
+  return 'This is Member Support. To contact the team, open Send a support request, write your message, and save it. You can return to My request history to check your enquiries and any replies.';
+ }
+ if(page==='bookkeeping.html'){
+  return 'You are in My Bookkeeping. Start by entering the date, whether the amount is income or an expense, and the transaction details. Save each entry, then choose the month you want to review. The totals are based on your own records, and you can print your report when ready.';
+ }
+ if(page==='login.html'){
+  return 'You are on the Member Login page. Enter the email address and password linked to your account, then select Log In. If you need a new password, use the Forgot Password option.';
+ }
+ if(page==='register.html'){
+  return 'You are creating a MzanConnect account. Select your account category and complete the registration details. Review the information, then submit the form. If email confirmation is required, follow the instructions sent to your registered address before signing in.';
+ }
+ if(page==='reset-password.html'){
+  if(shown('updateForm'))return 'You can now set a new password. Enter and confirm your new password, then save it. Use your registered email address to sign in afterwards.';
+  return 'To reset your password, enter the email address registered with MzanConnect, then select Send Reset Link. Open the recovery email and follow its instructions to choose a new password.';
+ }
+ if(page==='privacy.html'){
+  return 'This page explains how MzanConnect handles personal and business information. Review the sections on data collection, access, confidentiality, and your privacy rights. If you have a question about your information, contact Member Support.';
+ }
+ if(page==='copyright.html'){
+  return 'This page contains the ownership, copyright, and development credits for MzanConnect. You can review the information here, then return to Home when you are ready.';
+ }
+ const heading=document.querySelector('h1')?.textContent?.replace(/\s+/g,' ').trim()||'this section';
+ return 'You are viewing '+heading+'. Review the information on screen, then choose the action you need. Use the navigation below to move to another section.';
 }
-const nodes=root.querySelectorAll('h2,h3,p,summary,.service a,.tile a,nav a,main > a,main > button');
-for(const el of nodes){if(!visible(el))continue;const t=clearSpeech(el.innerText||el.textContent||'');if(!t||t.length>280||heard.has(t.toLowerCase()))continue;heard.add(t.toLowerCase());if(el.matches('a')&&t==='Open'){const card=el.closest('.service');const h=card&&card.querySelector('h2');parts.push('Open '+(h?h.textContent:'website'));continue;}parts.push(/[.!?]$/.test(t)?t:t+'.');if(parts.join(' ').length>3500)break;}
-return 'Welcome to MzanConnect. Your business journey matters. I am here to guide you, one step at a time. '+parts.join(' ')+' To explore buttons and forms, you can also use the screen reader on your phone.';
-}
-function speak(){pause.textContent='⏸ Pause';if(!supported){info.textContent='Voice reading is not available. Try Android TalkBack in Accessibility settings.';return;}if(getComputedStyle(document.body).visibility==='hidden'){info.textContent='Please wait for the page to load.';return;}synth.cancel();const u=new SpeechSynthesisUtterance(textForPage());const voice=preferredVoice();if(voice){u.voice=voice;u.lang=voice.lang;}else{u.lang='en-ZA';}u.rate=.83;u.pitch=.98;u.volume=1;u.onend=()=>{if(current===u){info.textContent='Finished reading.';current=null;}};u.onerror=()=>{if(current===u){info.textContent='Unable to read aloud. Try your phone screen reader.';current=null;}};current=u;synth.speak(u);info.textContent='Reading clearly. South African English is preferred when available on your phone.';}
+function speak(){pause.textContent='⏸ Pause';if(!supported){info.textContent='Voice reading is not available. Try Android TalkBack in Accessibility settings.';return;}if(getComputedStyle(document.body).visibility==='hidden'){info.textContent='Please wait for the page to load.';return;}synth.cancel();const u=new SpeechSynthesisUtterance(textForPage());const voice=preferredVoice();if(voice){u.voice=voice;u.lang=voice.lang;}else{u.lang='en-ZA';}u.rate=.83;u.pitch=1.02;u.volume=1;u.onend=()=>{if(current===u){info.textContent='Finished reading.';current=null;}};u.onerror=()=>{if(current===u){info.textContent='Unable to read aloud. Try your phone screen reader.';current=null;}};current=u;synth.speak(u);info.textContent='Speaking guidance for this section.';}
 const listen=button('▶ Listen',speak);
 const pause=button('⏸ Pause',()=>{if(!supported)return;if(synth.paused){synth.resume();pause.textContent='⏸ Pause';info.textContent='Reading resumed.';}else if(synth.speaking){synth.pause();pause.textContent='▶ Resume';info.textContent='Paused.';}});
 button('■ Stop',stop);
@@ -77,6 +154,6 @@ toggle.removeAttribute('aria-expanded');
 }
 syncHomeVoice();
 const view=document.getElementById('view');
-if(view)new MutationObserver(()=>{stop();syncHomeVoice();}).observe(view,{childList:true});
+if(view)new MutationObserver(()=>{if(supported)synth.cancel();current=null;pause.textContent='⏸ Pause';info.textContent='Section changed. Tap Listen for the next step.';syncHomeVoice();}).observe(view,{childList:true});
 window.addEventListener('pagehide',()=>{if(supported)synth.cancel();});
 })();
