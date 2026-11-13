@@ -32,16 +32,26 @@ main{max-width:850px;margin:auto;padding:20px}
 @media(max-width:420px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.actions{flex-wrap:wrap}.actions a{min-width:130px}}
 
 @media print {
-  .section-print{display:none!important}
-  body{visibility:visible!important;background:#fff!important;color:#111!important;font-size:11pt}
+  .welcome,.panel:not([data-report]){display:none!important}
+  .panel[data-report]{display:block!important}
+  .panel[data-report] h3{font-size:12pt;margin:0 0 6px}
+  .panel[data-report] h4{font-size:10pt;margin:6px 0}
+  .panel[data-report] p{margin:4px 0;line-height:1.25}
+  .panel[data-report] .note{font-size:8pt}
+  #complianceList{font-size:9pt;line-height:1.15}
+  #complianceList > *{margin:2px 0!important;padding:0!important}
+  .progress{height:7px}
+  header h1{font-size:16pt;margin:0 0 2px}
+  header p{font-size:9pt}
+  body{visibility:visible!important;background:#fff!important;color:#111!important;font-size:9pt}
   header{background:#fff!important;color:#111!important;padding:0 0 12px;text-align:left;border-bottom:2px solid #14283b}
   header p{color:#333!important}
-  main{max-width:none;padding:8px 0}
-  .panel,.welcome{padding:10px 0;margin:0 0 12px;break-inside:avoid;border-radius:0}
+  main{max-width:none;padding:2px 0}
+  .panel{padding:6px 0;margin:0 0 7px;break-inside:avoid;border-radius:0}
   .grid,.actions,#logoutButton,#logoutMessage,.print-actions,.note-print{display:none!important}
   .progress{border:1px solid #aaa}
   .progress div{print-color-adjust:exact;-webkit-print-color-adjust:exact}
-  @page{size:A4;margin:15mm}
+  @page{size:A4 portrait;margin:10mm}
 }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
