@@ -37,6 +37,20 @@ textarea{min-height:85px;resize:vertical}
 .request-record{border-top:1px solid #dce6e9;padding:10px 0;overflow-wrap:anywhere}
 .request-record p{margin:3px 0 5px;font-size:13px;color:#415865}
 .request-record small{display:block;font-size:12px;color:#516876;margin:4px 0}
+.request-deliverables{border-top:1px solid #d7e4e6;margin-top:12px;padding-top:8px}
+.request-deliverables summary{color:#116a71;font-weight:700}
+.request-document-list{padding:7px 0}
+.request-document{display:flex;align-items:center;flex-wrap:wrap;gap:7px;padding:9px 0;border-top:1px solid #e6edef}
+.request-document span{flex:1 1 160px;font-weight:600;overflow-wrap:anywhere;min-width:0}
+.request-document small{flex:1 1 100%;margin:0}
+.download-action,.upload-action{font-size:13px;min-height:40px}
+.request-file-upload{margin-top:11px;padding:10px;background:#f2faf9;border:1px solid #cde4e2;border-radius:10px}
+.request-file-upload label{display:block;font-weight:700;margin:0}
+.request-file-upload input[type=file]{display:block;width:100%;margin:7px 0;padding:8px;border:1px solid #b8cccf;border-radius:7px;background:white;font-size:14px;min-width:0}
+.request-upload-hint{font-size:12px!important;color:#51616a!important;margin:7px 0!important}
+.upload-feedback{color:#126763!important;font-size:13px!important;font-weight:700;margin:8px 0 0!important;overflow-wrap:anywhere}
+.upload-feedback:empty{display:none}
+
 .request-record label{font-size:12px;margin-top:5px}
 .status-actions-label{font-weight:700;margin:10px 0 5px!important;color:#14283b!important}
 .status-actions{display:flex;flex-wrap:wrap;gap:7px;margin:5px 0}
@@ -80,8 +94,8 @@ details a{display:block;padding:6px 0;color:#086c70}
 <button type="submit" id="submitServiceRequest">Send service request</button>
 <p class="hint">Requesting a quote does not commit you to payment. Service fees and any government charges will be explained before you agree to proceed.</p>
 </form></section>
-<section id="serviceSignedIn" class="card" hidden><h2 class="box-title">My service requests</h2><p class="hint">Track your request: Submitted to owner → In progress → Completed. Reload this page for the latest status.</p><small id="serviceAccount"></small><div id="myServiceRequests" aria-live="polite">Loading your requests…</div></section>
-<section id="serviceOwnerPanel" class="card" hidden><h2 class="box-title">Owner service inbox</h2><p class="hint">Private owner view. For each request, tap Submitted to owner, In progress or Completed to save its status. Members see the status when they reopen their requests.</p><div id="ownerServiceRequests">Loading service requests…</div></section>
+<section id="serviceSignedIn" class="card" hidden><h2 class="box-title">My service requests</h2><p class="hint">Track your request: Submitted to owner → In progress → Completed. Reload this page for the latest status and finished documents.</p><small id="serviceAccount"></small><div id="myServiceRequests" aria-live="polite">Loading your requests…</div></section>
+<section id="serviceOwnerPanel" class="card" hidden><h2 class="box-title">Owner service inbox</h2><p class="hint">Private owner view. For each request, tap Submitted to owner, In progress or Completed to save its status. Members see the status when they reopen their requests. Upload finished PDF or Word files directly to the matching request so the member can download them.</p><div id="ownerServiceRequests">Loading service requests…</div></section>
 <details class="card"><summary>Official websites — for reference or self-service</summary>
 <a href="https://www.bizportal.gov.za/" target="_blank" rel="noopener noreferrer">CIPC BizPortal ↗</a>
 <a href="https://secure.csd.gov.za/" target="_blank" rel="noopener noreferrer">Central Supplier Database ↗</a>
@@ -89,6 +103,6 @@ details a{display:block;padding:6px 0;color:#086c70}
 <a href="https://www.cidb.org.za/" target="_blank" rel="noopener noreferrer">CIDB ↗</a></details>
 <p class="notice">MzanConnect is an independent business assistance service, not a government agency. Some processes require the applicant's direct participation, formal authority, or a registered professional. Never share passwords or OTPs with us.</p>
 </main>
-<script defer src="business-service-requests.js?v=3"></script>
+<script defer src="business-service-requests.js?v=4"></script>
 <script defer src="legal-notices.js?v=1"></script><script defer src="voice-accessibility.js?v=6"></script><script defer src="app-shell.js?v=2"></script>
 </body></html>
