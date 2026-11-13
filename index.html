@@ -211,6 +211,14 @@ body:has(.approved-cover:not([hidden])) .approved-join{left:4.8%;width:45.8%}
 body:has(.approved-cover:not([hidden])) .approved-login{left:52.2%;width:43.1%}
 body:has(.approved-cover:not([hidden])) .approved-cover a:focus-visible{outline:4px solid #fff}
 body:has(.approved-cover:not([hidden])) .welcome-cover{display:none}
+
+/* Rounded navigation buttons coordinate with the spoken-guidance controls. */
+body > nav,body:has(.welcome-cover) > nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;width:calc(100% - 20px);max-width:1030px;margin:8px auto 12px;padding:8px;border:1px solid #dce9eb;border-radius:16px;background:#fff;box-shadow:0 4px 14px #14283b0d}
+body > nav button,body:has(.welcome-cover) > nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0;min-height:52px;padding:7px 2px;background:#116a71;color:#fff;border:1px solid #ffffff80;border-radius:11px;font-size:clamp(9px,2.6vw,13px);font-weight:650;line-height:1.2;box-shadow:0 2px 5px #14283b12}
+body > nav button:hover,body:has(.welcome-cover) > nav button:hover{background:#0d555c}
+body > nav button:focus-visible{outline:3px solid #ffbf47;outline-offset:2px}
+.nav-icon{font-size:18px;line-height:1}
+
 </style>
 </head>
 <body>
@@ -228,11 +236,11 @@ body:has(.approved-cover:not([hidden])) .welcome-cover{display:none}
 <main><div id="view"></div></main>
 
 <nav>
-<button onclick="show('home')">⌂ Home</button>
-<button onclick="location.href='support.html'">☏ Support</button>
-<button onclick="show('opportunities')">▣ Explore</button>
-<button onclick="location.href='member.html'">▤ Business</button>
-<button onclick="location.href='dashboard.html'">⚙ Dashboard</button>
+<button onclick="show('home')"><span class="nav-icon" aria-hidden="true">⌂</span><span>Home</span></button>
+<button onclick="location.href='support.html'"><span class="nav-icon" aria-hidden="true">☏</span><span>Support</span></button>
+<button onclick="show('opportunities')"><span class="nav-icon" aria-hidden="true">▣</span><span>Explore</span></button>
+<button onclick="location.href='member.html'"><span class="nav-icon" aria-hidden="true">▤</span><span>Business</span></button>
+<button onclick="location.href='dashboard.html'"><span class="nav-icon" aria-hidden="true">⚙</span><span>Dashboard</span></button>
 </nav>
 
 <script>
@@ -500,6 +508,6 @@ navigator.serviceWorker.register('./sw.js').catch(()=>{});
 </script>
 
 <!-- Member access buttons appear only on the Home view. -->
-<script defer src="voice-accessibility.js?v=4"></script><script defer src="legal-notices.js?v=4"></script></body>
+<script defer src="voice-accessibility.js?v=5"></script><script defer src="legal-notices.js?v=4"></script></body>
 </html>
 
