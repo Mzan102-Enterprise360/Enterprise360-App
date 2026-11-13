@@ -21,6 +21,21 @@ main{max-width:850px;margin:auto;padding:20px}
 .tile span{display:block;font-size:28px;margin-bottom:10px}
 .tile small{display:block;font-weight:normal;margin-top:8px;color:#637482}
 .progress{background:#e5ecea;border-radius:20px;overflow:hidden;height:12px}
+@media screen{.print-only{display:none!important}}
+.report-milestone{margin:4px 0;line-height:1.4}
+.report-transaction-table{width:100%;border-collapse:collapse;table-layout:fixed;margin-top:10px}
+.report-transaction-table th,.report-transaction-table td{padding:5px 6px;border-bottom:1px solid #d8e1e4;text-align:left;overflow-wrap:anywhere;vertical-align:top}
+.report-transaction-table th:last-child,.report-transaction-table td:last-child{text-align:right}
+.report-transaction-table th:first-child{width:16%}
+.report-transaction-table th:nth-child(2){width:23%}
+.report-transaction-table th:last-child{width:21%}
+.report-error{color:#a12727;font-weight:700}
+.report-ready{color:#125f4c;font-weight:700}
+.report-finance-figures{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.report-finance-figures p{margin:5px 0;font-size:14px}
+.report-finance-figures strong{display:block;font-size:17px}
+@media(max-width:440px){.report-finance-figures{grid-template-columns:1fr}}
+
 .progress div{background:#147b59;height:100%;width:0}
 .actions{display:flex;gap:10px}
 .actions a{flex:1;text-align:center;padding:13px 8px;border-radius:10px;text-decoration:none;background:#147b59;color:white;font-weight:bold}
@@ -34,6 +49,17 @@ main{max-width:850px;margin:auto;padding:20px}
 @media print {
   .welcome,.panel:not([data-report]){display:none!important}
   .panel[data-report]{display:block!important}
+  .print-only{display:block!important}
+  .panel[data-report="bookkeeping"]{break-inside:auto!important;page-break-inside:auto!important}
+  .report-transaction-table{font-size:8pt;table-layout:fixed;page-break-inside:auto}
+  .report-transaction-table thead{display:table-header-group}
+  .report-transaction-table tr{break-inside:avoid;page-break-inside:avoid}
+  .report-transaction-table td,.report-transaction-table th{padding:3px 4px;line-height:1.25}
+  .report-finance-figures{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .report-finance-figures strong{font-size:10pt}
+  .panel[data-report] h2,.panel[data-report] h3{break-after:avoid}
+  .report-error{display:none}
+
   .panel[data-report] h3{font-size:12pt;margin:0 0 6px}
   .panel[data-report] h4{font-size:10pt;margin:6px 0}
   .panel[data-report] p{margin:4px 0;line-height:1.25}
@@ -48,7 +74,7 @@ main{max-width:850px;margin:auto;padding:20px}
   header p{color:#333!important}
   main{max-width:none;padding:2px 0}
   .panel{padding:6px 0;margin:0 0 7px;break-inside:avoid;border-radius:0}
-  .grid,.actions,#logoutButton,#logoutMessage,.print-actions,.note-print{display:none!important}
+  .grid,.actions,#logoutButton,#logoutMessage,.print-actions,.note-print,#printReportStatus{display:none!important}
   .progress{border:1px solid #aaa}
   .progress div{print-color-adjust:exact;-webkit-print-color-adjust:exact}
   @page{size:A4 portrait;margin:10mm}
@@ -87,15 +113,23 @@ main{padding:14px}
 <p id="logoutMessage" role="status"></p>
 </header>
 <main>
-<section class="welcome"><div class="print-actions"><button id="printDashboard" type="button" style="padding:12px 16px;background:#147b59;color:white;border:0;border-radius:9px;font-weight:bold;cursor:pointer">🖨 Print Dashboard / Save as PDF</button><p class="note-print note">Print the full dashboard report. On your phone, select Save as PDF.</p></div>
+<section class="welcome"><div class="print-actions"><button id="printDashboard" type="button" disabled style="padding:12px 16px;background:#147b59;color:white;border:0;border-radius:9px;font-weight:bold;cursor:pointer">🖨 Print Full Dashboard / Save as PDF</button><p class="note-print note">Includes My Business, Compliance, Business Growth and all saved Bookkeeping transactions. On your phone, choose Save as PDF.</p><p id="printReportStatus" class="note" role="status" aria-live="polite">Preparing the complete report…</p></div>
 <h2 id="memberWelcome">Welcome to Your Business Hub</h2>
 <p>Manage your business, explore opportunities and track your growth in one place.</p>
+</section>
+<section class="panel print-only" data-report="metadata">
+<h2>Complete Business Dashboard Report</h2>
+<p><strong>Prepared:</strong> <span id="reportDate">—</span></p>
+<p class="note">Based on this member's saved business records. Check the information before using or sharing the report.</p>
 </section>
 <section class="panel" data-report="profile">
 
 <h3>🏢 My Business</h3>
 <p><strong>Business Name:</strong> <span id="profileBusiness">Not provided</span></p>
 <p><strong>Business Sector:</strong> <span id="profileSector">Not provided</span></p>
+<p class="print-only"><strong>Contact Person:</strong> <span id="profileContact">Not provided</span></p>
+<p class="print-only"><strong>Region:</strong> <span id="profileRegion">Not provided</span></p>
+<p class="print-only"><strong>Business Description:</strong> <span id="profileDescription">Not provided</span></p>
 <p><strong>Membership Package:</strong> <span id="profilePlan">Not selected</span></p>
 <h4>Profile Completion: <span id="profilePercent">0%</span></h4>
 <div class="progress"><div id="profileBar"></div></div>
@@ -120,12 +154,34 @@ main{padding:14px}
 <p class="note">Self-reported checklist only. This does not verify official compliance.</p>
 <div class="actions"><a href="member.html?section=compliance&v=20261110b">Update Checklist</a></div>
 </section>
+<section class="panel print-only" data-report="growth">
+<h3>📈 Business Growth Passport</h3>
+<p><strong>Growth milestones:</strong> <span id="growthCount">0 of 5 completed</span></p>
+<div id="growthPrintList"></div>
+<p class="note">Progress based on the milestones saved in your member account.</p>
+</section>
 <section class="panel" data-report="readiness">
 
 <h3>My Business Readiness</h3>
 <p>Overall readiness: <strong id="readinessPercent">0%</strong></p>
 <div class="progress"><div id="readinessBar" style="width:0%"></div></div>
 <p id="readinessExplanation" class="note">Based on saved profile and self-reported compliance. Not an official certification.</p>
+</section>
+<section class="panel print-only" data-report="bookkeeping">
+<h3>📒 My Bookkeeping — Financial Summary &amp; Transactions</h3>
+<p id="financePeriod">Reviewing saved transactions…</p>
+<div class="report-finance-figures">
+<p>Total income / turnover <strong id="financeIncome">—</strong></p>
+<p>Total expenses <strong id="financeExpenses">—</strong></p>
+<p>Net profit / loss <strong id="financeProfit">—</strong></p>
+</div>
+<p class="note">Figures come from saved bookkeeping transactions. VAT is not separately captured. This is not an audited financial statement.</p>
+<h4>Full saved transaction history</h4>
+<table class="report-transaction-table">
+<thead><tr><th>Date</th><th>Type / Category</th><th>Description</th><th>Amount</th></tr></thead>
+<tbody id="financeRows"></tbody>
+</table>
+<p id="financeEmpty" class="note">No bookkeeping transactions saved yet.</p>
 </section>
 <section class="panel">
 <h3>Quick Actions</h3>
@@ -137,106 +193,155 @@ main{padding:14px}
 </main>
 <script>
 (async function initializeDashboard(){
-  const logoutButton=document.getElementById("logoutButton");
-  const logoutMessage=document.getElementById("logoutMessage");
-  let client;
+  const $=id=>document.getElementById(id);
+  const printButton=$('printDashboard');
+  const printStatus=$('printReportStatus');
+  const logoutButton=$('logoutButton');
+  const logoutMessage=$('logoutMessage');
+  const money=value=>new Intl.NumberFormat('en-ZA',{style:'currency',currency:'ZAR'}).format(value);
+  const requirements=['CIPC records','SARS tax status','CSD registration','B-BBEE documents','Relevant industry licences'];
+  const growthLabels=['Complete business assessment','Review compliance','Prepare funding documents','Identify procurement opportunities','Complete monthly business review'];
+  let client,user;
   try{
-    if(!window.supabase)throw new Error("Authentication library unavailable");
+    if(!window.supabase)throw Error('Authentication library unavailable');
     client=window.supabase.createClient(
-      "https://akxzubckdebawqwwwaoe.supabase.co",
-      "sb_publishable_XEeBfPCzJ0MzGpHWHygeug_rGptbzno"
+      'https://akxzubckdebawqwwwaoe.supabase.co',
+      'sb_publishable_XEeBfPCzJ0MzGpHWHygeug_rGptbzno'
     );
-    const {data,error}=await client.auth.getUser();
-    if(error||!data.user){
-      window.location.replace("login.html");
-      return;
-    }
-    const isOwner=data.user.app_metadata?.mzanconnect_role==="owner";
-    document.getElementById("profilePlan").textContent=isOwner ? "MzanConnect Owner" : "MzanConnect Member";
-  }catch(error){
-    window.location.replace("login.html");
-    return;
-  }
+    const result=await client.auth.getUser();
+    if(result.error||!result.data.user){location.replace('login.html');return;}
+    user=result.data.user;
+    $('profilePlan').textContent=user.app_metadata?.mzanconnect_role==='owner'?'MzanConnect Owner':'MzanConnect Member';
+  }catch(error){location.replace('login.html');return;}
 
-  document.getElementById("printDashboard").addEventListener("click",()=>window.print());
-  logoutButton.addEventListener("click",async function(){
+  document.body.style.visibility='visible';
+  logoutButton.addEventListener('click',async()=>{
     logoutButton.disabled=true;
-    logoutButton.textContent="Signing out...";
+    logoutButton.textContent='Signing out...';
     try{
       const {error}=await client.auth.signOut();
       if(error)throw error;
-      window.location.replace("index.html");
+      location.replace('index.html');
     }catch(error){
-      logoutMessage.textContent="Unable to sign out. Please try again.";
+      logoutMessage.textContent='Unable to sign out. Please try again.';
       logoutButton.disabled=false;
-      logoutButton.textContent="Log Out";
+      logoutButton.textContent='Log Out';
     }
   });
 
-  let profileFieldsCompleted=0;
-  // Read the signed-in member's own profile from Supabase.
-  try {
-    const {data:{user}}=await client.auth.getUser();
-    const {data:profile,error:profileError}=await client
-      .from("business_profiles")
-      .select("business_name,sector,contact_name")
-      .eq("user_id",user.id)
-      .maybeSingle();
-    if(profileError)throw profileError;
-    if(profile){
-      const business=String(profile.business_name||"").trim();
-      const sector=String(profile.sector||"").trim();
-      document.getElementById("profileBusiness").textContent=business||"Not provided";
-      document.getElementById("profileSector").textContent=sector||"Not provided";
-      if(business)document.getElementById("memberWelcome").textContent="Welcome, "+business+"!";
-      profileFieldsCompleted=[business,sector].filter(Boolean).length;
-      const percent=Math.round(profileFieldsCompleted/2*100);
-      document.getElementById("profilePercent").textContent=percent+"%";
-      document.getElementById("profileBar").style.width=percent+"%";
-      document.querySelector(".panel .note").textContent="Profile loaded from your secure account.";
+  function addChecklist(rootId,labels,prefix,map){
+    const root=$(rootId);
+    root.replaceChildren();
+    let completed=0;
+    labels.forEach((label,i)=>{
+      const checked=map.get(prefix+i)===true;
+      if(checked)completed++;
+      const line=document.createElement('p');
+      line.className='report-milestone';
+      line.textContent=(checked?'✓ ':'○ ')+label+(prefix==='g'?(checked?' — Completed':' — Not completed'):'');
+      root.append(line);
+    });
+    return completed;
+  }
+  async function fetchAllBookkeeping(){
+    const all=[];
+    const pageSize=1000;
+    const maxRecords=5000;
+    for(let offset=0;offset<=maxRecords;offset+=pageSize){
+      const {data,error}=await client.from('bookkeeping_transactions')
+        .select('id,transaction_date,kind,category,description,amount')
+        .eq('user_id',user.id)
+        .order('transaction_date',{ascending:true})
+        .order('id',{ascending:true})
+        .range(offset,offset+pageSize-1);
+      if(error)throw error;
+      if(!Array.isArray(data))throw Error('Bookkeeping records were not returned.');
+      all.push(...data);
+      if(all.length>maxRecords)throw Error('More than 5,000 transactions: a complete single-document report is not available. Use My Bookkeeping or request a complete export.');
+      if(data.length<pageSize)return all;
     }
-  }catch(error){
-    console.warn("Secure profile could not be loaded.",error);
+    throw Error('Could not verify the complete transaction history.');
   }
 
-  const requirements=[
-    "CIPC records",
-    "SARS tax status",
-    "CSD registration",
-    "B-BBEE documents",
-    "Relevant industry licences"
-  ];
-  let tasks={};
-  // Prefer server-side compliance records for signed-in members.
-  try{
-    const {data:{user}}=await client.auth.getUser();
-    const {data:items,error:itemsError}=await client.from("compliance_items")
-      .select("item_key,completed").eq("user_id",user.id);
-    if(itemsError)throw itemsError;
-    if(items && items.length){
-      items.forEach(item=>{if(/^c[0-4]$/.test(item.item_key))tasks[item.item_key]=item.completed===true;});
+  async function loadReport(){
+    printButton.disabled=true;
+    printStatus.className='note';
+    printStatus.textContent='Preparing your complete saved dashboard report…';
+    try{
+      const [profileResponse,checklistResponse,records]=await Promise.all([
+        client.from('business_profiles').select('business_name,sector,contact_name,region,description').eq('user_id',user.id).maybeSingle(),
+        client.from('compliance_items').select('item_key,completed').eq('user_id',user.id),
+        fetchAllBookkeeping()
+      ]);
+      if(profileResponse.error)throw profileResponse.error;
+      if(checklistResponse.error)throw checklistResponse.error;
+      const profile=profileResponse.data||{};
+      const getField=key=>String(profile[key]||'').trim();
+      $('profileBusiness').textContent=getField('business_name')||'Not provided';
+      $('profileSector').textContent=getField('sector')||'Not provided';
+      $('profileContact').textContent=getField('contact_name')||'Not provided';
+      $('profileRegion').textContent=getField('region')||'Not provided';
+      $('profileDescription').textContent=getField('description')||'Not provided';
+      const profileFieldsCompleted=[getField('business_name'),getField('sector')].filter(Boolean).length;
+      const profilePercent=Math.round(profileFieldsCompleted/2*100);
+      $('profilePercent').textContent=profilePercent+'%';
+      $('profileBar').style.width=profilePercent+'%';
+      if(getField('business_name'))$('memberWelcome').textContent='Welcome, '+getField('business_name')+'!';
+      const complianceMap=new Map((checklistResponse.data||[]).map(row=>[row.item_key,row.completed===true]));
+      const completed=addChecklist('complianceList',requirements,'c',complianceMap);
+      const compliancePercent=Math.round(completed/requirements.length*100);
+      $('compliancePercent').textContent=compliancePercent+'%';
+      $('complianceBar').style.width=compliancePercent+'%';
+      $('complianceCount').textContent=completed+' of '+requirements.length+' requirements completed';
+      const growthCompleted=addChecklist('growthPrintList',growthLabels,'g',complianceMap);
+      $('growthCount').textContent=growthCompleted+' of '+growthLabels.length+' milestones completed ('+Math.round(growthCompleted/growthLabels.length*100)+'%)';
+      const readiness=Math.round((profileFieldsCompleted+completed)/7*100);
+      $('readinessPercent').textContent=readiness+'%';
+      $('readinessBar').style.width=readiness+'%';
+      $('readinessExplanation').textContent=profileFieldsCompleted+' of 2 profile fields and '+completed+' of 5 self-reported compliance items completed. Not an official certification.';
+
+      let income=0,expense=0;
+      const rows=$('financeRows');
+      rows.replaceChildren();
+      for(const entry of records){
+        const cents=Math.round(Number(entry.amount)*100);
+        if(!Number.isSafeInteger(cents)||cents<0)throw Error('Bookkeeping contains an invalid amount; complete printout was not prepared.');
+        if(entry.kind==='income')income+=cents;
+        else if(entry.kind==='expense')expense+=cents;
+        else throw Error('Bookkeeping contains an unknown transaction type; complete printout was not prepared.');
+        if(!Number.isSafeInteger(income)||!Number.isSafeInteger(expense))throw Error('Bookkeeping totals exceed the supported amount.');
+        const tr=document.createElement('tr');
+        const values=[
+          entry.transaction_date||'—',
+          (entry.kind==='income'?'Income':'Expense')+' / '+(entry.category||'Uncategorised'),
+          entry.description||'—',
+          money(cents/100)
+        ];
+        values.forEach(value=>{const cell=document.createElement('td');cell.textContent=String(value);tr.append(cell);});
+        rows.append(tr);
+      }
+      $('financeIncome').textContent=money(income/100);
+      $('financeExpenses').textContent=money(expense/100);
+      $('financeProfit').textContent=money((income-expense)/100);
+      $('financeEmpty').hidden=records.length>0;
+      $('financePeriod').textContent=records.length
+        ?'All '+records.length+' saved transactions, '+records[0].transaction_date+' to '+records[records.length-1].transaction_date+'.'
+        :'No saved bookkeeping transactions. These totals represent no recorded transactions, not confirmed zero business activity.';
+      $('reportDate').textContent=new Date().toLocaleString('en-ZA',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
+      printButton.disabled=false;
+      printStatus.className='note report-ready';
+      printStatus.textContent='Complete report ready: My Business, Compliance, Growth, Readiness and all '+records.length+' saved bookkeeping transaction(s).';
+    }catch(error){
+      printStatus.className='note report-error';
+      printStatus.textContent='Full report could not be prepared: '+(error.message||'Please reload and try again.')+' Printing is disabled to avoid an incomplete report.';
+      printButton.disabled=true;
     }
-  }catch(error){
-    console.warn("Compliance records unavailable.",error);
   }
-  const completed=requirements.filter((_,i)=>tasks["c"+i]===true).length;
-  const percent=Math.round(completed/requirements.length*100);
-  document.getElementById("compliancePercent").textContent=percent+"%";
-  document.getElementById("complianceBar").style.width=percent+"%";
-  document.getElementById("complianceCount").textContent=completed+" of "+requirements.length+" requirements completed";
-  const readiness=Math.round((profileFieldsCompleted+completed)/7*100);
-  document.getElementById("readinessPercent").textContent=readiness+"%";
-  document.getElementById("readinessBar").style.width=readiness+"%";
-  document.getElementById("readinessExplanation").textContent=profileFieldsCompleted+" of 2 profile fields and "+completed+" of 5 self-reported compliance items completed. Not an official certification.";
-  const list=document.getElementById("complianceList");
-  requirements.forEach((name,i)=>{
-    const item=document.createElement("p");
-    const checked=tasks["c"+i]===true;
-    item.textContent=(checked?"✓ ":"○ ")+name;
-    item.style.color=checked?"#147b59":"#526675";
-    list.appendChild(item);
+  printButton.addEventListener('click',()=>{
+    if(printButton.disabled)return;
+    window.print();
   });
-  document.body.style.visibility="visible";
+  await loadReport();
 })();
 </script>
 <script defer src="legal-notices.js?v=1"></script><script defer src="voice-accessibility.js?v=7"></script><script defer src="app-shell.js?v=2"></script></body>
