@@ -9,7 +9,7 @@
 <style>
 *{box-sizing:border-box}
 html{background:#fff}
-body{margin:0;background:#fff;font-family:Arial,sans-serif;color:#14283b;visibility:hidden}
+body{margin:0;background:#f3f6f8;font-family:Arial,sans-serif;color:#14283b;visibility:hidden}
 header{background:#14283b;color:white;padding:25px 18px;text-align:center}
 header h1{margin:0 0 8px}
 header p{margin:0;color:#d4e0e7}
@@ -52,6 +52,16 @@ main{max-width:850px;margin:auto;padding:20px}
   .progress{border:1px solid #aaa}
   .progress div{print-color-adjust:exact;-webkit-print-color-adjust:exact}
   @page{size:A4 portrait;margin:10mm}
+}
+
+/* Premium MzanConnect accents; printed reports retain plain A4 styling */
+@media screen {
+header{background:linear-gradient(125deg,#14283b 0%,#163b50 65%,#116a71 100%)}
+.welcome{background:linear-gradient(115deg,#f0faf9 0%,#fff 75%);border:1px solid #cce8e5;box-shadow:0 6px 22px rgba(20,40,59,.07)}
+.panel,.tile{box-shadow:0 5px 18px rgba(20,40,59,.06)}
+.tile{transition:transform .16s ease,box-shadow .16s ease}
+.tile:hover{transform:translateY(-2px);box-shadow:0 9px 24px rgba(20,40,59,.12)}
+.tile:focus-visible,.actions a:focus-visible{outline:3px solid #12a3a8;outline-offset:2px}
 }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
