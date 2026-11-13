@@ -219,6 +219,21 @@ body > nav button:hover,body:has(.welcome-cover) > nav button:hover{background:#
 body > nav button:focus-visible{outline:3px solid #ffbf47;outline-offset:2px}
 .nav-icon{font-size:18px;line-height:1}
 
+
+/* Fit the complete home screen to the browser's currently visible height. */
+@media screen {
+body:has(.welcome-cover){height:100vh;height:100dvh;min-height:0;display:flex;flex-direction:column}
+body:has(.welcome-cover) main{flex:1 1 0;min-height:0;width:100%;padding:2px 10px;display:flex}
+body:has(.welcome-cover) #view{flex:1 1 0;min-height:0;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center}
+body:has(.welcome-cover) .approved-cover:not([hidden]){flex:0 0 auto;width:var(--home-art-width, min(100%, 40vh));max-width:100%;margin:0 auto;border-radius:18px}
+body:has(.welcome-cover) .approved-cover img{width:100%;height:auto}
+body:has(.welcome-cover) .home-disclaimer{flex:0 0 auto;width:100%;font-size:clamp(10px,2.6vw,12px);line-height:1.25;margin:5px 0 2px}
+body:has(.welcome-cover) > nav{flex:0 0 auto;margin:4px auto;padding:5px;gap:5px}
+body:has(.welcome-cover) > nav button{min-height:44px;padding:4px 2px;gap:2px}
+body:has(.welcome-cover) #mzan-legal-footer{flex:0 0 auto;padding:5px 8px!important;font-size:10px!important;line-height:1.2!important}
+body:has(.welcome-cover) #mzan-legal-footer div{margin:2px 0}
+}
+
 </style>
 </head>
 <body>
@@ -501,6 +516,31 @@ show(['home','business','compliance','opportunities','growth','chat'].includes(p
 }
 window.addEventListener('hashchange',showFromUrl);
 showFromUrl();
+
+/* Keep the exact image and its clickable regions together while fitting available space. */
+function fitHomeArtwork(){
+ const cover=document.getElementById('approvedCover');
+ if(!cover||cover.hidden)return;
+ const picture=cover.querySelector('img');
+ const note=el.querySelector('.home-disclaimer');
+ const noteStyle=note?getComputedStyle(note):null;
+ const noteHeight=note?note.getBoundingClientRect().height+parseFloat(noteStyle.marginTop)+parseFloat(noteStyle.marginBottom):0;
+ const room=Math.max(0,el.clientHeight-noteHeight-2);
+ const ratio=picture.naturalWidth&&picture.naturalHeight?picture.naturalWidth/picture.naturalHeight:1234/1536;
+ const width=Math.max(0,Math.min(el.clientWidth,room*ratio,840));
+ cover.style.setProperty('--home-art-width',width+'px');
+}
+const homeFitObserver=new ResizeObserver(fitHomeArtwork);
+homeFitObserver.observe(el);
+new MutationObserver(()=>{
+ const note=el.querySelector('.home-disclaimer');
+ if(note)homeFitObserver.observe(note);
+ requestAnimationFrame(fitHomeArtwork);
+}).observe(el,{childList:true});
+el.addEventListener('load',fitHomeArtwork,true);
+window.addEventListener('resize',fitHomeArtwork);
+if(window.visualViewport)window.visualViewport.addEventListener('resize',fitHomeArtwork);
+requestAnimationFrame(fitHomeArtwork);
 
 if('serviceWorker' in navigator){
 navigator.serviceWorker.register('./sw.js').catch(()=>{});
