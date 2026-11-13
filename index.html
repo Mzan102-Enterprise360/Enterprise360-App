@@ -245,6 +245,13 @@ body:has(.welcome-cover) #mzan-legal-footer div{margin:2px 0}
 body:has(.welcome-cover) .cover-copy h1{font-size:clamp(27px,6.8vw,62px)}
 body:has(.welcome-cover) .cover-copy .cover-kicker{font-size:clamp(12px,3vw,20px);letter-spacing:0}
 
+
+/* Final hero polish: prominent legible slogan, responsive without clipping. */
+.approved-message{inset:42.5% 0 auto;height:22%;padding:1% 2.5%;background:linear-gradient(110deg,#002d40,#005364)}
+.approved-message h1{font-size:clamp(17px,8.1cqw,76px);line-height:1.05;font-weight:900;letter-spacing:-.045em;text-shadow:0 2px 8px #001e2a55}
+.approved-message p{font-size:clamp(9px,3cqw,27px);font-weight:650;margin:1cqw 0 0}
+@media(prefers-reduced-motion:reduce){.cover-actions a,button{transition:none!important}}
+
 </style>
 </head>
 <body>
