@@ -26,6 +26,24 @@ main{width:100%;max-width:800px;margin:0 auto;padding:10px 14px 20px}
 .summary{gap:6px}
 .summary div{padding:9px}
 }
+
+/* Bookkeeping mobile spacing: remove empty status gap and keep tap targets accessible */
+@media screen {
+header{padding:12px 16px 14px}
+header .header-brand{margin-bottom:7px}
+header h1{margin-bottom:5px}
+header p:not(.header-brand){line-height:1.35}
+main{padding:8px 12px 18px}
+.dashboard-return{padding:5px 7px;margin:0 0 8px}
+.dashboard-return a,.actions .dashboard-return a{min-height:44px;padding:9px 12px;font-size:16px}
+#status:empty{display:none}
+#status:not(:empty){margin:4px 0 10px;min-height:0}
+.card{padding:13px;margin-bottom:10px}
+.card h2{margin:0 0 9px}
+label{margin:9px 0 4px}
+input,select,textarea{padding:10px 12px;min-height:44px}
+textarea{min-height:64px}
+}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script></head>
 <body><header><p class="header-brand">◈ MzanConnect</p><h1>My Bookkeeping</h1><p>Record income and expenses, and review your business finances.</p></header>
 <main><div class="dashboard-return"><a href="dashboard.html" aria-label="Back to dashboard">← Back to Dashboard</a></div><p id="status" role="status" aria-live="polite"></p>
