@@ -32,6 +32,15 @@ main{padding:14px}
 label{margin:11px 0 5px}
 input{min-height:44px}
 }
+/* Fit short account sections while allowing long forms to scroll */
+@media screen {
+body{min-height:100dvh;overflow-x:hidden}
+main{width:100%;max-width:650px;margin:0 auto;padding:10px 14px 20px}
+.dashboard-return{padding:6px 8px;margin-bottom:9px}
+.dashboard-return a{min-height:44px;padding:8px 12px}
+.card{padding:14px;margin:8px 0}
+.card h2{margin:0 0 10px}
+}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script></head>
 <body><header><p class="header-brand">◈ MzanConnect</p><h1 id="sectionTitle">My Business</h1><p id="sectionDescription">Manage and update your business profile.</p></header>
 <main><div class="dashboard-return"><a href="dashboard.html" aria-label="Back to dashboard">← Back to Dashboard</a></div><p id="message" role="status" aria-live="polite"></p>

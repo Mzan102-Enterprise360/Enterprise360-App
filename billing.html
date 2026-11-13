@@ -24,6 +24,18 @@ header{background:linear-gradient(115deg,#14283b 0%,#163d50 75%,#116a6a 100%);pa
 header .header-brand{margin:0 0 12px;font-size:16px;font-weight:700;color:#d4e6eb}
 header h1{margin:0 0 8px;font-size:clamp(24px,5vw,32px);line-height:1.2;color:#fff}
 header p:not(.header-brand){margin:0;color:#dce8eb;line-height:1.45;font-size:15px}
+/* Compact short billing overview; retain readable plans and receipt printing */
+@media screen {
+body{min-height:100dvh;overflow-x:hidden}
+header{padding:14px 16px}
+main{width:100%;max-width:760px;margin:0 auto;padding:10px 14px 20px}
+.panel{padding:15px;margin-bottom:10px}
+.panel h2{margin:0 0 10px}
+.plans{gap:7px;margin:10px 0}
+.plans li{padding:10px 12px}
+.dashboard-return{padding:6px 8px;margin-bottom:9px}
+.dashboard-return a{min-height:44px;padding:8px 12px}
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 </head>
