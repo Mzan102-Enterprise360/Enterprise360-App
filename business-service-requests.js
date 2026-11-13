@@ -1,0 +1,93 @@
+/* MzanConnect service enquiries: signed-in members only; RLS protects private records. */
+(() => {
+'use strict';
+const byId = id => document.getElementById(id);
+const titles={cipc:'CIPC BizPortal assistance',csd:'CSD supplier registration',sars:'SARS compliance guidance',cidb:'CIDB contractor registration',other:'Other business service'};
+const create=(tag, text, className)=>{const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el;};
+let db, user, owner=false;
+const loginPrompt=byId('serviceSignIn'), panel=byId('serviceRequestPanel'), form=byId('serviceRequestForm');
+const note=byId('serviceFeedback'), myList=byId('myServiceRequests'), ownerPanel=byId('serviceOwnerPanel'), ownerList=byId('ownerServiceRequests');
+function notify(message, failure=false){note.textContent=message;note.style.color=failure?'#9a2c2c':'#126763';}
+function statusText(status){return ({new:'New',reviewing:'Under review',awaiting_documents:'Documents requested',quoted:'Quote prepared',in_progress:'In progress',completed:'Completed',cancelled:'Cancelled'})[status]||status;}
+function showRequest(type){
+ if(!user){loginPrompt.hidden=false;loginPrompt.scrollIntoView({behavior:'smooth',block:'nearest'});return;}
+ byId('serviceType').value=type;byId('selectedService').textContent=titles[type]||titles.other;
+ panel.hidden=false;notify('');panel.scrollIntoView({behavior:'smooth',block:'start'});
+ byId('businessName').focus({preventScroll:true});
+}
+document.querySelectorAll('[data-request-service]').forEach(b=>b.addEventListener('click',()=>showRequest(b.dataset.requestService)));
+function requestRow(r,admin){
+ const card=create('article',undefined,'request-record');
+ const heading=create('strong',(titles[r.service_type]||'Business assistance')+' · '+statusText(r.status));
+ card.append(heading,create('small',new Date(r.created_at).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'})));
+ if(r.business_name)card.append(create('p','Business: '+r.business_name));
+ if(r.details)card.append(create('p',r.details));
+ if(admin){
+  card.append(create('p','Member email: '+r.contact_email));
+  const label=create('label','Update status: '); const select=create('select');
+  select.setAttribute('aria-label','Status for '+(titles[r.service_type]||'request'));
+  ['new','reviewing','awaiting_documents','quoted','in_progress','completed','cancelled'].forEach(s=>{const option=create('option',statusText(s));option.value=s;select.append(option);});
+  select.value=r.status; label.append(select);
+  const save=create('button','Save status','mini-action');save.type='button';
+  const feedback=create('span','');feedback.setAttribute('role','status');
+  save.addEventListener('click',async()=>{
+   if(save.disabled)return; save.disabled=true;feedback.textContent=' Saving…';
+   const {error}=await db.from('business_service_requests').update({status:select.value,updated_at:new Date().toISOString()}).eq('id',r.id);
+   if(error){feedback.textContent=' Could not update. Retry.';}else{heading.textContent=(titles[r.service_type]||'Business assistance')+' · '+statusText(select.value);feedback.textContent=' Saved.';}
+   save.disabled=false;
+  });
+  card.append(label,save,feedback);
+ }
+ return card;
+}
+async function refreshLists(){
+ if(!db||!user)return;
+ const fields='id,service_type,business_name,details,contact_email,status,created_at';
+ const mine=await db.from('business_service_requests').select(fields).eq('user_id',user.id).order('created_at',{ascending:false}).limit(30);
+ myList.replaceChildren();
+ if(mine.error)myList.textContent='Could not load your requests. Try refreshing the page.';
+ else if(!mine.data.length)myList.textContent='You have not requested any services yet.';
+ else myList.append(...mine.data.map(r=>requestRow(r,false)));
+ if(owner){
+  const inbox=await db.from('business_service_requests').select(fields).order('created_at',{ascending:false}).limit(50);
+  ownerList.replaceChildren();
+  if(inbox.error)ownerList.textContent='Could not load the private inbox. Try refreshing.';
+  else if(!inbox.data.length)ownerList.textContent='No service requests received yet.';
+  else ownerList.append(...inbox.data.map(r=>requestRow(r,true)));
+ }
+}
+(async()=>{
+ try{
+  if(!window.supabase)throw new Error('Authentication library unavailable');
+  db=window.supabase.createClient('https://akxzubckdebawqwwwaoe.supabase.co','sb_publishable_XEeBfPCzJ0MzGpHWHygeug_rGptbzno');
+  const response=await db.auth.getUser();if(response.error)throw response.error;
+  user=response.data.user;
+  if(!user){loginPrompt.hidden=false;return;}
+  byId('serviceAccount').textContent='Signed in as '+(user.email||'MzanConnect member');
+  byId('serviceSignedIn').hidden=false;
+  owner=user.app_metadata?.mzanconnect_role==='owner';
+  if(owner){ownerPanel.hidden=false;}
+  await refreshLists();
+ }catch(err){loginPrompt.hidden=false;byId('serviceSignInHint').textContent='Please sign in to send a service request.';}
+})();
+form.addEventListener('submit',async e=>{
+ e.preventDefault();
+ if(!user||!db){loginPrompt.hidden=false;return;}
+ const btn=byId('submitServiceRequest');if(btn.disabled)return;
+ if(!byId('serviceConsent').checked){notify('Please consent to being contacted.',true);return;}
+ const details=byId('serviceDetails').value.trim();
+ const business=byId('businessName').value.trim();
+ const values={user_id:user.id,service_type:byId('serviceType').value,business_name:business,details,contact_email:user.email||'',consent_confirmed:true};
+ if(!values.contact_email){notify('Your account needs a confirmed email address.',true);return;}
+ btn.disabled=true;notify('Sending your request…');
+ try{
+  const {error}=await db.from('business_service_requests').insert(values);
+  if(error)throw error;
+  form.reset();panel.hidden=true;
+  notify('Your request has been saved. Mzan 102 can review it in the private service inbox.');
+  await refreshLists();
+  byId('serviceSignedIn').scrollIntoView({behavior:'smooth',block:'start'});
+ }catch(err){notify('Could not save your request. Check your connection and try again.',true);}
+ finally{btn.disabled=false;}
+});
+})();
