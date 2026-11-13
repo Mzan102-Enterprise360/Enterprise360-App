@@ -234,6 +234,17 @@ body:has(.welcome-cover) #mzan-legal-footer{flex:0 0 auto;padding:5px 8px!import
 body:has(.welcome-cover) #mzan-legal-footer div{margin:2px 0}
 }
 
+
+/* Live headline over the artwork's original text area; image and links retain their dimensions. */
+.approved-cover{container-type:inline-size}
+.approved-message{position:absolute;inset:44.5% 0 auto;height:18.5%;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;background:linear-gradient(110deg,#003044,#004b5b);color:#fff;padding:0 3%;pointer-events:none}
+.approved-message h1{font:850 6.9cqw/1.08 system-ui,Arial;letter-spacing:-.035em;margin:0}
+.approved-message h1 span{display:block;white-space:nowrap}
+.approved-message h1 span:last-child{color:#80f0d7}
+.approved-message p{font-size:2.9cqw;line-height:1.2;margin:1.6cqw 0 0;color:#fff}
+body:has(.welcome-cover) .cover-copy h1{font-size:clamp(27px,6.8vw,62px)}
+body:has(.welcome-cover) .cover-copy .cover-kicker{font-size:clamp(12px,3vw,20px);letter-spacing:0}
+
 </style>
 </head>
 <body>
@@ -278,14 +289,14 @@ for(const item of document.querySelectorAll('.brand-extra'))item.hidden=opportun
 let html='';
 
 if(page==='home')html=`
-<div class="approved-cover" id="approvedCover" hidden><img src="mzanconnect-approved-homepage.png" alt="MzanConnect business hub: three South African business professionals, Your business. Your next opportunity." onload="this.parentElement.hidden=false;this.parentElement.nextElementSibling.hidden=true" onerror="this.parentElement.remove()" loading="eager"><a class="approved-join" href="register.html" aria-label="Join MzanConnect"></a><a class="approved-login" href="login.html" aria-label="Member Login"></a></div>
+<div class="approved-cover" id="approvedCover" hidden><img src="mzanconnect-approved-homepage.png" alt="MzanConnect business hub: three South African business professionals, Your business. Your next opportunity." onload="this.parentElement.hidden=false;this.parentElement.nextElementSibling.hidden=true" onerror="this.parentElement.remove()" loading="eager"><div class="approved-message"><h1><span>One Connection.</span><span>Endless Possibilities.</span></h1><p>Your business. Your next opportunity.</p></div><a class="approved-join" href="register.html" aria-label="Join MzanConnect"></a><a class="approved-login" href="login.html" aria-label="Member Login"></a></div>
 <section class="welcome-cover" aria-labelledby="coverTitle">
   <div class="cover-photo" role="img" aria-label="South African business professionals collaborating around a laptop"></div>
   <div class="cover-content">
     <div class="cover-topline"><span class="cover-brand-icon" aria-hidden="true">✦</span><span>MZANCONNECT</span><span class="cover-topline-rule" aria-hidden="true"></span><span class="cover-edition">BUSINESS HUB</span></div>
     <div class="cover-copy">
-      <p class="cover-kicker">ONE CONNECTION. ENDLESS POSSIBILITIES.</p>
-      <h1 id="coverTitle">Your business.<br><em>Your next opportunity.</em></h1>
+      <h1 id="coverTitle">One Connection.<br><em>Endless Possibilities.</em></h1>
+      <p class="cover-kicker">Your business. Your next opportunity.</p>
       <p class="cover-lead">Find opportunities. Grow your business. Move forward.</p>
       <div class="member-access-buttons cover-actions" aria-label="Member registration and login"><a href="register.html">♟ &nbsp; Join MzanConnect</a><a href="login.html">⇥ &nbsp; Member Login</a></div>
     </div>
