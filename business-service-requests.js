@@ -2,7 +2,7 @@
 (() => {
 'use strict';
 const byId = id => document.getElementById(id);
-const titles={cipc:'CIPC BizPortal assistance',csd:'CSD supplier registration',sars:'SARS compliance guidance',cidb:'CIDB contractor registration',other:'Other business service'};
+const titles={cipc:'CIPC BizPortal assistance',csd:'CSD supplier registration',sars:'SARS compliance guidance',cidb:'CIDB contractor registration',business_plan:'Business plan service',business_profile:'Business profile service',other:'Other business service'};
 const create=(tag, text, className)=>{const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el;};
 let db, user, owner=false;
 const loginPrompt=byId('serviceSignIn'), panel=byId('serviceRequestPanel'), form=byId('serviceRequestForm');
