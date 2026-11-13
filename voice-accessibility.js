@@ -27,7 +27,7 @@ const toggle=document.createElement('button');toggle.type='button';toggle.textCo
 toggle.setAttribute('aria-controls','mzan-voice-panel');
 let current=null;
 function stop(){if(supported){synth.cancel();current=null;}info.textContent='Stopped.';}
-function visible(el){if(el.closest('[hidden],[aria-hidden="true"],#mzan-voice-tools,form,[data-private],.receipt,[autocomplete="cc-number"]'))return false;const s=getComputedStyle(el);return s.display!=='none'&&s.visibility==='visible';}
+function visible(el){if(el.closest('[hidden],[aria-hidden="true"],#mzan-voice-tools,form,[data-private],.receipt,[autocomplete="cc-number"]'))return false;const s=getComputedStyle(el);return s.display!=='none'&&s.visibility==='visible'&&el.getClientRects().length>0;}
 function textForPage(){
 const root=document.querySelector('main')||document.body;
 const heading=document.querySelector('h1');
