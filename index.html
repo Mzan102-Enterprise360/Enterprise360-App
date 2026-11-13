@@ -202,6 +202,15 @@ body:has(.welcome-cover) .growth-symbol{font-size:clamp(38px,8vw,76px)}
 body:has(.welcome-cover) .home-disclaimer{margin:7px 0 5px}
 @media(max-width:480px){body:has(.welcome-cover) .cover-photo{height:clamp(150px,27vh,230px)}body:has(.welcome-cover) .cover-content{padding:10px 13px 0}body:has(.welcome-cover) .cover-copy{padding:12px 0 3px}body:has(.welcome-cover) .welcome-cover h1{font-size:clamp(30px,8vw,42px)}body:has(.welcome-cover) .cover-lead{margin-bottom:15px}body:has(.welcome-cover) .cover-actions{gap:8px}body:has(.welcome-cover) .cover-actions a{padding:8px 4px;min-height:53px;font-size:clamp(11px,3.1vw,15px);border-radius:13px}body:has(.welcome-cover) .cover-landscape{margin-top:10px;height:68px}body:has(.welcome-cover) .cover-edition{font-size:10px}}
 
+
+/* Approved artwork: exact supplied design when asset is present; retain functioning fallback until then. */
+body:has(.approved-cover:not([hidden])) .approved-cover{position:relative;display:block;width:100%;max-width:840px;margin:0 auto;overflow:hidden;border-radius:24px;box-shadow:0 12px 30px #062c3c26}
+body:has(.approved-cover:not([hidden])) .approved-cover img{display:block;width:100%;height:auto}
+body:has(.approved-cover:not([hidden])) .approved-cover a{position:absolute;top:69.8%;height:9.4%;border-radius:20px;outline-offset:3px}
+body:has(.approved-cover:not([hidden])) .approved-join{left:4.8%;width:45.8%}
+body:has(.approved-cover:not([hidden])) .approved-login{left:52.2%;width:43.1%}
+body:has(.approved-cover:not([hidden])) .approved-cover a:focus-visible{outline:4px solid #fff}
+body:has(.approved-cover:not([hidden])) .welcome-cover{display:none}
 </style>
 </head>
 <body>
@@ -246,6 +255,7 @@ for(const item of document.querySelectorAll('.brand-extra'))item.hidden=opportun
 let html='';
 
 if(page==='home')html=`
+<div class="approved-cover" id="approvedCover" hidden><img src="mzanconnect-approved-homepage.jpg" alt="MzanConnect business hub: three South African business professionals, Your business. Your next opportunity." onload="this.parentElement.hidden=false;this.parentElement.nextElementSibling.hidden=true" onerror="this.parentElement.remove()" loading="eager"><a class="approved-join" href="register.html" aria-label="Join MzanConnect"></a><a class="approved-login" href="login.html" aria-label="Member Login"></a></div>
 <section class="welcome-cover" aria-labelledby="coverTitle">
   <div class="cover-photo" role="img" aria-label="South African business professionals collaborating around a laptop"></div>
   <div class="cover-content">
