@@ -5,10 +5,11 @@ const synth=window.speechSynthesis;
 const supported=!!(synth&&window.SpeechSynthesisUtterance);
 const style=document.createElement('style');
 style.textContent=`
-#mzan-voice-tools{position:fixed;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:10000;font:15px Arial,sans-serif;color:#14283b}
-#mzan-voice-tools button{font:inherit;cursor:pointer;border:2px solid #fff;border-radius:10px;background:#116a71;color:#fff;min-height:46px;padding:9px 12px;box-shadow:0 2px 8px #0003}
+#mzan-voice-tools{position:fixed;right:12px;top:calc(12px + env(safe-area-inset-top,0px));z-index:10000;font:15px Arial,sans-serif;color:#14283b}
+#mzan-voice-tools button{font:inherit;cursor:pointer;border:2px solid #fff;border-radius:10px;background:#116a71;color:#fff;min-height:44px;padding:9px 12px;box-shadow:0 2px 8px #0003}
+#mzan-voice-tools > button{width:42px;height:42px;min-height:42px;padding:0;border-radius:50%;font-size:21px;display:flex;align-items:center;justify-content:center;margin-left:auto}
 #mzan-voice-tools button:focus-visible{outline:3px solid #ffbf47;outline-offset:2px}
-#mzan-voice-panel{background:#fff;color:#14283b;border:2px solid #116a71;border-radius:12px;padding:12px;box-shadow:0 3px 15px #0003;max-width:min(310px,calc(100vw - 24px));margin-bottom:8px}
+#mzan-voice-panel{background:#fff;color:#14283b;border:2px solid #116a71;border-radius:12px;padding:12px;box-shadow:0 3px 15px #0003;max-width:min(310px,calc(100vw - 24px));margin-top:8px;position:absolute;top:42px;right:0}
 #mzan-voice-panel[hidden]{display:none}
 #mzan-voice-panel p{margin:5px 0 10px;line-height:1.35;font-size:13px}
 #mzan-voice-panel .mzan-actions{display:flex;flex-wrap:wrap;gap:6px}
@@ -23,7 +24,7 @@ const info=document.createElement('p');info.id='mzan-voice-status';info.setAttri
 info.textContent=supported?'Tap Listen to hear calm, clear guidance. Available voices depend on your device. You can pause or stop at any time.':'Voice reading is unavailable in this browser. You can use your phone screen reader.';
 const actions=document.createElement('div');actions.className='mzan-actions';
 function button(label,fn){const b=document.createElement('button');b.type='button';b.textContent=label;b.addEventListener('click',fn);actions.append(b);return b;}
-const toggle=document.createElement('button');toggle.type='button';toggle.textContent='🔊 Listen';toggle.setAttribute('aria-label','Open spoken page guidance');toggle.setAttribute('aria-expanded','false');
+const toggle=document.createElement('button');toggle.type='button';toggle.textContent='🔊';toggle.setAttribute('aria-label','Open spoken page guidance');toggle.setAttribute('aria-expanded','false');
 toggle.setAttribute('aria-controls','mzan-voice-panel');
 let current=null;
 function preferredVoice(){
