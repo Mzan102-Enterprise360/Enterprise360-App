@@ -56,7 +56,7 @@ p{line-height:1.45}
 <small>A division of Mzan 102 (Pty) Ltd</small>
 </header>
 
-<main><div class="member-access-buttons" aria-label="Member registration and login"><a href="register.html">Join MzanConnect</a><a href="login.html">Member Login</a></div><div id="view"></div></main>
+<main><div id="view"></div></main>
 
 <nav>
 <button onclick="show('home')">⌂ Home</button>
@@ -81,6 +81,7 @@ function show(page){
 let html='';
 
 if(page==='home')html=`
+<div class="member-access-buttons" aria-label="Member registration and login"><a href="register.html">Join MzanConnect</a><a href="login.html">Member Login</a></div>
 <h2>Welcome to MzanConnect</h2>
 <p style="color:#087f8c;font-weight:700;font-size:16px;margin-top:0">
 One Connection. Endless Possibilities.
@@ -322,7 +323,7 @@ navigator.serviceWorker.register('./sw.js').catch(()=>{});
 }
 </script>
 
-<!-- Member access buttons are rendered once at the top of this page. -->
+<!-- Member access buttons appear only on the Home view. -->
 </body>
 </html>
 
