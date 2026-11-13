@@ -106,6 +106,20 @@ body:has(.welcome-cover) header #pageSubtitle{font-size:11px}
 @media(min-width:650px){.home-tool{min-height:80px}.welcome-cover{padding:19px 22px}.cover-lead{font-size:14px}}
 @media(max-height:700px){body:has(.welcome-cover) header{padding:6px 13px}.welcome-cover{padding:10px 14px}.cover-kicker{margin:5px 0 3px}.cover-lead{margin-bottom:7px}.home-tool{min-height:65px;padding:7px}.home-tools-grid{gap:7px}.home-disclaimer{margin-top:5px}}
 @media(max-height:470px) and (orientation:landscape){.welcome-cover{padding:8px 12px}.welcome-cover h1{font-size:23px}.cover-lead{display:none}.home-tool{min-height:53px}.home-tool-icon{width:28px;height:28px;flex-basis:28px}}
+
+/* Home-only viewport layout: no blank region after legal footer. Other pages retain scrolling. */
+@media screen {
+body:has(.welcome-cover){display:flex;flex-direction:column;min-height:100vh;min-height:100dvh}
+body:has(.welcome-cover) main{width:100%;flex:1 0 auto;display:flex;flex-direction:column;justify-content:center;padding:10px 13px}
+body:has(.welcome-cover) nav{flex-shrink:0}
+body:has(.welcome-cover) #mzan-legal-footer{flex-shrink:0}
+.welcome-cover::before{content:"";position:absolute;inset:-70% auto auto -25%;width:55%;aspect-ratio:1;border:1px solid #a2f5e328;border-radius:50%;pointer-events:none}
+.welcome-cover::after{content:"";position:absolute;right:-35px;bottom:-65px;width:130px;height:130px;border:1px solid #a2f5e32b;border-radius:50%;pointer-events:none}
+.welcome-cover .cover-content{position:relative;z-index:1}
+.cover-actions a{transition:transform .15s ease,box-shadow .15s ease}
+.cover-actions a:active{transform:scale(.98)}
+}
+@media screen and (max-height:620px){body:has(.welcome-cover) main{justify-content:flex-start;padding:6px 12px}body:has(.welcome-cover) .welcome-cover{padding:9px 13px}body:has(.welcome-cover) .cover-kicker{margin:4px 0}body:has(.welcome-cover) .cover-lead{margin-bottom:6px}}
 </style>
 </head>
 <body>
