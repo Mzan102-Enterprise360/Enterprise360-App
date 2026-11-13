@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#14283b">
-<meta name="description" content="Request business registration, CSD, compliance and CIDB assistance from Mzan 102 through MzanConnect.">
+<meta name="description" content="Request business plans, professional company profiles, registration, CSD and compliance support from Mzan 102 through MzanConnect.">
 <title>Request Business Services | MzanConnect</title>
 <style>
 *{box-sizing:border-box}
@@ -55,6 +55,8 @@ details a{display:block;padding:6px 0;color:#086c70}
 <p class="intro"><strong>Let Mzan 102 help with the paperwork.</strong> Request assistance from your phone. We'll review your needs, explain what documents or authorisation are required, and give you a quote before work begins.</p>
 <p id="serviceFeedback" role="status" aria-live="polite"></p>
 <section aria-label="Available business support services">
+<article class="card service"><h2>Business plan service</h2><p>Get help drafting or improving a business plan for funding applications, starting up or growing your business.</p><button type="button" data-request-service="business_plan">Request assistance</button></article>
+<article class="card service"><h2>Business profile service</h2><p>Let us create or update a professional company profile document for tenders and potential clients.</p><button type="button" data-request-service="business_profile">Request assistance</button></article>
 <article class="card service"><h2>Company registration</h2><p>Get help with CIPC BizPortal, company setup and registration steps.</p><button type="button" data-request-service="cipc">Request assistance</button></article>
 <article class="card service"><h2>CSD supplier registration</h2><p>We can help prepare or update your Central Supplier Database registration.</p><button type="button" data-request-service="csd">Request assistance</button></article>
 <article class="card service"><h2>SARS compliance guidance</h2><p>Ask for help understanding requirements and finding authorised tax assistance.</p><button type="button" data-request-service="sars">Request assistance</button></article>
@@ -64,7 +66,7 @@ details a{display:block;padding:6px 0;color:#086c70}
 <section id="serviceRequestPanel" class="card" hidden><h2 class="box-title">Request assistance</h2><p id="selectedService"></p>
 <form id="serviceRequestForm">
 <label for="serviceType">Service
-<select id="serviceType" required><option value="cipc">Company registration (CIPC)</option><option value="csd">CSD supplier registration</option><option value="sars">SARS compliance guidance</option><option value="cidb">CIDB registration</option><option value="other">Other business assistance</option></select></label>
+<select id="serviceType" required><option value="cipc">Company registration (CIPC)</option><option value="csd">CSD supplier registration</option><option value="sars">SARS compliance guidance</option><option value="cidb">CIDB registration</option><option value="business_plan">Business plan service</option><option value="business_profile">Business profile service</option><option value="other">Other business assistance</option></select></label>
 <label for="businessName">Business name <span>Optional — leave empty if you have not registered yet.</span><input id="businessName" maxlength="140" autocomplete="organization" placeholder="Your business or planned business name"></label>
 <label for="serviceDetails">What do you need help with? <span>Please do not include identity numbers, portal passwords, bank details or sensitive documents.</span><textarea id="serviceDetails" maxlength="1000" placeholder="Briefly describe what you want us to help you with."></textarea></label>
 <label class="checkbox-label"><input type="checkbox" id="serviceConsent" required><span>I agree that Mzan 102 (Pty) Ltd may use my MzanConnect account email to contact me about this service request. I understand that further written authorisation may be required before any application is submitted on my behalf.</span></label>
@@ -80,6 +82,6 @@ details a{display:block;padding:6px 0;color:#086c70}
 <a href="https://www.cidb.org.za/" target="_blank" rel="noopener noreferrer">CIDB ↗</a></details>
 <p class="notice">MzanConnect is an independent business assistance service, not a government agency. Some processes require the applicant's direct participation, formal authority, or a registered professional. Never share passwords or OTPs with us.</p>
 </main>
-<script defer src="business-service-requests.js?v=1"></script>
+<script defer src="business-service-requests.js?v=2"></script>
 <script defer src="legal-notices.js?v=1"></script><script defer src="voice-accessibility.js?v=6"></script><script defer src="app-shell.js?v=1"></script>
 </body></html>
