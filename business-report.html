@@ -44,18 +44,37 @@ const today=new Date();text('generated',today.toLocaleDateString('en-ZA',{year:'
 const appendPair=(root,label,value)=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value||'Not provided';root.append(dt,dd)};
 const labelsC=['CIPC records','SARS tax status','CSD registration','B-BBEE documents','Relevant industry licences'];
 const labelsG=['Complete business assessment','Review compliance','Prepare funding documents','Identify procurement opportunities','Complete monthly business review'];
+// Load every saved bookkeeping entry, rather than silently truncating financial totals.
+// Keep reports disabled when the complete history cannot be confirmed.
+async function allTransactions(db,memberId){
+  const batch=1000, maximum=5000, records=[];
+  for(let offset=0;offset<=maximum;offset+=batch){
+    const {data,error}=await db.from('bookkeeping_transactions')
+      .select('id,transaction_date,kind,amount')
+      .eq('user_id',memberId)
+      .order('transaction_date',{ascending:true})
+      .order('id',{ascending:true})
+      .range(offset,offset+batch-1);
+    if(error)throw error;
+    if(!Array.isArray(data))throw Error('Could not retrieve bookkeeping entries.');
+    records.push(...data);
+    if(records.length>maximum)throw Error('More than 5,000 transactions. A complete report requires a dedicated export. No partial financial summary will be printed.');
+    if(data.length<batch)return records;
+  }
+  throw Error('Unable to confirm the full bookkeeping history.');
+}
 try{
 if(!window.supabase)throw Error('Authentication library unavailable');
 const db=window.supabase.createClient('https://akxzubckdebawqwwwaoe.supabase.co','sb_publishable_XEeBfPCzJ0MzGpHWHygeug_rGptbzno');
 const {data:{user},error:authError}=await db.auth.getUser();
 if(authError||!user){location.replace('login.html');return}
 document.body.style.visibility='visible';
-const [p,c,f]=await Promise.all([
+const [p,c,records]=await Promise.all([
 db.from('business_profiles').select('business_name,contact_name,sector,region,description').eq('user_id',user.id).maybeSingle(),
 db.from('compliance_items').select('item_key,completed').eq('user_id',user.id),
-db.from('bookkeeping_transactions').select('transaction_date,kind,amount').eq('user_id',user.id).order('transaction_date',{ascending:true}).limit(1000)
+allTransactions(db,user.id)
 ]);
-if(p.error||c.error||f.error)throw Error([p.error,c.error,f.error].filter(Boolean).map(e=>e.message).join('; '));
+if(p.error||c.error)throw Error([p.error,c.error].filter(Boolean).map(e=>e.message).join('; '));
 const profile=p.data||{};
 for(const [field,label] of [['business_name','Business name'],['contact_name','Contact person'],['sector','Business sector'],['region','Region'],['description','Business description']])appendPair($('profile'),label,profile[field]);
 const map=new Map((c.data||[]).map(x=>[x.item_key,x.completed===true]));
@@ -66,10 +85,16 @@ text('growthSummary',grown+' of 5 growth milestones marked complete ('+grown*20+
 const fields=[profile.business_name,profile.sector].filter(x=>String(x||'').trim()).length;
 const readiness=Math.round((fields+completed)/7*100);
 text('readiness','Business readiness: '+readiness+'% (profile '+fields+'/2 fields; compliance '+completed+'/5 items).');
-const records=f.data||[];
-if(records.length===1000)throw Error('Financial report may be incomplete at the 1,000-record limit. No partial financial summary will be printed. Contact support for a complete report.');
+
 let income=0,expenses=0;
-for(const r of records){const cents=Math.round(Number(r.amount)*100);if(!Number.isSafeInteger(cents))throw Error('Invalid financial amount');if(r.kind==='income')income+=cents;else if(r.kind==='expense')expenses+=cents}
+for(const r of records){
+  const cents=Math.round(Number(r.amount)*100);
+  if(!Number.isSafeInteger(cents)||cents<0)throw Error('Invalid financial amount');
+  if(r.kind==='income')income+=cents;
+  else if(r.kind==='expense')expenses+=cents;
+  else throw Error('Unknown bookkeeping transaction type');
+  if(!Number.isSafeInteger(income)||!Number.isSafeInteger(expenses))throw Error('Financial totals exceed the supported range');
+}
 const dates=records.map(r=>r.transaction_date).filter(Boolean);
 text('financialPeriod',dates.length?'Recorded transactions from '+dates[0]+' to '+dates[dates.length-1]+'.':'No saved bookkeeping transactions. Financial totals below reflect no recorded activity, not verified zero business activity.');
 text('income',money(income/100));text('expenses',money(expenses/100));text('profit',money((income-expenses)/100));
@@ -77,4 +102,4 @@ text('status','Report ready. Review before printing or sharing.');
 $('print').disabled=false;$('print').onclick=()=>window.print();
 }catch(e){document.body.style.visibility='visible';text('status','Report unavailable: '+(e.message||'Unknown error'));$('status').className='error'}
 })();
-</script><script defer src="voice-accessibility.js?v=6"></script><script defer src="app-shell.js?v=1"></script></body></html>
+</script><script defer src="legal-notices.js?v=1"></script><script defer src="voice-accessibility.js?v=12"></script><script defer src="app-shell.js?v=3"></script></body></html>
