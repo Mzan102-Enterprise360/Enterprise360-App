@@ -1,18 +1,85 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#14283b"><title>Business Support | MzanConnect</title>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#14283b">
+<meta name="description" content="Request business registration, CSD, compliance and CIDB assistance from Mzan 102 through MzanConnect.">
+<title>Request Business Services | MzanConnect</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#f3f6f8;color:#14283b;font:15px Arial,sans-serif}
-header{background:linear-gradient(120deg,#14283b,#116a71);color:white;padding:11px 14px}
-h1{margin:0 0 3px;font-size:22px;line-height:1.2}header p{margin:0;color:#e1f4f3;font-size:13px;line-height:1.3}
-main{max-width:720px;margin:auto;padding:9px 12px}
-.service{background:white;border:1px solid #dce6e9;border-radius:10px;padding:10px 12px;margin-bottom:8px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 10px;align-items:center}
-.service h2{grid-column:1;grid-row:1;font-size:17px;margin:0}
-.service p{grid-column:1;grid-row:2;margin:0;color:#4c5d67;font-size:13px;line-height:1.3}
-.service a{grid-column:2;grid-row:1 / span 2;display:flex;align-items:center;justify-content:center;background:#116a71;color:white;border-radius:7px;padding:8px 10px;text-decoration:none;font-size:12px;font-weight:bold;min-height:44px;max-width:112px;text-align:center}
-.service a:focus-visible{outline:3px solid #12a3a8;outline-offset:2px}
-footer{font-size:11px;color:#526675;line-height:1.35;padding:2px}
-@media(max-width:330px){.service{grid-template-columns:1fr}.service a{grid-column:1;grid-row:3;max-width:none;justify-self:start}.service p{grid-column:1}}
-</style></head><body><header><h1>Business Support</h1><p>Essential registration and compliance links.</p></header><main><section class="service"><h2>CIPC BizPortal</h2><p>Register your business and access essential company registration services.</p><a href="https://www.bizportal.gov.za/" target="_blank" rel="noopener noreferrer" aria-label="Open CIPC BizPortal official website in a new tab">Open ↗</a></section>
-<section class="service"><h2>CSD</h2><p>Register or update your business as a government supplier.</p><a href="https://secure.csd.gov.za/" target="_blank" rel="noopener noreferrer" aria-label="Open CSD official website in a new tab">Open ↗</a></section>
-<section class="service"><h2>SARS eFiling</h2><p>Manage tax returns and tax compliance for your business.</p><a href="https://www.sarsefiling.co.za/" target="_blank" rel="noopener noreferrer" aria-label="Open SARS eFiling official website in a new tab">Open ↗</a></section><section class="service"><h2>CIDB</h2><p>Construction contractor registration and grading for applicable construction tenders.</p><a href="https://www.cidb.org.za/" target="_blank" rel="noopener noreferrer" aria-label="Open CIDB official website in a new tab">Open ↗</a></section><footer>Official external websites. MzanConnect does not request government portal passwords. Other requirements may apply to your business.</footer></main><script defer src="legal-notices.js?v=1"></script><script defer src="voice-accessibility.js?v=6"></script><script defer src="app-shell.js?v=1"></script></body></html>
+body{margin:0;background:#f3f6f8;color:#14283b;font:15px/1.4 Arial,sans-serif;overflow-x:hidden}
+header{background:linear-gradient(110deg,#14283b,#116a71);color:#fff;padding:14px 16px}
+header .brand{font-size:12px;color:#dcf2f1;font-weight:bold;letter-spacing:.02em;margin:0 0 3px}
+h1{margin:0 0 3px;font-size:clamp(23px,5vw,28px);line-height:1.2}
+header p:not(.brand){margin:0;color:#e1f4f3;font-size:14px}
+main{max-width:720px;margin:auto;padding:10px 12px 16px}
+.intro,.notice{background:#e7f3f3;border:1px solid #b9d8d9;border-radius:12px;padding:11px 13px;margin:0 0 11px}
+.intro{font-size:14px}.notice{font-size:13px;color:#294950;background:#fff}
+.card{background:white;border:1px solid #dce6e9;border-radius:13px;padding:13px;margin-bottom:9px;box-shadow:0 2px 8px #14283b08}
+.service{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center}
+.service h2{margin:0;font-size:17px;grid-column:1;grid-row:1}
+.service p{margin:0;color:#4c5d67;font-size:13px;grid-column:1;grid-row:2}
+.service button{grid-column:2;grid-row:1/span 2;max-width:125px;min-width:105px}
+button,.button-link{background:#116a71;border:0;border-radius:9px;color:white;cursor:pointer;display:inline-flex;justify-content:center;align-items:center;text-align:center;font:700 13px/1.3 Arial,sans-serif;min-height:44px;padding:10px 12px;text-decoration:none}
+button:disabled{opacity:.6;cursor:wait}
+button:hover,.button-link:hover{background:#0a5159}
+button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #e2aa25;outline-offset:3px}
+.btn-secondary{background:#14283b}
+.box-title{font-size:20px;margin:0 0 9px}
+#serviceFeedback{font-weight:700;margin:7px 0}
+#serviceFeedback:empty{display:none}
+form{display:grid;gap:10px}
+label{display:block;font-weight:650;font-size:14px}
+label span{display:block;color:#5b6a73;font-size:12px;font-weight:400}
+input,select,textarea{display:block;width:100%;border:1px solid #aebbc2;border-radius:9px;padding:11px;margin-top:5px;font:15px Arial,sans-serif;background:#fff;color:#14283b}
+textarea{min-height:85px;resize:vertical}
+.checkbox-label{display:flex;gap:9px;align-items:flex-start;font-weight:400}
+.checkbox-label input{width:18px;height:18px;margin:0;flex:none}
+.hint{font-size:12px;color:#526675;margin:0}
+.request-record{border-top:1px solid #dce6e9;padding:10px 0;overflow-wrap:anywhere}
+.request-record p{margin:3px 0 5px;font-size:13px;color:#415865}
+.request-record small{display:block;font-size:12px;color:#516876;margin:4px 0}
+.request-record label{font-size:12px;margin-top:5px}
+.request-record select{max-width:280px}
+.mini-action{margin:7px 6px 3px 0;min-height:36px;padding:6px 12px}
+details summary{cursor:pointer;font-weight:700;min-height:35px;padding:8px 0}
+details a{display:block;padding:6px 0;color:#086c70}
+#serviceAccount{font-size:12px;color:#46616a;display:block;margin-bottom:8px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:400px){.service{grid-template-columns:minmax(0,1fr) 110px}.service button{min-width:0;max-width:110px;font-size:12px;padding:9px 5px}.service h2{font-size:16px}}
+@media(max-width:320px){.service{grid-template-columns:1fr}.service button{grid-column:1;grid-row:3;max-width:none;margin-top:5px}}
+@media print{button,.button-link{display:none!important}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+</head><body>
+<header><p class="brand">◇ MzanConnect</p><h1>Business Support</h1><p>Tell us what you need. We'll help you take the next step.</p></header>
+<main>
+<p class="intro"><strong>Let Mzan 102 help with the paperwork.</strong> Request assistance from your phone. We'll review your needs, explain what documents or authorisation are required, and give you a quote before work begins.</p>
+<p id="serviceFeedback" role="status" aria-live="polite"></p>
+<section aria-label="Available business support services">
+<article class="card service"><h2>Company registration</h2><p>Get help with CIPC BizPortal, company setup and registration steps.</p><button type="button" data-request-service="cipc">Request assistance</button></article>
+<article class="card service"><h2>CSD supplier registration</h2><p>We can help prepare or update your Central Supplier Database registration.</p><button type="button" data-request-service="csd">Request assistance</button></article>
+<article class="card service"><h2>SARS compliance guidance</h2><p>Ask for help understanding requirements and finding authorised tax assistance.</p><button type="button" data-request-service="sars">Request assistance</button></article>
+<article class="card service"><h2>CIDB registration</h2><p>Get help with contractor registration requirements and grading applications.</p><button type="button" data-request-service="cidb">Request assistance</button></article>
+</section>
+<section id="serviceSignIn" class="card" hidden><h2 class="box-title">Sign in to request a service</h2><p id="serviceSignInHint">To keep your request private and track its progress, first sign in or join MzanConnect.</p><div class="actions"><a class="button-link" href="login.html">Member Login</a><a class="button-link btn-secondary" href="register.html">Join MzanConnect</a></div></section>
+<section id="serviceRequestPanel" class="card" hidden><h2 class="box-title">Request assistance</h2><p id="selectedService"></p>
+<form id="serviceRequestForm">
+<label for="serviceType">Service
+<select id="serviceType" required><option value="cipc">Company registration (CIPC)</option><option value="csd">CSD supplier registration</option><option value="sars">SARS compliance guidance</option><option value="cidb">CIDB registration</option><option value="other">Other business assistance</option></select></label>
+<label for="businessName">Business name <span>Optional — leave empty if you have not registered yet.</span><input id="businessName" maxlength="140" autocomplete="organization" placeholder="Your business or planned business name"></label>
+<label for="serviceDetails">What do you need help with? <span>Please do not include identity numbers, portal passwords, bank details or sensitive documents.</span><textarea id="serviceDetails" maxlength="1000" placeholder="Briefly describe what you want us to help you with."></textarea></label>
+<label class="checkbox-label"><input type="checkbox" id="serviceConsent" required><span>I agree that Mzan 102 (Pty) Ltd may use my MzanConnect account email to contact me about this service request. I understand that further written authorisation may be required before any application is submitted on my behalf.</span></label>
+<button type="submit" id="submitServiceRequest">Send service request</button>
+<p class="hint">Requesting a quote does not commit you to payment. Service fees and any government charges will be explained before you agree to proceed.</p>
+</form></section>
+<section id="serviceSignedIn" class="card" hidden><h2 class="box-title">My service requests</h2><small id="serviceAccount"></small><div id="myServiceRequests" aria-live="polite">Loading your requests…</div></section>
+<section id="serviceOwnerPanel" class="card" hidden><h2 class="box-title">Owner service inbox</h2><p class="hint">Private to the MzanConnect owner. Review requests and update their status; contact members using their registered email.</p><div id="ownerServiceRequests">Loading service requests…</div></section>
+<details class="card"><summary>Official websites — for reference or self-service</summary>
+<a href="https://www.bizportal.gov.za/" target="_blank" rel="noopener noreferrer">CIPC BizPortal ↗</a>
+<a href="https://secure.csd.gov.za/" target="_blank" rel="noopener noreferrer">Central Supplier Database ↗</a>
+<a href="https://www.sarsefiling.co.za/" target="_blank" rel="noopener noreferrer">SARS eFiling ↗</a>
+<a href="https://www.cidb.org.za/" target="_blank" rel="noopener noreferrer">CIDB ↗</a></details>
+<p class="notice">MzanConnect is an independent business assistance service, not a government agency. Some processes require the applicant's direct participation, formal authority, or a registered professional. Never share passwords or OTPs with us.</p>
+</main>
+<script defer src="business-service-requests.js?v=1"></script>
+<script defer src="legal-notices.js?v=1"></script><script defer src="voice-accessibility.js?v=6"></script><script defer src="app-shell.js?v=1"></script>
+</body></html>
