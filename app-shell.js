@@ -12,7 +12,7 @@ style.textContent=`
 .mzan-home-return{box-sizing:border-box;flex:0 0 auto;width:calc(100% - 20px);max-width:1030px;margin:4px auto}
 .mzan-home-return a{display:flex;align-items:center;justify-content:center;min-height:44px;padding:8px 12px;border:2px solid #148c8f;border-radius:12px;background:#14283b;color:#fff;font:700 16px/1.2 Arial,sans-serif;text-decoration:none;box-shadow:0 3px 9px #14283b20}
 body #mzan-app-navigation{box-sizing:border-box;position:relative;flex:0 0 auto;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;width:calc(100% - 20px);max-width:1030px;margin:4px auto;padding:5px;background:#fff;border:1px solid #dce9eb;border-radius:16px;box-shadow:0 4px 14px #14283b0d}
-body #mzan-app-navigation a,body #mzan-app-navigation button{box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;min-height:48px;margin:0;padding:5px 2px;border:1px solid #ffffff80;border-radius:11px;background:#116a71;color:#fff;font:700 clamp(10px,2.6vw,13px)/1.2 Arial,sans-serif;text-align:center;text-decoration:none;box-shadow:none;cursor:pointer}
+body #mzan-app-navigation a,body #mzan-app-navigation button{box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;min-height:58px;margin:0;padding:5px 2px;border:1px solid #ffffff80;border-radius:11px;background:#116a71;color:#fff;font:700 clamp(9px,2.3vw,12px)/1.2 Arial,sans-serif;overflow-wrap:anywhere;text-align:center;text-decoration:none;box-shadow:none;cursor:pointer}
 body #mzan-app-navigation [aria-current=page]{background:#14283b;box-shadow:inset 0 -3px #80f0d7}
 #mzan-app-navigation .nav-icon{font-size:19px;line-height:1}
 #mzan-app-navigation :focus-visible,.mzan-home-return a:focus-visible{outline:3px solid #ffbf47;outline-offset:2px}
@@ -45,7 +45,7 @@ homeRow.append(home);main.before(homeRow);
 let nav=page==='index.html'?document.querySelector('body > nav'):null;
 if(!nav){
 nav=document.createElement('nav');
-for(const [label,icon,href] of [['Home','⌂','index.html'],['Support','☏','support.html'],['Explore','▣','index.html#opportunities'],['Business','▤','member.html'],['Dashboard','⚙','dashboard.html']]){
+for(const [label,icon,href] of [['Home','⌂','index.html'],['Business Support','☏','business-support.html'],['Explore','▣','index.html#opportunities'],['Billing & Membership','▤','billing.html'],['Dashboard','⚙','dashboard.html']]){
 const a=document.createElement('a');a.href=href;
 const symbol=document.createElement('span');symbol.className='nav-icon';symbol.setAttribute('aria-hidden','true');symbol.textContent=icon;
 const text=document.createElement('span');text.textContent=label;a.append(symbol,text);nav.append(a);
@@ -58,7 +58,7 @@ main.tabIndex=0;
 function sync(){
 const isHome=page==='index.html'&&!!document.querySelector('.welcome-cover');
 homeRow.hidden=isHome;
-const active=isHome?'Home':page==='index.html'?(document.getElementById('opportunitySearch')?'Explore':''):page==='support.html'?'Support':page==='member.html'?'Business':page==='dashboard.html'?'Dashboard':'';
+const active=isHome?'Home':page==='index.html'?(document.getElementById('opportunitySearch')?'Explore':''):page==='business-support.html'?'Business Support':page==='billing.html'?'Billing & Membership':page==='dashboard.html'?'Dashboard':'';
 for(const item of nav.querySelectorAll('a,button')){
 if(item.textContent.trim().endsWith(active)&&active)item.setAttribute('aria-current','page');else item.removeAttribute('aria-current');
 }
