@@ -40,7 +40,10 @@ const url=new URL(a.getAttribute('href'),document.baseURI);
 return url.origin===location.origin&&url.pathname.endsWith('/index.html')&&!url.hash&&!a.closest('nav');
 });
 const home=existingHome||document.createElement('a');
-home.href='index.html';home.textContent='⌂ Back to Home';home.setAttribute('aria-label','Back to Home');
+home.href='index.html';
+const fromBusinessSupport=page==='business-support.html';
+home.textContent=fromBusinessSupport?'⌂ Return to MzanConnect App':'⌂ Back to Home';
+home.setAttribute('aria-label',fromBusinessSupport?'Return to the MzanConnect app home':'Back to Home');
 homeRow.append(home);main.before(homeRow);
 let nav=page==='index.html'?document.querySelector('body > nav'):null;
 if(!nav){
