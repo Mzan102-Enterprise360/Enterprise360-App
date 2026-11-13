@@ -8,7 +8,7 @@ let db, user, owner=false;
 const loginPrompt=byId('serviceSignIn'), panel=byId('serviceRequestPanel'), form=byId('serviceRequestForm');
 const note=byId('serviceFeedback'), myList=byId('myServiceRequests'), ownerPanel=byId('serviceOwnerPanel'), ownerList=byId('ownerServiceRequests');
 function notify(message, failure=false){note.textContent=message;note.style.color=failure?'#9a2c2c':'#126763';}
-function statusText(status){return ({new:'New',reviewing:'Under review',awaiting_documents:'Documents requested',quoted:'Quote prepared',in_progress:'In progress',completed:'Completed',cancelled:'Cancelled'})[status]||status;}
+function statusText(status){return ({new:'Submitted to owner',reviewing:'Under review',awaiting_documents:'Documents requested',quoted:'Quote prepared',in_progress:'In progress',completed:'Completed',cancelled:'Cancelled'})[status]||status;}
 function showRequest(type){
  if(!user){loginPrompt.hidden=false;loginPrompt.scrollIntoView({behavior:'smooth',block:'nearest'});return;}
  byId('serviceType').value=type;byId('selectedService').textContent=titles[type]||titles.other;
@@ -24,19 +24,40 @@ function requestRow(r,admin){
  if(r.details)card.append(create('p',r.details));
  if(admin){
   card.append(create('p','Member email: '+r.contact_email));
-  const label=create('label','Update status: '); const select=create('select');
-  select.setAttribute('aria-label','Status for '+(titles[r.service_type]||'request'));
-  ['new','reviewing','awaiting_documents','quoted','in_progress','completed','cancelled'].forEach(s=>{const option=create('option',statusText(s));option.value=s;select.append(option);});
-  select.value=r.status; label.append(select);
-  const save=create('button','Save status','mini-action');save.type='button';
-  const feedback=create('span','');feedback.setAttribute('role','status');
-  save.addEventListener('click',async()=>{
-   if(save.disabled)return; save.disabled=true;feedback.textContent=' Saving…';
-   const {error}=await db.from('business_service_requests').update({status:select.value,updated_at:new Date().toISOString()}).eq('id',r.id);
-   if(error){feedback.textContent=' Could not update. Retry.';}else{heading.textContent=(titles[r.service_type]||'Business assistance')+' · '+statusText(select.value);feedback.textContent=' Saved.';}
-   save.disabled=false;
+  const actions=create('div',undefined,'status-actions');
+  const title=create('p','Mark request as:','status-actions-label');
+  const feedback=create('p','', 'status-feedback');feedback.setAttribute('role','status');
+  const available=['new','in_progress','completed'];
+  const buttons=[];
+  function setButtons(busy=false){
+   buttons.forEach(({button,status})=>{
+    button.disabled=busy||r.status===status;
+    button.setAttribute('aria-pressed',String(r.status===status));
+   });
+  }
+  available.forEach(status=>{
+   const button=create('button',statusText(status),'status-action');
+   button.type='button';
+   button.setAttribute('aria-label','Mark '+(titles[r.service_type]||'request')+' as '+statusText(status));
+   button.addEventListener('click',async()=>{
+    if(button.disabled)return;
+    setButtons(true);feedback.textContent='Saving status…';
+    try{
+     const {data,error}=await db.from('business_service_requests')
+      .update({status,updated_at:new Date().toISOString()})
+      .eq('id',r.id).select('id,status').single();
+     if(error||!data)throw error||new Error('No updated request returned');
+     r.status=data.status;
+     heading.textContent=(titles[r.service_type]||'Business assistance')+' · '+statusText(r.status);
+     feedback.textContent='Saved: '+statusText(r.status)+'. The member will see this when opening their requests.';
+    }catch(e){
+     feedback.textContent='Status was not saved. Please try again.';
+    }finally{setButtons(false);}
+   });
+   buttons.push({button,status});actions.append(button);
   });
-  card.append(label,save,feedback);
+  setButtons(false);
+  card.append(title,actions,feedback);
  }
  return card;
 }
@@ -84,7 +105,7 @@ form.addEventListener('submit',async e=>{
   const {error}=await db.from('business_service_requests').insert(values);
   if(error)throw error;
   form.reset();panel.hidden=true;
-  notify('Your request has been saved. Mzan 102 can review it in the private service inbox.');
+  notify('Submitted to owner. Your request is saved; you can check its progress under My service requests.');
   await refreshLists();
   byId('serviceSignedIn').scrollIntoView({behavior:'smooth',block:'start'});
  }catch(err){notify('Could not save your request. Check your connection and try again.',true);}
