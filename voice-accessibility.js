@@ -87,7 +87,7 @@ function textForPage(){
   if(shown('serviceOwnerPanel')){
    return 'You are in Business Support. Members can request company registration, business plans, profiles, and compliance assistance. As the owner, review new enquiries in your private inbox below. Mark each request as submitted, in progress, or completed. When the work is ready, upload the finished PDF or Word document to that request so the member can download it.';
   }
-  return 'Business Support makes it easier to get practical assistance. Choose the service you need, then select Request assistance. Tell us what you would like help with and submit your enquiry. You can check its progress and collect completed documents under My service requests.';
+  return 'Business Support makes it easier to get practical assistance. You can first expand View Business Service Prices to see our introductory fees. When you are ready, choose a service and select Request assistance. Describe the work you need, then submit your enquiry. We will confirm a quotation before work begins. Check progress and completed documents under My service requests.';
  }
  if(page==='dashboard.html'){
   return 'This is your member dashboard. Start with My Business to review or update your profile. Use Compliance and Bookkeeping to organise your records, and Growth Passport to follow your business goals. For account questions, open Member Support. You can print individual reports when needed.';
