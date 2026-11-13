@@ -63,6 +63,19 @@ header{background:linear-gradient(125deg,#14283b 0%,#163b50 65%,#116a71 100%)}
 .tile:hover{transform:translateY(-2px);box-shadow:0 9px 24px rgba(20,40,59,.12)}
 .tile:focus-visible,.actions a:focus-visible{outline:3px solid #12a3a8;outline-offset:2px}
 }
+/* Balanced screen spacing; print layout remains unchanged */
+@media screen {
+header{padding:16px}
+header h1{margin-bottom:5px}
+main{padding:14px}
+.welcome,.panel{padding:16px;margin-bottom:12px}
+.grid{gap:10px;margin-bottom:12px}
+.tile{padding:15px 10px;min-height:92px}
+.tile span{margin-bottom:5px}
+.tile small{margin-top:5px;line-height:1.4}
+#logoutButton{margin-top:10px;min-height:44px}
+.actions a{min-height:44px}
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 </head>
