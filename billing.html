@@ -130,8 +130,28 @@ main{padding:7px 10px 16px!important}
     document.getElementById("status").innerHTML=isOwner ? '<span class="status">Owner membership — no payment required</span>' : '<span class="status">Monthly membership: R199</span>';
     document.getElementById("explanation").textContent=isOwner ? "Your owner account already has access." : "Your monthly membership begins only after Yoco verifies your payment.";
     document.body.style.visibility="visible";
+    // Show the real paid membership expiry, and do not invite active members
+    // to pay again while their existing month is still valid.
+    let activeMembership=null;
+    if(!isOwner){
+      try{
+        const {data:active,error:activeError}=await client.from("membership_subscriptions")
+          .select("current_period_end").eq("user_id",data.user.id)
+          .eq("status","active").gt("current_period_end",new Date().toISOString())
+          .order("current_period_end",{ascending:false}).limit(1);
+        if(activeError)throw activeError;
+        if(active?.length){
+          activeMembership=active[0];
+          const date=new Date(activeMembership.current_period_end).toLocaleDateString("en-ZA",{day:"numeric",month:"long",year:"numeric"});
+          document.getElementById("status").innerHTML='<span class="status">Active monthly membership</span>';
+          document.getElementById("explanation").textContent="Your R199 membership is paid through "+date+". Renew after the current month expires. No automatic renewal.";
+        }
+      }catch{
+        document.getElementById("explanation").textContent="Membership status could not be verified. Live checkout checks your subscription before accepting a new payment.";
+      }
+    }
     const liveSection=document.getElementById("liveMembership"),liveButton=document.getElementById("startLiveCheckout"),livePlan=document.getElementById("livePlan"),liveStatus=document.getElementById("liveCheckoutStatus");
-    if(isOwner)liveSection.hidden=true;
+    if(isOwner||activeMembership)liveSection.hidden=true;
     else {
       const returned=new URLSearchParams(location.search).get("payment");
       if(returned==="returned")liveStatus.textContent="Returned from Yoco. Your membership activates only after payment verification. Refresh to check receipts.";
