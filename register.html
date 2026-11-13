@@ -63,7 +63,7 @@ a{color:#147b59}
 <option>Other</option>
 </select>
 
-<p class="note"><strong>Registration is open:</strong> Business owners and aspiring entrepreneurs can join without an invitation code.</p>
+<p class="note">Create your MzanConnect account to access business tools and opportunities.</p>
 <label for="package">Membership Package</label>
 <select id="package" required>
 <option value="Member">MzanConnect Member</option>
@@ -163,7 +163,7 @@ form.addEventListener("submit", async function(event) {
         showResult("Account created, but your business profile could not be saved. Please contact support.",true);
         return;
       }
-      showResult("Account created. Confirm your email if required, then log in to your dashboard. No invitation code is needed.");
+      showResult("Account created. Confirm your email if required, then log in to your dashboard.");
     } else {
       resendEmail.value = email;
       showResult("Registration request received. Check your inbox and spam folder. If the link doesn’t arrive, use Resend confirmation email below. If you’ve already confirmed your email, choose Log In.");
