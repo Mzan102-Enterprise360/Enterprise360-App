@@ -18,12 +18,12 @@ style.textContent=`
 /* Home voice strip stays above the artwork and opens sideways without changing height. */
 body:has(.welcome-cover) #mzan-voice-tools{position:relative;top:auto;right:auto;display:flex;align-items:center;gap:6px;flex:0 0 56px;height:56px;min-height:56px;width:calc(100% - 20px);max-width:1030px;margin:0 auto;padding:6px 0;z-index:10}
 body:has(.welcome-cover) #mzan-voice-tools > button{flex:0 0 44px;width:44px;height:44px;min-height:44px}
-body:has(.welcome-cover) #mzan-voice-panel{position:static;display:flex;align-items:center;gap:12px;flex:1;min-width:0;max-width:none;height:44px;margin:0;padding:0 6px;border:0;border-radius:10px;box-shadow:none;overflow-x:auto;overflow-y:hidden;white-space:nowrap;scrollbar-width:none}
+body:has(.welcome-cover) #mzan-voice-panel{position:static;display:flex;align-items:center;gap:12px;flex:1;min-width:0;max-width:none;height:44px;margin:0;padding:0 6px;border:0;border-radius:10px;box-shadow:none;overflow:hidden;white-space:nowrap}
 body:has(.welcome-cover) #mzan-voice-panel[hidden]{display:none}
 body:has(.welcome-cover) #mzan-voice-panel > strong{display:none}
 body:has(.welcome-cover) #mzan-voice-panel .mzan-actions{order:-1;flex:0 0 auto;flex-wrap:nowrap;gap:4px}
 body:has(.welcome-cover) #mzan-voice-panel .mzan-actions button{flex:0 0 auto;min-width:0;min-height:44px;padding:7px 8px;font-size:13px}
-body:has(.welcome-cover) #mzan-voice-panel p{flex:0 0 auto;margin:0;font-size:12px;line-height:1.3}
+body:has(.welcome-cover) #mzan-voice-panel p{flex:1;min-width:0;margin:0;font-size:12px;line-height:1.3;overflow-x:auto;white-space:nowrap}
 
 @media print{#mzan-voice-tools{display:none!important}}
 `;
@@ -66,9 +66,18 @@ const listen=button('▶ Listen',speak);
 const pause=button('⏸ Pause',()=>{if(!supported)return;if(synth.paused){synth.resume();pause.textContent='⏸ Pause';info.textContent='Reading resumed.';}else if(synth.speaking){synth.pause();pause.textContent='▶ Resume';info.textContent='Paused.';}});
 button('■ Stop',stop);
 panel.append(title,info,actions);
-toggle.addEventListener('click',()=>{panel.hidden=!panel.hidden;toggle.setAttribute('aria-expanded',String(!panel.hidden));if(panel.hidden)stop();});
+toggle.addEventListener('click',()=>{if(document.querySelector('.welcome-cover')){speak();return;}panel.hidden=!panel.hidden;toggle.setAttribute('aria-expanded',String(!panel.hidden));if(panel.hidden)stop();});
 host.append(panel,toggle);
 const main=document.querySelector('main');
 if(main)main.before(host);else document.body.prepend(host);
+function syncHomeVoice(){
+const home=!!document.querySelector('.welcome-cover');
+panel.hidden=!home;
+toggle.setAttribute('aria-label',home?'Listen to spoken page guidance':'Open spoken page guidance');
+if(home)toggle.removeAttribute('aria-expanded');else toggle.setAttribute('aria-expanded','false');
+}
+syncHomeVoice();
+const view=document.getElementById('view');
+if(view)new MutationObserver(syncHomeVoice).observe(view,{childList:true});
 window.addEventListener('pagehide',()=>{if(supported)synth.cancel();});
 })();
