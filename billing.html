@@ -12,12 +12,24 @@ main{max-width:760px;margin:20px auto;padding:0 16px 28px}.panel{background:whit
 button,select{font:inherit;padding:11px 13px;margin:6px 0;border-radius:9px}button{cursor:pointer}button:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid #0d9c94;outline-offset:3px}#startLiveCheckout{background:#147b59;color:#fff;border:0;font-weight:700;min-height:44px}#livePlan{min-height:44px;max-width:100%;width:100%;border:1px solid #b9c8ce}button:disabled{opacity:.55}a.button{display:inline-block;background:#147b59;color:white;text-decoration:none;padding:12px 16px;border-radius:10px;font-weight:bold}
 small,.note{color:#5b6c77;line-height:1.5}ul{line-height:1.9}.disabled{border:1px solid #d8e0e5;border-radius:10px;background:#f5f7f8;padding:13px;color:#536570}
 @media print{body:has(#receiptPrint:not([hidden])) header,body:has(#receiptPrint:not([hidden])) main>.panel:not(#receiptPrint),.no-print{display:none!important}body{visibility:visible!important;background:#fff;color:#111}main{margin:0;padding:0}#receiptPrint:not([hidden]){display:block!important;box-shadow:none;border-radius:0}@page{size:A4;margin:15mm}}
+
+/* Consistent mobile-friendly dashboard navigation; excluded from printed reports */
+.dashboard-return{background:#fff;border:1px solid #dfe9ec;border-radius:16px;padding:20px 26px;margin:0 0 20px;box-shadow:0 5px 18px rgba(20,40,59,.06)}
+.dashboard-return a,.actions .dashboard-return a{display:flex;align-items:center;justify-content:center;min-height:56px;width:100%;padding:12px 16px;border-radius:12px;background:#147b59;color:#fff;text-decoration:none;font-size:18px;font-weight:700;text-align:center}
+.dashboard-return a:focus-visible{outline:3px solid #12a3a8;outline-offset:3px}
+@media print{.dashboard-return{display:none!important}}
+
+/* Compact, purposeful section header */
+header{background:linear-gradient(115deg,#14283b 0%,#163d50 75%,#116a6a 100%);padding:22px 20px 24px;text-align:left}
+header .header-brand{margin:0 0 12px;font-size:16px;font-weight:700;color:#d4e6eb}
+header h1{margin:0 0 8px;font-size:clamp(24px,5vw,32px);line-height:1.2;color:#fff}
+header p:not(.header-brand){margin:0;color:#dce8eb;line-height:1.45;font-size:15px}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 </head>
 <body>
-<header><h1>Billing &amp; Membership</h1><p>Manage your membership and receipts</p></header>
-<main>
+<header><p class="header-brand">◈ MzanConnect</p><h1>Billing &amp; Membership</h1><p>View your membership plans, payment status and receipts.</p></header>
+<main><div class="dashboard-return"><a href="dashboard.html" aria-label="Back to dashboard">← Back to Dashboard</a></div>
 <section class="panel"><h2>Your membership</h2><p id="status" role="status">Checking your membership...</p><p id="explanation" class="note"></p></section>
 <section class="panel"><h2>Choose your plan</h2><ul class="plans"><li><span>Starter</span><strong>R199 / month</strong></li><li><span>Growth</span><strong>R399 / month</strong></li><li><span>Premium</span><strong>R499 / month</strong></li></ul><p class="note">Membership is paid one month at a time. No automatic renewal.</p></section>
 <section class="panel" id="liveMembership"><h2>Secure checkout</h2><p class="note">Your membership starts after your payment is confirmed.</p><label for="livePlan">Plan</label> <select id="livePlan"><option value="starter">Starter — R199</option><option value="growth">Growth — R399</option><option value="premium">Premium — R499</option></select> <button id="startLiveCheckout" type="button" disabled>Continue to Yoco checkout</button><p id="liveCheckoutStatus" role="status">Checking payment availability…</p></section>
@@ -32,7 +44,7 @@ small,.note{color:#5b6c77;line-height:1.5}ul{line-height:1.9}.disabled{border:1p
 <div id="testPaymentHistory"></div>
 </section>
 <section class="panel" id="receiptPrint" hidden><h2>◈ MzanConnect — Payment Receipt</h2><div id="receiptDetails"></div><p class="note">Receipt issued for a verified payment. Keep for your records.</p><button class="no-print" id="printReceipt" type="button">Print / Save receipt as PDF</button><button class="no-print" id="closeReceipt" type="button">Close receipt</button></section>
-<section class="panel"><h2>Need assistance?</h2><p><a href="support.html">Contact Member Support</a></p><a class="button" href="dashboard.html">← Back to dashboard</a></section>
+<section class="panel"><h2>Need assistance?</h2><p><a href="support.html">Contact Member Support</a></p></section>
 </main>
 <script>
 (async function(){
