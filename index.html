@@ -326,9 +326,7 @@ if(page==='business')html=`
 
 <label>Membership (demo)</label>
 <select id="plan">
-${['Starter','Growth','Premium'].map(x=>`
-<option ${state.plan===x?'selected':''}>${x}</option>
-`).join('')}
+<option value="MzanConnect Membership">MzanConnect Membership — R199 per month</option>
 </select>
 
 <button onclick="state.business=document.getElementById('business').value;state.sector=document.getElementById('sector').value;state.plan=document.getElementById('plan').value;save();show('business')">
