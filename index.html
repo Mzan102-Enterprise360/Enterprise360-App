@@ -27,6 +27,8 @@ button.secondary{background:#e7eef2;color:#19354a}
 
 nav{position:relative;bottom:auto;z-index:1;background:white;display:flex;justify-content:space-around;width:100%;border-top:1px solid #dce4e8;padding:10px 2px}
 nav button{background:transparent;color:#173344;font-size:12px;padding:9px}
+nav a{text-decoration:none}
+body:has(.welcome-cover) > nav a{min-height:44px;padding:4px 2px;gap:2px}
 input,select,textarea{width:100%;border:1px solid #bdcbd2;border-radius:9px;padding:11px;margin:5px 0 12px;font:inherit}
 label{font-size:13px;font-weight:650}
 h2{margin:6px 0 14px}
@@ -270,7 +272,7 @@ body:has(.welcome-cover) .cover-copy .cover-kicker{font-size:clamp(12px,3vw,20px
 
 <nav>
 <button onclick="show('home')"><span class="nav-icon" aria-hidden="true">⌂</span><span>Home</span></button>
-<button onclick="location.href='business-support.html'"><span class="nav-icon" aria-hidden="true">☏</span><span>Business Support</span></button>
+<a href="./business-support.html" aria-label="Open Business Support within MzanConnect"><span class="nav-icon" aria-hidden="true">☏</span><span>Business Support</span></a>
 <button onclick="show('opportunities')"><span class="nav-icon" aria-hidden="true">▣</span><span>Explore</span></button>
 <button onclick="location.href='billing.html'"><span class="nav-icon" aria-hidden="true">▤</span><span>Billing &amp; Membership</span></button>
 <button onclick="location.href='dashboard.html'"><span class="nav-icon" aria-hidden="true">⚙</span><span>Dashboard</span></button>
