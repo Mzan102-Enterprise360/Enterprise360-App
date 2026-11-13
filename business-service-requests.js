@@ -16,6 +16,98 @@ function showRequest(type){
  byId('businessName').focus({preventScroll:true});
 }
 document.querySelectorAll('[data-request-service]').forEach(b=>b.addEventListener('click',()=>showRequest(b.dataset.requestService)));
+
+const DELIVERABLES_BUCKET='mzanconnect-service-deliverables';
+const MAX_DELIVERABLE_SIZE=10*1024*1024;
+function attachDeliverables(card, request, ownerView){
+ const section=create('section',undefined,'request-deliverables');
+ const documents=create('details');
+ const summary=create('summary','Files for this request — view / download');
+ const list=create('div','Open to check for completed documents.','request-document-list');
+ list.setAttribute('aria-live','polite');
+ documents.append(summary,list);
+ section.append(documents);
+ let loading=false;
+ async function reloadFiles(){
+  if(loading)return;
+  loading=true;list.textContent='Loading your documents…';
+  try{
+   const {data,error}=await db.storage.from(DELIVERABLES_BUCKET)
+    .list(request.id,{limit:100,sortBy:{column:'created_at',order:'desc'}});
+   if(error)throw error;
+   const files=(data||[]).filter(file=>file.name && file.id && /\.(pdf|docx)$/i.test(file.name));
+   list.replaceChildren();
+   if(!files.length){list.textContent='No completed documents have been uploaded for this request yet.';return;}
+   for(const file of files){
+    const line=create('div',undefined,'request-document');
+    const fileName=file.name.replace(/^[0-9a-f-]{36}_/i,'').replace(/_/g,' ');
+    const filename=create('span',fileName);
+    const download=create('button','Download file','download-action');
+    const feedback=create('small','');
+    feedback.setAttribute('role','status');
+    download.type='button';
+    download.addEventListener('click',async()=>{
+     if(download.disabled)return;
+     download.disabled=true;feedback.textContent=' Preparing download…';
+     try{
+      const {data:blob,error}=await db.storage.from(DELIVERABLES_BUCKET)
+       .download(request.id+'/'+file.name);
+      if(error||!blob)throw error||new Error('The file is not available');
+      const url=URL.createObjectURL(blob);
+      const anchor=document.createElement('a');
+      anchor.href=url;anchor.download=fileName;anchor.style.display='none';
+      document.body.append(anchor);anchor.click();anchor.remove();
+      window.setTimeout(()=>URL.revokeObjectURL(url),60000);
+      feedback.textContent=' Download started.';
+     }catch(e){feedback.textContent=' Could not download. Please try again.';}
+     finally{download.disabled=false;}
+    });
+    line.append(filename,download,feedback);
+    list.append(line);
+   }
+  }catch(e){list.textContent='Unable to load documents. Close and reopen this section to retry.';}
+  finally{loading=false;}
+ }
+ documents.addEventListener('toggle',()=>{if(documents.open)void reloadFiles();});
+ if(ownerView){
+  const uploadArea=create('div',undefined,'request-file-upload');
+  const label=create('label','Upload a completed document:');
+  const input=document.createElement('input');
+  input.type='file';input.accept='.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+  input.setAttribute('aria-label','Choose completed document for '+(titles[request.service_type]||'business service'));
+  label.append(input);
+  const hint=create('p','PDF or Word (.docx), maximum 10 MB. This file will be visible only to you and the member who requested the service.','request-upload-hint');
+  const button=create('button','Upload to this request','upload-action');button.type='button';
+  const feedback=create('p','', 'upload-feedback');feedback.setAttribute('role','status');
+  button.addEventListener('click',async()=>{
+   if(button.disabled)return;
+   const file=input.files?.[0];
+   if(!file){feedback.textContent='Choose a PDF or Word document first.';return;}
+   const ext=(file.name.split('.').pop()||'').toLowerCase();
+   if(!['pdf','docx'].includes(ext)){feedback.textContent='Only PDF or Word (.docx) documents are supported.';return;}
+   if(file.size<1||file.size>MAX_DELIVERABLE_SIZE){feedback.textContent='Please select a document smaller than 10 MB.';return;}
+   const safeName=file.name.replace(/[^A-Za-z0-9._-]/g,'_').slice(-110);
+   const uid=window.crypto?.randomUUID?.()||String(Date.now())+'-'+Math.random().toString(16).slice(2);
+   const path=request.id+'/'+uid+'_'+safeName;
+   button.disabled=true;feedback.textContent='Uploading securely…';
+   try{
+    const mime=ext==='pdf'?'application/pdf':'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    const {error}=await db.storage.from(DELIVERABLES_BUCKET)
+     .upload(path,file,{upsert:false,contentType:mime,cacheControl:'3600'});
+    if(error)throw error;
+    input.value='';
+    feedback.textContent='Uploaded successfully. The member can now download this document in their request history.';
+    documents.open=true;
+    await reloadFiles();
+   }catch(e){feedback.textContent='Upload was not saved: '+(e?.message||'Please try again.');}
+   finally{button.disabled=false;}
+  });
+  uploadArea.append(label,hint,button,feedback);
+  section.append(uploadArea);
+ }
+ card.append(section);
+}
+
 function requestRow(r,admin){
  const card=create('article',undefined,'request-record');
  const heading=create('strong',(titles[r.service_type]||'Business assistance')+' · '+statusText(r.status));
@@ -59,6 +151,7 @@ function requestRow(r,admin){
   setButtons(false);
   card.append(title,actions,feedback);
  }
+ attachDeliverables(card,r,admin);
  return card;
 }
 async function refreshLists(){
