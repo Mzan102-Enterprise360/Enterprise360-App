@@ -152,7 +152,7 @@ ${state.messages.map(x=>`
 </div>`;
 
 if(page==='opportunities')html=`
-<div class="card" style="padding:12px 14px"><a href="dashboard.html" style="display:inline-flex;align-items:center;gap:8px;color:#116a71;font-weight:700;text-decoration:none;min-height:44px" aria-label="Return to member dashboard">← Back to Dashboard</a></div>
+<div class="card" style="padding:12px 14px"><button type="button" onclick="returnToDashboard()" style="width:100%;text-align:center;background:#147b59;color:white;min-height:48px;font-size:16px" aria-label="Return to member dashboard">← Back to Dashboard</button></div>
 <h2>Funding &amp; Tender Opportunities</h2>
 <p>Search official sources for funding, tenders, supplier registration and business development. Check each source for current listings, requirements and deadlines.</p>
 <div class="card">
@@ -316,6 +316,11 @@ state.messages.push(v);
 save();
 show('chat');
 }
+}
+
+function returnToDashboard(){
+  // Navigate to the protected dashboard without retaining the Opportunities hash.
+  window.location.assign(new URL('dashboard.html',document.baseURI).href);
 }
 
 function showFromUrl(){
