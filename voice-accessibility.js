@@ -105,8 +105,8 @@ function textForPage(){
   if(shown('receiptPrint')){
    return 'Your payment receipt is displayed. Review the details carefully. You can print the receipt or save a PDF for your records, then close it to return to Billing and Membership.';
   }
-  if(shown('testCheckoutSection')||shown('testSection')){
-   return 'You are viewing Billing and Membership. Your owner account also has a separate test checkout. Test payments do not charge a card or activate a real membership. You can review available plans and any verified test receipts here.';
+  if(shown('yocoSandbox')){
+   return 'This is Billing and Membership. Your owner account does not require payment. Members have one monthly membership at one hundred and ninety rand, and any hands-on business services are quoted separately. The test checkout below is for payment testing only. Test payments do not activate paid memberships.';
   }
   return 'This is Billing and Membership. Your MzanConnect membership costs one hundred and ninety rand for one month. It includes access to the business tools on your dashboard. Business plans, company profiles and other hands-on services are quoted and paid separately. Review your membership status and receipts, then use the secure Yoco checkout if you need to activate your membership.';
  }
