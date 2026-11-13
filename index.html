@@ -120,6 +120,14 @@ body:has(.welcome-cover) #mzan-legal-footer{flex-shrink:0}
 .cover-actions a:active{transform:scale(.98)}
 }
 @media screen and (max-height:620px){body:has(.welcome-cover) main{justify-content:flex-start;padding:6px 12px}body:has(.welcome-cover) .welcome-cover{padding:9px 13px}body:has(.welcome-cover) .cover-kicker{margin:4px 0}body:has(.welcome-cover) .cover-lead{margin-bottom:6px}}
+
+/* Compact home: keep content directly beneath header, with no artificial vertical fill. */
+@media screen {
+body:has(.welcome-cover){min-height:0;display:block}
+body:has(.welcome-cover) main{display:block;flex:none;min-height:0;padding:9px 13px 8px}
+body:has(.welcome-cover) #view{min-height:0}
+body:has(.welcome-cover) .welcome-cover{margin-top:0}
+}
 </style>
 </head>
 <body>
