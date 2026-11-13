@@ -73,6 +73,29 @@ header #opportunityHeaderDescription{color:#e0edf0;font-size:14px;line-height:1.
 #view .opportunity-return button{min-height:46px!important;padding:9px 12px!important;font-size:16px!important}
 #view .opportunity-intro{margin:7px 0 12px;line-height:1.45}
 }
+
+/* Branded mobile-first welcome cover: visual only, existing routes preserved */
+.welcome-cover{position:relative;overflow:hidden;isolation:isolate;border-radius:22px;background:linear-gradient(145deg,#10273b 0%,#174458 55%,#087f84 100%);color:#fff;padding:30px 22px 25px;box-shadow:0 15px 35px rgba(13,51,68,.17);margin-bottom:15px}
+.cover-orb{position:absolute;border-radius:50%;pointer-events:none;z-index:-1}.cover-orb-one{width:240px;height:240px;right:-100px;top:-105px;border:34px solid rgba(139,245,217,.13)}.cover-orb-two{width:180px;height:180px;left:-100px;bottom:-100px;background:rgba(46,203,185,.12)}
+.cover-content{position:relative;max-width:520px;margin:auto;text-align:center}
+.cover-eyebrow{font-size:11px;font-weight:800;letter-spacing:.19em;color:#aaf0e4}
+.cover-mark{font-size:30px;color:#b9ffdd;margin:7px auto 3px}
+.welcome-cover h1{font-size:clamp(30px,7vw,43px);line-height:1.14;letter-spacing:-.035em;margin:6px 0 13px;font-weight:800}
+.welcome-cover h1 em{font-style:normal;color:#8cf1d8}
+.cover-lead{font-size:15px;line-height:1.55;max-width:340px;margin:0 auto 12px;color:#e6f5f5}
+.cover-tagline{font-size:12px;font-weight:750;letter-spacing:.025em;color:#aaf0e4;margin-bottom:19px}
+.cover-actions{margin-bottom:10px}
+.cover-actions a:first-child{background:#19a688;color:#fff}.cover-actions a:last-child{background:#fff;color:#143344}
+.cover-actions a{min-height:49px;transition:transform .2s,box-shadow .2s}
+.cover-actions a:focus-visible,.cover-explore:focus-visible{outline:3px solid #ffcc70;outline-offset:3px}
+.cover-explore{width:100%;background:transparent;border:1px solid #9bd5d2;color:#fff;min-height:45px;font-size:14px}
+.home-discovery{text-align:center;padding:4px 0 9px}.home-discovery h2{font-size:18px;margin:4px 0 12px}
+.home-feature-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.home-feature{background:#fff;border:1px solid #dce9e9;border-radius:13px;padding:12px 7px;display:flex;align-items:center;flex-direction:column;gap:5px;min-width:0}
+.home-feature>span{color:#087f8c;font-size:23px}.home-feature strong{font-size:12px;line-height:1.3}.home-feature small{font-size:11px;color:#61717b;line-height:1.3}
+.home-disclaimer{font-size:11px;color:#61717b;margin:13px 0}
+@media(max-width:390px){.welcome-cover{padding:24px 14px 20px}.home-feature-grid{gap:5px}.home-feature{padding:10px 5px}}
+@media(prefers-reduced-motion:no-preference){.welcome-cover{animation:cover-in .5s ease-out both}@keyframes cover-in{from{opacity:.6;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}}
 </style>
 </head>
 <body>
@@ -117,23 +140,27 @@ for(const item of document.querySelectorAll('.brand-extra'))item.hidden=opportun
 let html='';
 
 if(page==='home')html=`
-<div class="member-access-buttons" aria-label="Member registration and login"><a href="register.html">Join MzanConnect</a><a href="login.html">Member Login</a></div>
-<h2>Welcome to MzanConnect</h2>
-<p style="color:#087f8c;font-weight:700;font-size:16px;margin-top:0">
-One Connection. Endless Possibilities.
-</p>
-
-<div class="card">
-<span class="pill">Business Growth Hub</span>
-<h3>${esc(state.business||'Connecting Business to Opportunity')}</h3>
-<p>Discover business funding, tenders, mining supplier registration, procurement information and enterprise development programmes.</p>
-<p><strong>For entrepreneurs, women, youth, SMMEs and business suppliers.</strong></p>
-<p class="muted">MzanConnect is a business opportunities and supplier development platform, not a job application or recruitment portal.</p>
-</div>
-
-<div class="card">
-<p>Welcome to your business growth journey. Use the navigation below to explore opportunities, manage your business, access member support or open your dashboard.</p>
-</div>`;
+<section class="welcome-cover" aria-labelledby="coverTitle">
+  <div class="cover-orb cover-orb-one" aria-hidden="true"></div><div class="cover-orb cover-orb-two" aria-hidden="true"></div>
+  <div class="cover-content">
+    <span class="cover-eyebrow">WELCOME TO MZANCONNECT</span>
+    <div class="cover-mark" aria-hidden="true">✦</div>
+    <h1 id="coverTitle">Your business.<br><em>New possibilities.</em></h1>
+    <p class="cover-lead">Discover opportunities. Build your business. Move forward with confidence.</p>
+    <p class="cover-tagline">One Connection. Endless Possibilities.</p>
+    <div class="member-access-buttons cover-actions" aria-label="Member registration and login"><a href="register.html">Join MzanConnect</a><a href="login.html">Member Login</a></div>
+    <button type="button" class="cover-explore" onclick="show('opportunities')" aria-label="Explore funding, tenders and supplier opportunities">Explore Opportunities <span aria-hidden="true">→</span></button>
+  </div>
+</section>
+<section class="home-discovery" aria-label="What you can do on MzanConnect">
+  <h2>Where will your business go next?</h2>
+  <div class="home-feature-grid">
+    <div class="home-feature"><span aria-hidden="true">◈</span><strong>Find opportunities</strong><small>Funding, tenders and suppliers</small></div>
+    <div class="home-feature"><span aria-hidden="true">▣</span><strong>Grow with support</strong><small>Business tools and guidance</small></div>
+    <div class="home-feature"><span aria-hidden="true">✓</span><strong>Stay organised</strong><small>Compliance and bookkeeping</small></div>
+  </div>
+  <p class="home-disclaimer">Built for entrepreneurs, women, youth and SMMEs. MzanConnect is not a job application portal.</p>
+</section>`;
 
 if(page==='business')html=`
 <h2>My Business</h2>
