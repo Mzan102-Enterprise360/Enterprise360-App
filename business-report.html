@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MzanConnect | Full Business Report</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#eef3f5;color:#14283b;font:15px Arial,sans-serif;visibility:hidden}
+header{background:#14283b;color:#fff;padding:22px;text-align:center}header h1{margin:0 0 6px}
+main{max-width:850px;margin:auto;padding:18px}.card{background:white;border-radius:12px;padding:20px;margin-bottom:14px}
+h2{font-size:19px;margin:0 0 12px;border-bottom:1px solid #d9e3e6;padding-bottom:8px}
+dl{display:grid;grid-template-columns:180px 1fr;gap:8px 12px;margin:0}dt{font-weight:bold}dd{margin:0;overflow-wrap:anywhere}
+ul{padding-left:20px}li{margin:7px 0}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px}
+button,.actions a{background:#147b59;color:white;border:0;border-radius:8px;padding:12px 16px;font:inherit;text-decoration:none;cursor:pointer}
+.actions a{background:#14283b}.muted{color:#5c6d77;font-size:13px}.error{color:#a12727}
+@media(max-width:500px){dl{grid-template-columns:1fr}dt{margin-top:6px}}
+@media print{body{visibility:visible!important;background:white;color:#111;font-size:10pt}header{background:white;color:#111;text-align:left;padding:0 0 12px;border-bottom:2px solid #14283b}main{max-width:none;padding:10px 0}.card{padding:8px 0;margin:0 0 12px;break-inside:avoid}.actions,.no-print{display:none!important}h2{font-size:13pt}dl{grid-template-columns:160px 1fr}@page{size:A4;margin:14mm}}
+</style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script></head>
+<body><header><h1>◈ MzanConnect</h1><p>Full Business Report</p></header>
+<main><div class="actions"><a href="dashboard.html">Back to Dashboard</a><button id="print" type="button" disabled>Print Full Business Report / Save as PDF</button></div>
+<p id="status" role="status" class="no-print">Loading your saved business information…</p>
+<section class="card"><h2>Report information</h2><dl><dt>Prepared on</dt><dd id="generated"></dd><dt>Report type</dt><dd>Member-generated business report, based on self-reported records</dd></dl></section>
+<section class="card"><h2>Business Profile</h2><dl id="profile"></dl></section>
+<section class="card"><h2>Compliance Checklist</h2><p id="complianceSummary"></p><ul id="compliance"></ul><p class="muted">Self-reported checklist only. This report does not independently verify CIPC, SARS or other regulatory compliance.</p></section>
+<section class="card"><h2>Business Readiness</h2><p id="readiness"></p><p class="muted">Calculated from saved profile and self-reported compliance; not an official certification.</p></section>
+<section class="card"><h2>Growth Passport</h2><p id="growthSummary"></p><ul id="growth"></ul></section>
+<section class="card"><h2>Financial Summary</h2><p id="financialPeriod"></p><dl><dt>Total income / turnover</dt><dd id="income">—</dd><dt>Total expenses</dt><dd id="expenses">—</dd><dt>Net profit / loss</dt><dd id="profit">—</dd><dt>VAT</dt><dd>Not separately recorded in the current bookkeeping system</dd></dl><p class="muted">Figures reflect saved bookkeeping transactions for the stated period only. No individual transaction records are included. This is not an audited financial statement or tax return.</p></section>
+</main>
+<script>
+(async()=>{
+const $=id=>document.getElementById(id);
+const text=(id,value)=>$(id).textContent=String(value);
+const money=n=>new Intl.NumberFormat('en-ZA',{style:'currency',currency:'ZAR'}).format(n);
+const today=new Date();text('generated',today.toLocaleDateString('en-ZA',{year:'numeric',month:'long',day:'numeric'}));
+const appendPair=(root,label,value)=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value||'Not provided';root.append(dt,dd)};
+const labelsC=['CIPC records','SARS tax status','CSD registration','B-BBEE documents','Relevant industry licences'];
+const labelsG=['Complete business assessment','Review compliance','Prepare funding documents','Identify procurement opportunities','Complete monthly business review'];
+try{
+if(!window.supabase)throw Error('Authentication library unavailable');
+const db=window.supabase.createClient('https://akxzubckdebawqwwwaoe.supabase.co','sb_publishable_XEeBfPCzJ0MzGpHWHygeug_rGptbzno');
+const {data:{user},error:authError}=await db.auth.getUser();
+if(authError||!user){location.replace('login.html');return}
+document.body.style.visibility='visible';
+const [p,c,f]=await Promise.all([
+db.from('business_profiles').select('business_name,contact_name,sector,region,description').eq('user_id',user.id).maybeSingle(),
+db.from('compliance_items').select('item_key,completed').eq('user_id',user.id),
+db.from('bookkeeping_transactions').select('transaction_date,kind,amount').eq('user_id',user.id).order('transaction_date',{ascending:true}).limit(1000)
+]);
+if(p.error||c.error||f.error)throw Error([p.error,c.error,f.error].filter(Boolean).map(e=>e.message).join('; '));
+const profile=p.data||{};
+for(const [field,label] of [['business_name','Business name'],['contact_name','Contact person'],['sector','Business sector'],['region','Region'],['description','Business description']])appendPair($('profile'),label,profile[field]);
+const map=new Map((c.data||[]).map(x=>[x.item_key,x.completed===true]));
+const list=(id,labels,prefix)=>{let done=0;labels.forEach((label,i)=>{const ok=map.get(prefix+i)===true;if(ok)done++;const li=document.createElement('li');li.textContent=(ok?'Completed: ':'Not completed: ')+label;$(id).append(li)});return done};
+const completed=list('compliance',labelsC,'c');const grown=list('growth',labelsG,'g');
+text('complianceSummary',completed+' of 5 checklist items marked complete ('+completed*20+'%).');
+text('growthSummary',grown+' of 5 growth milestones marked complete ('+grown*20+'%).');
+const fields=[profile.business_name,profile.sector].filter(x=>String(x||'').trim()).length;
+const readiness=Math.round((fields+completed)/7*100);
+text('readiness','Business readiness: '+readiness+'% (profile '+fields+'/2 fields; compliance '+completed+'/5 items).');
+const records=f.data||[];
+if(records.length===1000)throw Error('Financial report may be incomplete at the 1,000-record limit. No partial financial summary will be printed. Contact support for a complete report.');
+let income=0,expenses=0;
+for(const r of records){const cents=Math.round(Number(r.amount)*100);if(!Number.isSafeInteger(cents))throw Error('Invalid financial amount');if(r.kind==='income')income+=cents;else if(r.kind==='expense')expenses+=cents}
+const dates=records.map(r=>r.transaction_date).filter(Boolean);
+text('financialPeriod',dates.length?'Recorded transactions from '+dates[0]+' to '+dates[dates.length-1]+'.':'No saved bookkeeping transactions. Financial totals below reflect no recorded activity, not verified zero business activity.');
+text('income',money(income/100));text('expenses',money(expenses/100));text('profit',money((income-expenses)/100));
+text('status','Report ready. Review before printing or sharing.');
+$('print').disabled=false;$('print').onclick=()=>window.print();
+}catch(e){document.body.style.visibility='visible';text('status','Report unavailable: '+(e.message||'Unknown error'));$('status').className='error'}
+})();
+</script></body></html>
