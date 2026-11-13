@@ -18,11 +18,17 @@ small,.note{color:#5b6c77;line-height:1.5}ul{line-height:1.9}.disabled{border:1p
 .dashboard-return a,.actions .dashboard-return a{display:flex;align-items:center;justify-content:center;min-height:56px;width:100%;padding:12px 16px;border-radius:12px;background:#147b59;color:#fff;text-decoration:none;font-size:18px;font-weight:700;text-align:center}
 .dashboard-return a:focus-visible{outline:3px solid #12a3a8;outline-offset:3px}
 @media print{.dashboard-return{display:none!important}}
+
+/* Compact, purposeful section header */
+header{background:linear-gradient(115deg,#14283b 0%,#163d50 75%,#116a6a 100%);padding:22px 20px 24px;text-align:left}
+header .header-brand{margin:0 0 12px;font-size:16px;font-weight:700;color:#d4e6eb}
+header h1{margin:0 0 8px;font-size:clamp(24px,5vw,32px);line-height:1.2;color:#fff}
+header p:not(.header-brand){margin:0;color:#dce8eb;line-height:1.45;font-size:15px}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 </head>
 <body>
-<header><h1>Billing &amp; Membership</h1><p>Manage your membership and receipts</p></header>
+<header><p class="header-brand">◈ MzanConnect</p><h1>Billing &amp; Membership</h1><p>View your membership plans, payment status and receipts.</p></header>
 <main><div class="dashboard-return"><a href="dashboard.html" aria-label="Back to Dashboard">← Back to Dashboard</a></div>
 <section class="panel"><h2>Your membership</h2><p id="status" role="status">Checking your membership...</p><p id="explanation" class="note"></p></section>
 <section class="panel"><h2>Choose your plan</h2><ul class="plans"><li><span>Starter</span><strong>R199 / month</strong></li><li><span>Growth</span><strong>R399 / month</strong></li><li><span>Premium</span><strong>R499 / month</strong></li></ul><p class="note">Membership is paid one month at a time. No automatic renewal.</p></section>
