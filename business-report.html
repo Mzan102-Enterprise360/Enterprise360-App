@@ -52,10 +52,10 @@ const completed=list('compliance',labelsC,'c');const grown=list('growth',labelsG
 text('complianceSummary',completed+' of 5 checklist items marked complete ('+completed*20+'%).');
 text('growthSummary',grown+' of 5 growth milestones marked complete ('+grown*20+'%).');
 const fields=[profile.business_name,profile.sector].filter(x=>String(x||'').trim()).length;
-const readiness=Math.round(((fields/2)+(completed/5))/2*100);
+const readiness=Math.round((fields+completed)/7*100);
 text('readiness','Business readiness: '+readiness+'% (profile '+fields+'/2 fields; compliance '+completed+'/5 items).');
 const records=f.data||[];
-if(records.length===1000)throw Error('Financial records exceed the 1,000-row report limit. No partial financial summary will be printed. Contact support for a complete report.');
+if(records.length===1000)throw Error('Financial report may be incomplete at the 1,000-record limit. No partial financial summary will be printed. Contact support for a complete report.');
 let income=0,expenses=0;
 for(const r of records){const cents=Math.round(Number(r.amount)*100);if(!Number.isSafeInteger(cents))throw Error('Invalid financial amount');if(r.kind==='income')income+=cents;else if(r.kind==='expense')expenses+=cents}
 const dates=records.map(r=>r.transaction_date).filter(Boolean);
