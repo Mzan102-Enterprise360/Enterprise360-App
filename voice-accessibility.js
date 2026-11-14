@@ -25,6 +25,13 @@ body #mzan-voice-panel .mzan-actions{order:-1;flex:0 0 auto;flex-wrap:nowrap;gap
 body #mzan-voice-panel .mzan-actions button{flex:0 0 auto;width:auto;min-width:0;min-height:44px;padding:7px 8px;font-size:13px}
 body #mzan-voice-panel p{flex:1;min-width:0;margin:0;font-size:12px;line-height:1.3;overflow-x:auto;white-space:nowrap}
 
+/* Mobile: do not show a truncated scrolling status beside the listening buttons. */
+@media(max-width:800px){
+  body #mzan-voice-panel{gap:0}
+  body #mzan-voice-panel .mzan-actions{flex:1 1 100%;min-width:0}
+  body #mzan-voice-panel .mzan-actions button{flex:1 1 0;min-width:0;padding:7px 3px;font-size:clamp(11px,2.8vw,13px)}
+  body #mzan-voice-panel p{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);padding:0;margin:-1px;white-space:nowrap}
+}
 @media print{#mzan-voice-tools{display:none!important}}
 `;
 document.head.append(style);
