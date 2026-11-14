@@ -133,7 +133,24 @@ main{padding:7px 10px 16px!important}
     // Show the real paid membership expiry, and do not invite active members
     // to pay again while their existing month is still valid.
     let activeMembership=null;
+    let isFoundingPilot=false;
+    let foundingStatusAvailable=true;
     if(!isOwner){
+      try{
+        const {data:founder,error:founderError}=await client.from("founding_memberships")
+          .select("pilot_status").eq("user_id",data.user.id).maybeSingle();
+        if(founderError)throw founderError;
+        if(founder?.pilot_status==="active"){
+          isFoundingPilot=true;
+          document.getElementById("status").innerHTML='<span class="status">Founding member — free pilot access</span>';
+          document.getElementById("explanation").textContent="Your invitation-only founding membership is free while the pilot is active. You do not need to make a payment.";
+        }
+      }catch{
+        foundingStatusAvailable=false;
+        document.getElementById("explanation").textContent="Unable to verify founding membership. Payment is temporarily unavailable to protect your account. Refresh or contact Member Support.";
+      }
+    }
+    if(!isOwner&&!isFoundingPilot&&foundingStatusAvailable){
       try{
         const {data:active,error:activeError}=await client.from("membership_subscriptions")
           .select("current_period_end").eq("user_id",data.user.id)
@@ -151,7 +168,7 @@ main{padding:7px 10px 16px!important}
       }
     }
     const liveSection=document.getElementById("liveMembership"),liveButton=document.getElementById("startLiveCheckout"),livePlan=document.getElementById("livePlan"),liveStatus=document.getElementById("liveCheckoutStatus");
-    if(isOwner||activeMembership)liveSection.hidden=true;
+    if(isOwner||isFoundingPilot||activeMembership||!foundingStatusAvailable)liveSection.hidden=true;
     else {
       const returned=new URLSearchParams(location.search).get("payment");
       if(returned==="returned")liveStatus.textContent="Returned from Yoco. Your membership activates only after payment verification. Refresh to check receipts.";
