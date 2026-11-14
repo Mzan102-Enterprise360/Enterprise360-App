@@ -250,6 +250,8 @@ body:has(.welcome-cover) .cover-copy .cover-kicker{font-size:clamp(12px,3vw,20px
 
 /* Final hero polish: prominent legible slogan, responsive without clipping. */
 .approved-message{inset:44% 0 auto;height:19.5%;padding:0 2.5%;background:linear-gradient(110deg,#002d40,#005364)}
+/* Blend the dark artwork panel into the original background; no hard rule under the slogan. */
+.approved-message::after{content:"";position:absolute;left:0;right:0;top:calc(100% - 1px);height:1.1cqw;background:linear-gradient(to bottom,rgba(0,55,72,.9),rgba(0,55,72,0));pointer-events:none}
 .approved-message h1{font-size:clamp(17px,7cqw,62px);line-height:1.08;font-weight:900;letter-spacing:-.04em;text-shadow:0 2px 8px #001e2a55}
 .approved-message p{font-size:clamp(9px,2.7cqw,24px);font-weight:650;margin:.8cqw 0 0}
 @media(prefers-reduced-motion:reduce){.cover-actions a,button{transition:none!important}}
