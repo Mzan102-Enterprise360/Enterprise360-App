@@ -252,6 +252,10 @@ body:has(.welcome-cover) .cover-copy .cover-kicker{font-size:clamp(12px,3vw,20px
 .approved-message{inset:44% 0 auto;height:19.5%;padding:0 2.5%;background:linear-gradient(to bottom,#002d40 0%,#004b5c 70%,#003349 93%,rgba(0,51,73,0) 100%)}
 .approved-message h1{font-size:clamp(17px,7cqw,62px);line-height:1.08;font-weight:900;letter-spacing:-.04em;text-shadow:0 2px 8px #001e2a55}
 .approved-message p{font-size:clamp(9px,2.7cqw,24px);font-weight:650;margin:.8cqw 0 0}
+/* Compact home-only mission line; the existing image fit routine accounts for the caption height. */
+body:has(.welcome-cover) .home-disclaimer{margin:5px 5px 4px;line-height:1.3}
+body:has(.welcome-cover) .home-mission{display:block;color:#0b626d;font-size:clamp(11px,2.9vw,16px);font-weight:800;line-height:1.25;margin-bottom:3px}
+body:has(.welcome-cover) .home-disclaimer-detail{display:block;font-size:clamp(10px,2.5vw,12px);color:#61717b;line-height:1.3}
 @media(prefers-reduced-motion:reduce){.cover-actions a,button{transition:none!important}}
 
 </style>
@@ -321,7 +325,7 @@ if(page==='home')html=`
     <div class="cover-landscape" aria-hidden="true"><span class="mine-tower">▥</span><span class="landscape-tree">♣</span><span class="growth-symbol">↗</span></div>
   </div>
 </section>
-<p class="home-disclaimer">Business opportunities for South African entrepreneurs and SMMEs. Not a job application portal.</p>`;
+<p class="home-disclaimer"><strong class="home-mission">Empowering Her. Uplifting Youth. Growing Mzansi.</strong><span class="home-disclaimer-detail">Business opportunities for South African entrepreneurs and SMMEs. Not a job application portal.</span></p>`;
 
 if(page==='business')html=`
 <h2>My Business</h2>
