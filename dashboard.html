@@ -215,7 +215,14 @@ main{padding:14px}
     const result=await client.auth.getUser();
     if(result.error||!result.data.user){location.replace('login.html');return;}
     user=result.data.user;
-    if(user.id==='820a18ee-3482-4b6c-bd75-469cf198b9df')$('ownerSurveyReports').hidden=false;
+    if(user.id==='820a18ee-3482-4b6c-bd75-469cf198b9df'){
+      const surveyLink=$('ownerSurveyReports');
+      surveyLink.hidden=false;
+      client.from('smme_survey_2026_responses').select('id',{count:'exact',head:true})
+        .then(({count,error})=>{
+          if(!error&&Number.isInteger(count))surveyLink.textContent='Survey Reports & Print ('+count+' responses)';
+        });
+    }
     $('profilePlan').textContent=user.app_metadata?.mzanconnect_role==='owner'?'MzanConnect Owner':'MzanConnect Member';
   }catch(error){location.replace('login.html');return;}
 
