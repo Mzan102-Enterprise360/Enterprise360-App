@@ -293,7 +293,7 @@ body:has(.welcome-cover) .home-disclaimer-detail{display:block;font-size:clamp(1
 <main><div id="view"></div></main>
 
 <nav>
-<button onclick="show('home')"><span class="nav-icon" aria-hidden="true">⌂</span><span>Home</span></button>
+<button onclick="window.location.assign(new URL('index.html?from=app-nav', document.baseURI).href)"><span class="nav-icon" aria-hidden="true">⌂</span><span>Home</span></button>
 <a href="./business-support.html" aria-label="Open Business Support within MzanConnect"><span class="nav-icon" aria-hidden="true">☏</span><span>Business Support</span></a>
 <button onclick="show('opportunities')"><span class="nav-icon" aria-hidden="true">▣</span><span>Explore</span></button>
 <button onclick="location.href='billing.html'"><span class="nav-icon" aria-hidden="true">▤</span><span>Billing &amp; Membership</span></button>
