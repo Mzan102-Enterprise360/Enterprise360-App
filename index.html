@@ -272,6 +272,27 @@ body:has(.welcome-cover) .home-disclaimer-detail{display:block;font-size:clamp(1
 .survey-home-link{display:flex;align-items:center;justify-content:center;gap:7px;width:min(100%,390px);margin:6px auto 3px;padding:9px 12px;min-height:42px;background:#087f8c;color:#fff!important;border:1px solid #0d7a81;border-radius:10px;text-decoration:none;font-size:clamp(12px,3vw,14px);font-weight:800;line-height:1.2;box-shadow:0 2px 5px #14283b14}
 .survey-home-link:focus-visible{outline:3px solid #ecb037;outline-offset:2px}
 .survey-home-link:hover{background:#09616b}
+/* Prominent survey invitation immediately below the home brand; always reachable after modal dismissal. */
+#mzanSurveyHeaderLink{display:none}
+body:has(.welcome-cover) #mzanSurveyHeaderLink{
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  box-sizing:border-box;width:100%;max-width:660px;
+  min-height:58px;margin:9px auto 0;padding:12px 15px;
+  border:2px solid #b5fae3;border-radius:13px;
+  background:#13aa8e;color:#072e35;text-decoration:none;
+  font:850 clamp(16px,4.1vw,20px)/1.25 system-ui,Arial,sans-serif;
+  letter-spacing:.008em;text-align:center;
+  box-shadow:0 4px 0 #09675e,0 7px 16px #001c2b28;
+  transition:background .15s ease;
+}
+body:has(.welcome-cover) #mzanSurveyHeaderLink:hover{background:#49d0ab}
+#mzanSurveyHeaderLink:focus-visible{outline:3px solid #ffc44b;outline-offset:3px}
+@media(max-height:550px){
+ body:has(.welcome-cover) #mzanSurveyHeaderLink{
+   min-height:48px;padding:7px 12px;margin-top:5px;
+   font-size:clamp(15px,3.8vw,18px)
+ }
+}
 </style>
 </head>
 <body>
@@ -284,6 +305,7 @@ body:has(.welcome-cover) .home-disclaimer-detail{display:block;font-size:clamp(1
 
 <small class="brand-extra">Empowering Her. Uplifting Youth. Growing Mzansi.</small><br class="brand-extra">
 <small class="brand-extra">A division of Mzan 102 (Pty) Ltd</small>
+<a id="mzanSurveyHeaderLink" href="./survey.html" aria-label="Take the free MzanConnect SMME survey">✎ &nbsp; TAKE THE FREE SMME SURVEY</a>
 </header>
 
 <main><div id="view"></div></main>
@@ -349,7 +371,7 @@ if(page==='home')html=`
     <div class="cover-landscape" aria-hidden="true"><span class="mine-tower">▥</span><span class="landscape-tree">♣</span><span class="growth-symbol">↗</span></div>
   </div>
 </section>
-<p class="home-disclaimer"><strong class="home-mission">Empowering Her. Uplifting Youth. Growing Mzansi.</strong><span class="home-disclaimer-detail">Business opportunities for South African entrepreneurs and SMMEs. Not a job application portal. <a class="survey-home-link" href="survey.html" aria-label="Open the MzanConnect SMME survey">▤ &nbsp; Open the SMME Survey</a></span></p>`;
+<p class="home-disclaimer"><strong class="home-mission">Empowering Her. Uplifting Youth. Growing Mzansi.</strong><span class="home-disclaimer-detail">Business opportunities for South African entrepreneurs and SMMEs. Not a job application portal.</span></p>`;
 
 if(page==='business')html=`
 <h2>My Business</h2>
