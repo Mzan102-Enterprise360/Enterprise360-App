@@ -215,7 +215,7 @@ main{padding:14px}
     const result=await client.auth.getUser();
     if(result.error||!result.data.user){location.replace('login.html');return;}
     user=result.data.user;
-    if(user.id==='38bbc6d6-cac2-4e7d-be68-b53c810ab8b8'){
+    if(user.id==='820a18ee-3482-4b6c-bd75-469cf198b9df'){
       const surveyLink=$('ownerSurveyReports');
       surveyLink.hidden=false;
       client.from('smme_survey_2026_responses').select('id',{count:'exact',head:true})
