@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#14283b"><title>MzanConnect | SMME Survey 2026</title>
+<meta name="description" content="Voluntary independent survey of small-business readiness and equipment use in Gamagara, Northern Cape.">
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#163144;background:#eef3f5}
+*{box-sizing:border-box}body{margin:0}header{background:linear-gradient(120deg,#14283b,#145a60);color:white;padding:20px 16px}
+header .inside,main,footer{max-width:720px;margin:auto}
+header a{color:#e5faf6;text-decoration:underline}header h1{font-size:clamp(24px,6vw,34px);line-height:1.15;margin:17px 0 5px}
+header p{margin:8px 0;color:#e1f0ed;line-height:1.45}header .brand{font-size:15px;font-weight:800;letter-spacing:.04em}
+main{padding:18px 13px 28px}.card{background:#fff;border:1px solid #dce8e9;border-radius:17px;padding:17px;margin-bottom:14px;box-shadow:0 6px 22px #1738450d}
+.note{font-size:14px;color:#506577;line-height:1.55}h2{font-size:20px;margin:0 0 10px}
+fieldset{border:0;border-bottom:1px solid #e6eff0;padding:16px 0;margin:0}fieldset:last-of-type{border:0}
+legend{font-weight:720;line-height:1.35;padding:0;font-size:16px;max-width:100%}.required{color:#b3333d}
+select{display:block;margin-top:10px;width:100%;max-width:100%;min-height:48px;padding:10px 12px;font:inherit;border:1px solid #9babb4;border-radius:10px;background:#fff;color:#183446}
+.option{display:flex;align-items:flex-start;gap:11px;border:1px solid #dce6e9;border-radius:11px;padding:10px 11px;margin-top:8px;line-height:1.45;font-size:15px;cursor:pointer}
+.option:has(input:checked){border-color:#078d8c;background:#e8f8f4}.option input{width:18px;height:18px;flex-shrink:0;accent-color:#078783;margin:2px 0 0}
+button{border:0;border-radius:11px;background:#087d84;color:white;font:inherit;font-weight:750;padding:14px 17px;cursor:pointer;min-height:48px;width:100%}
+button:disabled{opacity:.6;cursor:wait}button:focus-visible,select:focus-visible,.option:focus-within{outline:3px solid #e5aa2a;outline-offset:3px}
+#status{display:none;border-radius:12px;background:#e8f4ee;color:#17492f;padding:15px;margin:14px 0;font-weight:600;line-height:1.5}
+#status.error{background:#fff0f0;color:#8d242c}
+footer{padding:8px 15px 24px;font-size:13px;color:#55717d;text-align:center}
+@media(min-width:700px){main{padding:22px 8px 34px}.card{padding:25px}}
+</style>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+</head><body>
+<header><div class="inside"><div class="brand">◈ MzanConnect</div>
+<h1>SMME Readiness &amp; Equipment Utilisation Survey</h1>
+<p>Kathu • Gamagara • Surrounding communities | 2026</p>
+<p><a href="index.html">← Return to MzanConnect</a></p></div></header>
+<main>
+<section class="card" aria-labelledby="intro-title"><h2 id="intro-title">Your experience matters</h2>
+<p>We want to understand what helps small businesses operate successfully, especially after receiving funding, machinery, equipment or business-development support.</p>
+<p class="note"><strong>Independent, voluntary research.</strong> Approximately 5 minutes. No membership, payment, name, phone number or business registration number is required. This survey is not run on behalf of Kumba, Khumani, SIOC-CDT or any other funder. Your participation does not affect funding decisions.</p>
+</section>
+<section class="card" aria-labelledby="privacy-title"><h2 id="privacy-title">Privacy and consent</h2>
+<p class="note">Mzan 102 (Pty) Ltd, through MzanConnect, will use your answers to prepare summary research findings about local SMMEs. Responses are stored with a hosted database provider and may be processed outside South Africa. We do not request personal names or contact details. In public reports, small groups will be combined or omitted to reduce the risk of identifying participants. Results are not shared as individual business records with sponsors. Responses will be retained only as long as necessary for the research, with a planned maximum of 12 months after survey closure. For research privacy questions, email <a href="mailto:reception.mzan102@gmail.com">reception.mzan102@gmail.com</a>. As no identifying details are collected, we may not be able to locate and remove an individual answer after submission.</p>
+<p class="note">Please do not share anyone else's confidential information. You can stop before submission. Select only answers you feel comfortable sharing; “prefer not to say” is available for sensitive questions.</p>
+</section>
+<section class="card" aria-labelledby="survey-title"><h2 id="survey-title">SMME survey — 10 questions</h2>
+<form id="survey" novalidate="false">
+<fieldset><legend>1. Where does your business mainly operate? <span class="required">*</span></legend>
+<select name="area" required><option value="">Select area</option><option value="kathu">Kathu</option><option value="gamagara_other">Elsewhere in Gamagara</option><option value="kuruman">Kuruman</option><option value="jtg_other">Elsewhere in John Taolo Gaetsewe</option><option value="other">Other area</option><option value="prefer_not">Prefer not to say</option></select></fieldset>
+<fieldset><legend>2. What is your main business sector? <span class="required">*</span></legend>
+<select name="sector" required><option value="">Select sector</option><option value="manufacturing">Manufacturing or production</option><option value="construction">Construction or welding</option><option value="catering">Catering or hospitality</option><option value="cleaning">Cleaning or maintenance</option><option value="transport">Transport or logistics</option><option value="retail">Retail or trading</option><option value="services">Professional or other services</option><option value="other">Other</option></select></fieldset>
+<fieldset><legend>3. Is the business currently operating? <span class="required">*</span></legend>
+<label class="option"><input type="radio" name="status" value="fully" required> Fully operating</label>
+<label class="option"><input type="radio" name="status" value="partly"> Partially operating</label>
+<label class="option"><input type="radio" name="status" value="not_started"> Not yet operating</label>
+<label class="option"><input type="radio" name="status" value="stopped"> Previously operated but stopped</label>
+<label class="option"><input type="radio" name="status" value="prefer_not"> Prefer not to say</label></fieldset>
+<fieldset><legend>4. Has the business received development support? <span class="required">*</span></legend>
+<label class="option"><input type="radio" name="support" value="equipment" required> Equipment or machinery</label>
+<label class="option"><input type="radio" name="support" value="funding"> Financial support</label>
+<label class="option"><input type="radio" name="support" value="both"> Both equipment and financial support</label>
+<label class="option"><input type="radio" name="support" value="training"> Training or mentorship only</label>
+<label class="option"><input type="radio" name="support" value="none"> No support received</label>
+<label class="option"><input type="radio" name="support" value="unsure"> Not sure / prefer not to say</label></fieldset>
+<fieldset><legend>5. Which organisation provided support, if applicable? <span class="required">*</span></legend>
+<select name="provider" required><option value="">Select an answer</option><option value="kumba">Kumba</option><option value="khumani">Khumani</option><option value="sioc_cdt">SIOC-CDT</option><option value="reisa">REISA</option><option value="government">Government programme</option><option value="other">Another source</option><option value="multiple">More than one source</option><option value="none">Not applicable / no support</option><option value="prefer_not">Don't know / prefer not to say</option></select></fieldset>
+<fieldset><legend>6. If you have business equipment, how much is it used? <span class="required">*</span></legend>
+<label class="option"><input type="radio" name="equipment_use" value="regularly" required> Used regularly to provide products or services</label>
+<label class="option"><input type="radio" name="equipment_use" value="sometimes"> Used occasionally</label>
+<label class="option"><input type="radio" name="equipment_use" value="unused"> Not currently used</label>
+<label class="option"><input type="radio" name="equipment_use" value="not_working"> Equipment is broken or not ready to use</label>
+<label class="option"><input type="radio" name="equipment_use" value="none"> No business equipment / not applicable</label>
+<label class="option"><input type="radio" name="equipment_use" value="prefer_not"> Prefer not to say</label></fieldset>
+<fieldset><legend>7. Which obstacles affect your business? (Select all that apply.)</legend>
+<label class="option"><input type="checkbox" name="barrier" value="premises"> Lack of suitable premises or work space</label>
+<label class="option"><input type="checkbox" name="barrier" value="electricity"> Electricity or infrastructure</label>
+<label class="option"><input type="checkbox" name="barrier" value="skills"> Technical skills or training</label>
+<label class="option"><input type="checkbox" name="barrier" value="customers"> Too few customers or orders</label>
+<label class="option"><input type="checkbox" name="barrier" value="cash"> Working capital or operating costs</label>
+<label class="option"><input type="checkbox" name="barrier" value="transport"> Transport or logistics</label>
+<label class="option"><input type="checkbox" name="barrier" value="maintenance"> Equipment maintenance or repair</label>
+<label class="option"><input type="checkbox" name="barrier" value="management"> Business management or record-keeping</label>
+<label class="option"><input type="checkbox" name="barrier" value="none"> No major obstacles</label></fieldset>
+<fieldset><legend>8. Does your business have suitable premises? <span class="required">*</span></legend>
+<label class="option"><input type="radio" name="premises" value="yes" required> Yes</label>
+<label class="option"><input type="radio" name="premises" value="home"> I operate from home</label>
+<label class="option"><input type="radio" name="premises" value="shared"> I use shared or temporary space</label>
+<label class="option"><input type="radio" name="premises" value="no"> No suitable space</label>
+<label class="option"><input type="radio" name="premises" value="prefer_not"> Prefer not to say</label></fieldset>
+<fieldset><legend>9. Did the business receive practical follow-up support? <span class="required">*</span></legend>
+<label class="option"><input type="radio" name="followup" value="ongoing" required> Yes, ongoing mentoring or site visits</label>
+<label class="option"><input type="radio" name="followup" value="ended"> Yes, but it ended</label>
+<label class="option"><input type="radio" name="followup" value="none"> No follow-up support</label>
+<label class="option"><input type="radio" name="followup" value="not_applicable"> No programme support / not applicable</label>
+<label class="option"><input type="radio" name="followup" value="unsure"> Unsure / prefer not to say</label></fieldset>
+<fieldset><legend>10. Which ONE improvement would help your business most? <span class="required">*</span></legend>
+<select name="priority" required><option value="">Choose one</option>
+<option value="premises">Access to suitable shared workspace</option><option value="sales">Customers, contracts or market access</option>
+<option value="finance">Working capital or finance</option><option value="training">Practical technical or business training</option>
+<option value="equipment">Equipment repair, set-up or utilisation</option><option value="mentoring">Ongoing mentorship or business monitoring</option>
+<option value="systems">Bookkeeping, administration or compliance</option><option value="other">Other support</option>
+<option value="none">No additional support needed</option></select></fieldset>
+<label class="option"><input id="consent" type="checkbox" required> I am an adult entrepreneur or authorised business representative. I have read the information above and voluntarily consent to this research submission. <span class="required">*</span></label>
+<div style="position:absolute;left:-99999px" aria-hidden="true"><label for="website">Leave this blank</label><input id="website" type="text" tabindex="-1" autocomplete="off"></div>
+<p class="note">Please review your answers. Once submitted, you will see a confirmation message.</p>
+<button id="send" type="submit">Submit survey</button><p id="status" role="status" aria-live="polite"></p>
+</form></section></main>
+<footer>MzanConnect • Independent SMME research • © 2026 Mzan 102 (Pty) Ltd</footer>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+  const form=document.getElementById('survey'),send=document.getElementById('send'),status=document.getElementById('status');
+  const client=window.supabase&&window.supabase.createClient('https://akxzubckdebawqwwwaoe.supabase.co','sb_publishable_XEeBfPCzJ0MzGpHWHygeug_rGptbzno');
+  const single=function(name){const x=form.querySelector('[name="'+name+'"]:checked');return x?x.value:null};
+  function message(value,isError){status.style.display='block';status.className=isError?'error':'';status.textContent=value;status.scrollIntoView({behavior:'smooth',block:'nearest'})}
+  form.addEventListener('submit',async function(ev){
+    ev.preventDefault();
+    if(!form.reportValidity())return;
+    if(document.getElementById('website').value)return;
+    if(!client){message('Survey service is temporarily unavailable. Please try again later.',true);return}
+    const barriers=Array.from(form.querySelectorAll('[name="barrier"]:checked'),x=>x.value);
+    if(barriers.includes('none')&&barriers.length>1){message('For question 7, choose either “No major obstacles” or the applicable obstacles, not both.',true);return}
+    const payload={
+      area:form.elements.area.value,sector:form.elements.sector.value,business_status:single('status'),
+      support_received:single('support'),support_provider:form.elements.provider.value,equipment_use:single('equipment_use'),
+      barriers:barriers,premises:single('premises'),followup:single('followup'),priority:form.elements.priority.value,
+      consent_confirmed:true,consent_version:'2026-11-15'
+    };
+    send.disabled=true;send.textContent='Submitting...';status.style.display='none';
+    try {
+      const response=await client.from('smme_survey_2026_responses').insert(payload);
+      if(response.error)throw response.error;
+      form.reset();form.hidden=true;message('Thank you. Your survey response has been received. No membership or payment is required.',false);
+    }catch(error){
+      message('Your response could not be submitted. Check your connection and try again. Your answers have not been confirmed as saved.',true);
+    }finally{send.disabled=false;send.textContent='Submit survey'}
+  });
+});
+</script>
+</body></html>
