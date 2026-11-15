@@ -41,6 +41,7 @@ main{max-width:850px;margin:auto;padding:20px}
 .actions{display:flex;gap:10px}
 .actions a{flex:1;text-align:center;padding:13px 8px;border-radius:10px;text-decoration:none;background:#147b59;color:white;font-weight:bold}
 .actions a:last-child{background:#14283b}
+.actions a[hidden]{display:none!important}
 .note{font-size:12px;color:#667}
 #logoutButton{margin-top:15px;background:#fff;color:#14283b;border:0;border-radius:9px;padding:12px 22px;font-size:15px;font-weight:bold;cursor:pointer}
 #logoutButton:disabled{opacity:.6}
@@ -189,6 +190,7 @@ main{padding:14px}
 <h3>Quick Actions</h3>
 <div class="actions">
 <a href="support.html">Member Support</a>
+<a id="ownerSurveyReports" href="survey-report.html" hidden>Survey Reports &amp; Print</a>
 <a href="index.html?from=app-nav">Home</a>
 </div>
 </section>
@@ -213,6 +215,7 @@ main{padding:14px}
     const result=await client.auth.getUser();
     if(result.error||!result.data.user){location.replace('login.html');return;}
     user=result.data.user;
+    if(user.id==='820a18ee-3482-4b6c-bd75-469cf198b9df')$('ownerSurveyReports').hidden=false;
     $('profilePlan').textContent=user.app_metadata?.mzanconnect_role==='owner'?'MzanConnect Owner':'MzanConnect Member';
   }catch(error){location.replace('login.html');return;}
 
