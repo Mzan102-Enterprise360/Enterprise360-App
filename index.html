@@ -7,6 +7,7 @@
 <meta name="theme-color" content="#14283b">
 <meta name="description" content="MzanConnect connects South African entrepreneurs, women, youth and SMMEs with business funding, tenders, mining supplier opportunities and enterprise development. Not a job application portal.">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="preload" as="image" href="mzanconnect-approved-homepage.png">
 <title>MzanConnect | Business Opportunities</title>
 <style>
 :root{font-family:system-ui,Arial;color:#172c39;background:#edf2f5}
@@ -227,9 +228,9 @@ body > nav button:focus-visible{outline:3px solid #ffbf47;outline-offset:2px}
 body:has(.welcome-cover){height:100vh;height:100dvh;min-height:0;display:flex;flex-direction:column}
 body:has(.welcome-cover) main{flex:1 1 0;min-height:0;width:100%;padding:2px 10px;display:flex}
 body:has(.welcome-cover) #view{flex:1 1 0;min-height:0;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center}
-body:has(.welcome-cover) .approved-cover:not([hidden]){flex:0 0 auto;width:min(100%,390px,max(120px,calc(82vh - 172px)));max-width:100%;margin:0 auto;border-radius:18px}
+body:has(.welcome-cover) .approved-cover:not([hidden]){flex:0 0 auto;width:min(100%,390px,max(215px,calc(82vh - 172px)));max-width:100%;margin:0 auto;border-radius:18px}
 @supports(height:100svh){
-body:has(.welcome-cover) .approved-cover:not([hidden]){width:min(100%,390px,max(120px,calc(82svh - 172px)))}
+body:has(.welcome-cover) .approved-cover:not([hidden]){width:min(100%,390px,max(215px,calc(82svh - 172px)))}
 }
 body:has(.welcome-cover) .approved-cover img{width:100%;height:auto}
 body:has(.welcome-cover) .home-disclaimer{flex:0 0 auto;width:100%;font-size:clamp(10px,2.6vw,12px);line-height:1.25;margin:5px 0 2px}
@@ -276,6 +277,16 @@ body:has(.welcome-cover) .home-disclaimer-detail{display:block;font-size:clamp(1
 .survey-home-link:focus-visible{outline:3px solid #ecb037;outline-offset:2px}
 .survey-home-link:hover{background:#05656a}
 @media (max-height:550px){.survey-home-link{min-height:44px;padding:7px 11px;margin:4px auto 3px;font-size:clamp(12px,3.2vw,14px)}}
+
+/* In short landscape view keep the approved portrait artwork readable, rather than
+   shrinking it to a tiny thumbnail. Allow vertical scrolling only when needed. */
+@media screen and (orientation:landscape) and (max-height:550px){
+ body:has(.welcome-cover){height:auto;min-height:100vh;overflow-y:auto}
+ @supports(height:100svh){body:has(.welcome-cover){min-height:100svh}}
+ body:has(.welcome-cover) main{flex:1 0 auto}
+ body:has(.welcome-cover) #view{flex:1 0 auto;justify-content:flex-start}
+ body:has(.welcome-cover) .approved-cover:not([hidden]){width:min(100%,260px)}
+}
 </style>
 </head>
 <body>
@@ -339,7 +350,7 @@ for(const item of document.querySelectorAll('.brand-extra'))item.hidden=opportun
 let html='';
 
 if(page==='home')html=`
-<div class="approved-cover" id="approvedCover" hidden><img src="mzanconnect-approved-homepage.png" alt="MzanConnect business hub: three South African business professionals, Your business. Your next opportunity." onload="this.parentElement.hidden=false;this.parentElement.nextElementSibling.hidden=true" onerror="this.parentElement.remove()" loading="eager"><div class="approved-message"><h1><span>One Connection.</span><span>Endless Possibilities.</span></h1><p>Your business. Your next opportunity.</p></div><a class="approved-join" href="register.html" aria-label="Join MzanConnect"></a><a class="approved-login" href="login.html" aria-label="Member Login"></a></div>
+<div class="approved-cover" id="approvedCover" hidden><img src="mzanconnect-approved-homepage.png" fetchpriority="high" alt="MzanConnect business hub: three South African business professionals, Your business. Your next opportunity." onload="this.parentElement.hidden=false;this.parentElement.nextElementSibling.hidden=true" onerror="this.parentElement.remove()" loading="eager"><div class="approved-message"><h1><span>One Connection.</span><span>Endless Possibilities.</span></h1><p>Your business. Your next opportunity.</p></div><a class="approved-join" href="register.html" aria-label="Join MzanConnect"></a><a class="approved-login" href="login.html" aria-label="Member Login"></a></div>
 <section class="welcome-cover" aria-labelledby="coverTitle">
   <div class="cover-photo" role="img" aria-label="South African business professionals collaborating around a laptop"></div>
   <div class="cover-content">
