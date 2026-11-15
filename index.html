@@ -287,6 +287,77 @@ body:has(.welcome-cover) .home-disclaimer-detail{display:block;font-size:clamp(1
  body:has(.welcome-cover) #view{flex:1 0 auto;justify-content:flex-start}
  body:has(.welcome-cover) .approved-cover:not([hidden]){width:min(100%,260px)}
 }
+/* Stable, non-scrolling MzanConnect cover. Reserve voice, nav and footer in
+   normal document flow and size artwork against the small (stable) viewport. */
+@media screen{
+ body:has(#view .welcome-cover){
+  display:flex;flex-direction:column;
+  box-sizing:border-box;height:100vh;height:100svh;
+  min-height:0;max-height:100svh;
+  margin:0;overflow:hidden;
+ }
+ body:has(#view .welcome-cover) > header{display:none}
+ body:has(#view .welcome-cover) > #mzan-voice-tools{flex-shrink:0}
+ body:has(#view .welcome-cover) > main{
+  flex:1 1 0;min-height:0;max-width:none;box-sizing:border-box;
+  width:100%;margin:0 auto;padding:2px 9px 3px;
+  overflow:hidden;display:flex;flex-direction:column;
+ }
+ body:has(#view .welcome-cover) > main > #view{
+  flex:1 1 0;min-height:0;max-height:100%;width:100%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  overflow:hidden;
+ }
+ body:has(#view .welcome-cover) #view > .approved-cover:not([hidden]){
+  flex:0 1 auto;width:min(100%,390px,max(110px,calc(80svh - 225px)));
+  max-width:100%;height:auto;margin:0 auto;border-radius:18px;
+ }
+ body:has(#view .welcome-cover) #view > .home-disclaimer{
+  flex:0 0 auto;box-sizing:border-box;width:100%;
+  margin:4px 0 2px;line-height:1.18;
+ }
+ body:has(#view .welcome-cover) .survey-home-link{
+  margin:4px auto 3px;min-height:44px;padding:7px 11px;
+ }
+ body:has(#view .welcome-cover) > nav{
+  flex:0 0 auto;box-sizing:border-box;
+  margin:3px auto;padding:4px;gap:4px;
+ }
+ body:has(#view .welcome-cover) > nav button{
+  min-height:44px;padding:4px 2px;gap:2px;
+ }
+ body:has(#view .welcome-cover) > #mzan-legal-footer{
+  flex:0 0 auto;box-sizing:border-box;
+  padding:4px 7px!important;line-height:1.12!important;
+  font-size:9px!important;
+ }
+ body:has(#view .welcome-cover) > #mzan-legal-footer div{margin:1px 0}
+}
+/* On short landscape phones, present the same cover without forcing the
+   portrait image below the visible screen; simplify only redundant captions. */
+@media screen and (orientation:landscape) and (max-height:550px){
+ body:has(#view .welcome-cover) > main{padding:1px 7px}
+ body:has(#view .welcome-cover) #view > .approved-cover:not([hidden]){
+  width:min(100%,max(104px,calc(80svh - 150px)));
+ }
+ body:has(#view .welcome-cover) .home-mission,
+ body:has(#view .welcome-cover) .home-disclaimer-detail{display:none}
+ body:has(#view .welcome-cover) #view > .home-disclaimer{margin:2px 0}
+ body:has(#view .welcome-cover) > nav{margin:2px auto;padding:3px}
+ body:has(#view .welcome-cover) > nav button{min-height:42px;padding:3px 2px}
+ body:has(#view .welcome-cover) > #mzan-legal-footer{
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  flex-wrap:wrap;padding:3px 6px!important;font-size:9px!important;
+ }
+ body:has(#view .welcome-cover) > #mzan-legal-footer div{margin:0}
+}
+/* Extreme viewport sizes or enlarged text should remain accessible rather
+   than cutting off links; ordinary phone viewports remain stationary. */
+@media screen and (max-height:310px){
+ body:has(#view .welcome-cover){height:auto;max-height:none;min-height:100svh;overflow:auto}
+ body:has(#view .welcome-cover) > main,
+ body:has(#view .welcome-cover) > main > #view{overflow:visible}
+}
 </style>
 </head>
 <body>
@@ -629,6 +700,6 @@ navigator.serviceWorker.register('./sw.js').catch(()=>{});
 })();
 </script>
 <!-- Member access buttons appear only on the Home view. -->
-<script defer src="legal-notices.js?v=4"></script><script defer src="voice-accessibility.js?v=8"></script><script defer src="app-shell.js?v=4"></script></body>
+<script defer src="legal-notices.js?v=4"></script><script defer src="voice-accessibility.js?v=13"></script><script defer src="app-shell.js?v=4"></script></body>
 </html>
 

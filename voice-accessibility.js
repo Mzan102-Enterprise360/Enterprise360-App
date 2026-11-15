@@ -24,6 +24,30 @@ body #mzan-voice-panel > strong{display:none}
 body #mzan-voice-panel .mzan-actions{order:-1;flex:0 0 auto;flex-wrap:nowrap;gap:4px}
 body #mzan-voice-panel .mzan-actions button{flex:0 0 auto;width:auto;min-width:0;min-height:44px;padding:7px 8px;font-size:13px}
 body #mzan-voice-panel p{flex:1;min-width:0;margin:0;font-size:12px;line-height:1.3;overflow-x:auto;white-space:nowrap}
+/* Dedicated voice toolbar row: no floating or overlap with the home artwork. */
+body #mzan-voice-tools.mzan-voice-home{
+ position:relative;top:auto;right:auto;z-index:auto;
+ box-sizing:border-box;flex:0 0 52px;
+ height:52px;min-height:52px;width:calc(100% - 20px);max-width:690px;
+ margin:3px auto 4px;padding:3px 8px;
+ border:1px solid #c9e1df;border-radius:12px;
+ background:#f1f9f7;box-shadow:0 2px 5px #102c3810;
+}
+body #mzan-voice-tools.mzan-voice-home > button{flex:0 0 42px;width:42px;height:42px;min-height:42px}
+body #mzan-voice-tools.mzan-voice-home #mzan-voice-panel{
+ position:static;flex:1 1 auto;height:42px;min-height:42px;
+ margin:0;padding:0 4px;background:transparent;overflow:hidden;
+}
+body #mzan-voice-tools.mzan-voice-home #mzan-voice-panel .mzan-actions button{
+ min-height:40px;padding:7px 6px;
+}
+@media(max-height:480px){
+ body #mzan-voice-tools.mzan-voice-home{flex-basis:46px;height:46px;min-height:46px;margin:2px auto 2px;padding:1px 6px}
+ body #mzan-voice-tools.mzan-voice-home > button{height:40px;width:40px;min-height:40px;flex-basis:40px}
+ body #mzan-voice-tools.mzan-voice-home #mzan-voice-panel{height:40px;min-height:40px}
+ body #mzan-voice-tools.mzan-voice-home #mzan-voice-panel .mzan-actions button{min-height:40px}
+}
+
 
 /* Mobile: do not show a truncated scrolling status beside the listening buttons. */
 @media(max-width:800px){
@@ -36,6 +60,7 @@ body #mzan-voice-panel p{flex:1;min-width:0;margin:0;font-size:12px;line-height:
 `;
 document.head.append(style);
 const host=document.createElement('aside');host.id='mzan-voice-tools';host.setAttribute('aria-label','Voice accessibility controls');
+const pageName=location.pathname.split('/').pop()||'index.html';
 const panel=document.createElement('div');panel.id='mzan-voice-panel';panel.hidden=true;
 const title=document.createElement('strong');title.textContent='Spoken guidance';
 const info=document.createElement('p');info.id='mzan-voice-status';info.setAttribute('role','status');info.setAttribute('aria-live','polite');
@@ -155,9 +180,11 @@ host.append(panel,toggle);
 const main=document.querySelector('main');
 if(main)main.before(host);else document.body.prepend(host);
 function syncHomeVoice(){
-panel.hidden=false;
-toggle.setAttribute('aria-label','Listen to spoken page guidance');
-toggle.removeAttribute('aria-expanded');
+  /* Apply the separate reserved row only to the actual home view, not Explore. */
+  host.classList.toggle('mzan-voice-home',pageName==='index.html'&&!!document.querySelector('#view .welcome-cover'));
+  panel.hidden=false;
+  toggle.setAttribute('aria-label','Listen to spoken page guidance');
+  toggle.removeAttribute('aria-expanded');
 }
 syncHomeVoice();
 const view=document.getElementById('view');
