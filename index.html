@@ -269,46 +269,10 @@ body:has(.welcome-cover) .home-disclaimer-detail{display:block;font-size:clamp(1
 .mzan-survey-invite a.mzan-survey-start{display:flex;justify-content:center;align-items:center;min-height:48px;border-radius:11px;background:#0a8186;color:#fff;font-size:15px;font-weight:800;text-decoration:none;margin-top:17px}
 #mzanSurveySkip{display:block;width:100%;border:1px solid #c6d8db;border-radius:11px;min-height:45px;background:#fff;color:#244250;font-size:14px;font-weight:700;margin-top:9px}
 .mzan-survey-invite small{display:block;font-size:11px;line-height:1.45;color:#657b85;margin-top:10px}
-.survey-home-link{display:flex;align-items:center;justify-content:center;gap:7px;width:min(100%,390px);margin:6px auto 3px;padding:9px 12px;min-height:42px;background:#087f8c;color:#fff!important;border:1px solid #0d7a81;border-radius:10px;text-decoration:none;font-size:clamp(12px,3vw,14px);font-weight:800;line-height:1.2;box-shadow:0 2px 5px #14283b14}
+.survey-home-link{display:flex;align-items:center;justify-content:center;box-sizing:border-box;gap:8px;width:min(100%,600px);min-height:56px;margin:8px auto 6px;padding:12px 15px;background:#087d80;color:#fff!important;border:2px solid #0b6f73;border-radius:13px;text-decoration:none;font-size:clamp(16px,4.1vw,20px);font-weight:850;line-height:1.2;text-align:center;box-shadow:0 3px 0 #075358,0 7px 16px #123d4b22;letter-spacing:.01em}
 .survey-home-link:focus-visible{outline:3px solid #ecb037;outline-offset:2px}
-.survey-home-link:hover{background:#09616b}
-/* Prominent survey invitation immediately below the home brand; always reachable after modal dismissal. */
-#mzanSurveyHeaderLink{display:none}
-body:has(.welcome-cover) #mzanSurveyHeaderLink{
-  display:flex;align-items:center;justify-content:center;gap:9px;
-  box-sizing:border-box;width:100%;max-width:660px;
-  min-height:58px;margin:9px auto 0;padding:12px 15px;
-  border:2px solid #b5fae3;border-radius:13px;
-  background:#13aa8e;color:#072e35;text-decoration:none;
-  font:850 clamp(16px,4.1vw,20px)/1.25 system-ui,Arial,sans-serif;
-  letter-spacing:.008em;text-align:center;
-  box-shadow:0 4px 0 #09675e,0 7px 16px #001c2b28;
-  transition:background .15s ease;
-}
-body:has(.welcome-cover) #mzanSurveyHeaderLink:hover{background:#49d0ab}
-#mzanSurveyHeaderLink:focus-visible{outline:3px solid #ffc44b;outline-offset:3px}
-@media(max-height:550px){
- body:has(.welcome-cover) #mzanSurveyHeaderLink{
-   min-height:48px;padding:7px 12px;margin-top:5px;
-   font-size:clamp(15px,3.8vw,18px)
- }
-}
-
-/* Sixth visible navigation action: survey is reachable on every homepage visit. */
-body > nav,body:has(.welcome-cover) > nav{grid-template-columns:repeat(6,minmax(0,1fr))}
-body > nav .mzan-survey-nav,body:has(.welcome-cover) > nav .mzan-survey-nav{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
-  min-width:0;min-height:52px;padding:7px 2px;background:#087e77;
-  color:#fff;border:2px solid #8be3c9;border-radius:11px;
-  font-size:clamp(10px,2.6vw,13px);font-weight:850;line-height:1.2;text-align:center;
-  text-decoration:none;box-shadow:0 2px 5px #14283b12
-}
-body > nav .mzan-survey-nav:hover{background:#07665f}
-body > nav .mzan-survey-nav:focus-visible{outline:3px solid #ffbf47;outline-offset:2px}
-@media(max-width:380px){
- body > nav,body:has(.welcome-cover) > nav{gap:3px;padding:5px}
- body > nav .mzan-survey-nav{font-size:10px;padding:5px 1px}
-}
+.survey-home-link:hover{background:#05656a}
+@media (max-height:550px){.survey-home-link{min-height:48px;padding:9px 12px;margin:5px auto 4px;font-size:clamp(15px,3.8vw,18px)}}
 </style>
 </head>
 <body>
@@ -321,7 +285,6 @@ body > nav .mzan-survey-nav:focus-visible{outline:3px solid #ffbf47;outline-offs
 
 <small class="brand-extra">Empowering Her. Uplifting Youth. Growing Mzansi.</small><br class="brand-extra">
 <small class="brand-extra">A division of Mzan 102 (Pty) Ltd</small>
-<a id="mzanSurveyHeaderLink" href="./survey.html" aria-label="Take the free MzanConnect SMME survey">✎ &nbsp; TAKE THE FREE SMME SURVEY</a>
 </header>
 
 <main><div id="view"></div></main>
@@ -330,7 +293,6 @@ body > nav .mzan-survey-nav:focus-visible{outline:3px solid #ffbf47;outline-offs
 <button onclick="show('home')"><span class="nav-icon" aria-hidden="true">⌂</span><span>Home</span></button>
 <a href="./business-support.html" aria-label="Open Business Support within MzanConnect"><span class="nav-icon" aria-hidden="true">☏</span><span>Business Support</span></a>
 <button onclick="show('opportunities')"><span class="nav-icon" aria-hidden="true">▣</span><span>Explore</span></button>
-<a class="mzan-survey-nav" href="./survey.html" aria-label="Open the free SMME Survey"><span class="nav-icon" aria-hidden="true">✎</span><span>Survey</span></a>
 <button onclick="location.href='billing.html'"><span class="nav-icon" aria-hidden="true">▤</span><span>Billing &amp; Membership</span></button>
 <button onclick="location.href='dashboard.html'"><span class="nav-icon" aria-hidden="true">⚙</span><span>Dashboard</span></button>
 </nav>
@@ -388,7 +350,7 @@ if(page==='home')html=`
     <div class="cover-landscape" aria-hidden="true"><span class="mine-tower">▥</span><span class="landscape-tree">♣</span><span class="growth-symbol">↗</span></div>
   </div>
 </section>
-<p class="home-disclaimer"><strong class="home-mission">Empowering Her. Uplifting Youth. Growing Mzansi.</strong><span class="home-disclaimer-detail">Business opportunities for South African entrepreneurs and SMMEs. Not a job application portal.</span></p>`;
+<p class="home-disclaimer"><a class="survey-home-link" href="./survey.html" aria-label="Take the free MzanConnect SMME Survey">✎ &nbsp; TAKE THE FREE SMME SURVEY</a><strong class="home-mission">Empowering Her. Uplifting Youth. Growing Mzansi.</strong><span class="home-disclaimer-detail">Business opportunities for South African entrepreneurs and SMMEs. Not a job application portal.</span></p>`;
 
 if(page==='business')html=`
 <h2>My Business</h2>
