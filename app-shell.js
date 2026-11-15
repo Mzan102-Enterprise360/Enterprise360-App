@@ -39,8 +39,11 @@ const existingHome=[...document.querySelectorAll('a[href]')].find(a=>{
 const url=new URL(a.getAttribute('href'),document.baseURI);
 return url.origin===location.origin&&url.pathname.endsWith('/index.html')&&!url.hash&&!a.closest('nav');
 });
+/* A single canonical updated home destination for all page-level back links. */
+const homeUrl=new URL('index.html?from=app-nav',document.baseURI).href;
+const exploreUrl=new URL('index.html?from=app-nav#opportunities',document.baseURI).href;
 const home=existingHome||document.createElement('a');
-home.href='index.html';
+home.href=homeUrl;
 const fromBusinessSupport=page==='business-support.html';
 home.textContent=fromBusinessSupport?'⌂ Return to MzanConnect App':'⌂ Back to Home';
 home.setAttribute('aria-label',fromBusinessSupport?'Return to the MzanConnect app home':'Back to Home');
@@ -48,7 +51,7 @@ homeRow.append(home);main.before(homeRow);
 let nav=page==='index.html'?document.querySelector('body > nav'):null;
 if(!nav){
 nav=document.createElement('nav');
-for(const [label,icon,href] of [['Home','⌂','index.html'],['Business Support','☏','business-support.html'],['Explore','▣','index.html#opportunities'],['Billing & Membership','▤','billing.html'],['Dashboard','⚙','dashboard.html']]){
+for(const [label,icon,href] of [['Home','⌂',homeUrl],['Business Support','☏','business-support.html'],['Explore','▣',exploreUrl],['Billing & Membership','▤','billing.html'],['Dashboard','⚙','dashboard.html']]){
 const a=document.createElement('a');a.href=href;
 const symbol=document.createElement('span');symbol.className='nav-icon';symbol.setAttribute('aria-hidden','true');symbol.textContent=icon;
 const text=document.createElement('span');text.textContent=label;a.append(symbol,text);nav.append(a);

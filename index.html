@@ -227,7 +227,10 @@ body > nav button:focus-visible{outline:3px solid #ffbf47;outline-offset:2px}
 body:has(.welcome-cover){height:100vh;height:100dvh;min-height:0;display:flex;flex-direction:column}
 body:has(.welcome-cover) main{flex:1 1 0;min-height:0;width:100%;padding:2px 10px;display:flex}
 body:has(.welcome-cover) #view{flex:1 1 0;min-height:0;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center}
-body:has(.welcome-cover) .approved-cover:not([hidden]){flex:0 0 auto;width:var(--home-art-width, min(100%, 40vh));max-width:100%;margin:0 auto;border-radius:18px}
+body:has(.welcome-cover) .approved-cover:not([hidden]){flex:0 0 auto;width:min(100%,390px,max(120px,calc(82vh - 172px)));max-width:100%;margin:0 auto;border-radius:18px}
+@supports(height:100svh){
+body:has(.welcome-cover) .approved-cover:not([hidden]){width:min(100%,390px,max(120px,calc(82svh - 172px)))}
+}
 body:has(.welcome-cover) .approved-cover img{width:100%;height:auto}
 body:has(.welcome-cover) .home-disclaimer{flex:0 0 auto;width:100%;font-size:clamp(10px,2.6vw,12px);line-height:1.25;margin:5px 0 2px}
 body:has(.welcome-cover) > nav{flex:0 0 auto;margin:4px auto;padding:5px;gap:5px}
@@ -290,7 +293,7 @@ body:has(.welcome-cover) .home-disclaimer-detail{display:block;font-size:clamp(1
 <main><div id="view"></div></main>
 
 <nav>
-<button onclick="show('home')"><span class="nav-icon" aria-hidden="true">⌂</span><span>Home</span></button>
+<button onclick="window.location.assign(new URL('index.html?from=app-nav', document.baseURI).href)"><span class="nav-icon" aria-hidden="true">⌂</span><span>Home</span></button>
 <a href="./business-support.html" aria-label="Open Business Support within MzanConnect"><span class="nav-icon" aria-hidden="true">☏</span><span>Business Support</span></a>
 <button onclick="show('opportunities')"><span class="nav-icon" aria-hidden="true">▣</span><span>Explore</span></button>
 <button onclick="location.href='billing.html'"><span class="nav-icon" aria-hidden="true">▤</span><span>Billing &amp; Membership</span></button>
@@ -584,31 +587,8 @@ function showFromUrl(){
 window.addEventListener('hashchange',showFromUrl);
 showFromUrl();
 
-/* Keep the exact image and its clickable regions together while fitting available space. */
-function fitHomeArtwork(){
- const cover=document.getElementById('approvedCover');
- if(!cover||cover.hidden)return;
- const picture=cover.querySelector('img');
- const note=el.querySelector('.home-disclaimer');
- const noteStyle=note?getComputedStyle(note):null;
- const noteHeight=note?note.getBoundingClientRect().height+parseFloat(noteStyle.marginTop)+parseFloat(noteStyle.marginBottom):0;
- const room=Math.max(0,el.clientHeight-noteHeight-2);
- const ratio=picture.naturalWidth&&picture.naturalHeight?picture.naturalWidth/picture.naturalHeight:1234/1536;
- const width=Math.max(0,Math.min(el.clientWidth,room*ratio,840));
- cover.style.setProperty('--home-art-width',width+'px');
-}
-const homeFitObserver=new ResizeObserver(fitHomeArtwork);
-homeFitObserver.observe(el);
-new MutationObserver(()=>{
- const note=el.querySelector('.home-disclaimer');
- if(note)homeFitObserver.observe(note);
- requestAnimationFrame(fitHomeArtwork);
-}).observe(el,{childList:true});
-el.addEventListener('load',fitHomeArtwork,true);
-window.addEventListener('resize',fitHomeArtwork);
-if(window.visualViewport)window.visualViewport.addEventListener('resize',fitHomeArtwork);
-requestAnimationFrame(fitHomeArtwork);
-
+/* Use CSS small-viewport units for a consistent artwork size, rather than
+   recalculating it whenever the phone address bar or virtual viewport changes. */
 if('serviceWorker' in navigator){
 navigator.serviceWorker.register('./sw.js').catch(()=>{});
 }
@@ -638,6 +618,6 @@ navigator.serviceWorker.register('./sw.js').catch(()=>{});
 })();
 </script>
 <!-- Member access buttons appear only on the Home view. -->
-<script defer src="legal-notices.js?v=4"></script><script defer src="voice-accessibility.js?v=8"></script><script defer src="app-shell.js?v=2"></script></body>
+<script defer src="legal-notices.js?v=4"></script><script defer src="voice-accessibility.js?v=8"></script><script defer src="app-shell.js?v=4"></script></body>
 </html>
 

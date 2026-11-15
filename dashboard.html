@@ -189,7 +189,7 @@ main{padding:14px}
 <h3>Quick Actions</h3>
 <div class="actions">
 <a href="support.html">Member Support</a>
-<a href="index.html">Home</a>
+<a href="index.html?from=app-nav">Home</a>
 </div>
 </section>
 </main>
@@ -223,7 +223,7 @@ main{padding:14px}
     try{
       const {error}=await client.auth.signOut();
       if(error)throw error;
-      location.replace('index.html');
+      location.replace('index.html?from=app-nav');
     }catch(error){
       logoutMessage.textContent='Unable to sign out. Please try again.';
       logoutButton.disabled=false;
@@ -346,6 +346,6 @@ main{padding:14px}
   await loadReport();
 })();
 </script>
-<script defer src="legal-notices.js?v=1"></script><script defer src="voice-accessibility.js?v=7"></script><script defer src="app-shell.js?v=2"></script></body>
+<script defer src="legal-notices.js?v=1"></script><script defer src="voice-accessibility.js?v=7"></script><script defer src="app-shell.js?v=4"></script></body>
 </html>
 
