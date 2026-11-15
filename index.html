@@ -293,6 +293,22 @@ body:has(.welcome-cover) #mzanSurveyHeaderLink:hover{background:#49d0ab}
    font-size:clamp(15px,3.8vw,18px)
  }
 }
+
+/* Sixth visible navigation action: survey is reachable on every homepage visit. */
+body > nav,body:has(.welcome-cover) > nav{grid-template-columns:repeat(6,minmax(0,1fr))}
+body > nav .mzan-survey-nav,body:has(.welcome-cover) > nav .mzan-survey-nav{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  min-width:0;min-height:52px;padding:7px 2px;background:#087e77;
+  color:#fff;border:2px solid #8be3c9;border-radius:11px;
+  font-size:clamp(10px,2.6vw,13px);font-weight:850;line-height:1.2;text-align:center;
+  text-decoration:none;box-shadow:0 2px 5px #14283b12
+}
+body > nav .mzan-survey-nav:hover{background:#07665f}
+body > nav .mzan-survey-nav:focus-visible{outline:3px solid #ffbf47;outline-offset:2px}
+@media(max-width:380px){
+ body > nav,body:has(.welcome-cover) > nav{gap:3px;padding:5px}
+ body > nav .mzan-survey-nav{font-size:10px;padding:5px 1px}
+}
 </style>
 </head>
 <body>
@@ -314,6 +330,7 @@ body:has(.welcome-cover) #mzanSurveyHeaderLink:hover{background:#49d0ab}
 <button onclick="show('home')"><span class="nav-icon" aria-hidden="true">⌂</span><span>Home</span></button>
 <a href="./business-support.html" aria-label="Open Business Support within MzanConnect"><span class="nav-icon" aria-hidden="true">☏</span><span>Business Support</span></a>
 <button onclick="show('opportunities')"><span class="nav-icon" aria-hidden="true">▣</span><span>Explore</span></button>
+<a class="mzan-survey-nav" href="./survey.html" aria-label="Open the free SMME Survey"><span class="nav-icon" aria-hidden="true">✎</span><span>Survey</span></a>
 <button onclick="location.href='billing.html'"><span class="nav-icon" aria-hidden="true">▤</span><span>Billing &amp; Membership</span></button>
 <button onclick="location.href='dashboard.html'"><span class="nav-icon" aria-hidden="true">⚙</span><span>Dashboard</span></button>
 </nav>
