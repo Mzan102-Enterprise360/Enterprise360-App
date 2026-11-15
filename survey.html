@@ -64,7 +64,9 @@ footer{padding:8px 15px 24px;font-size:13px;color:#55717d;text-align:center}
 <label class="option"><input type="radio" name="equipment_use" value="unused"> Not currently used</label>
 <label class="option"><input type="radio" name="equipment_use" value="not_working"> Equipment is broken or not ready to use</label>
 <label class="option"><input type="radio" name="equipment_use" value="none"> No business equipment / not applicable</label>
-<label class="option"><input type="radio" name="equipment_use" value="prefer_not"> Prefer not to say</label></fieldset>
+<label class="option"><input type="radio" name="equipment_use" value="prefer_not"> Prefer not to say</label>
+<label for="equipment_type" style="display:block;margin-top:16px;font-weight:700">If you have equipment, what is the main type?</label>
+<select id="equipment_type" name="equipment_type" required><option value="">Choose one</option><option value="sewing">Sewing / textile machines</option><option value="welding">Welding / metal fabrication equipment</option><option value="catering">Catering / food-processing equipment</option><option value="production">Manufacturing / other production machinery</option><option value="agriculture">Agricultural equipment</option><option value="construction">Construction equipment</option><option value="cleaning">Cleaning equipment</option><option value="office">Computers / office or digital equipment</option><option value="other">Other equipment</option><option value="none">No business equipment / not applicable</option><option value="prefer_not">Prefer not to say</option></select></fieldset>
 <fieldset><legend>7. Which obstacles affect your business? (Select all that apply.)</legend>
 <label class="option"><input type="checkbox" name="barrier" value="premises"> Lack of suitable premises or work space</label>
 <label class="option"><input type="checkbox" name="barrier" value="electricity"> Electricity or infrastructure</label>
@@ -74,6 +76,7 @@ footer{padding:8px 15px 24px;font-size:13px;color:#55717d;text-align:center}
 <label class="option"><input type="checkbox" name="barrier" value="transport"> Transport or logistics</label>
 <label class="option"><input type="checkbox" name="barrier" value="maintenance"> Equipment maintenance or repair</label>
 <label class="option"><input type="checkbox" name="barrier" value="management"> Business management or record-keeping</label>
+<label class="option"><input type="checkbox" name="barrier" value="other"> Other obstacles</label>
 <label class="option"><input type="checkbox" name="barrier" value="none"> No major obstacles</label></fieldset>
 <fieldset><legend>8. Does your business have suitable premises? <span class="required">*</span></legend>
 <label class="option"><input type="radio" name="premises" value="yes" required> Yes</label>
@@ -116,7 +119,7 @@ document.addEventListener('DOMContentLoaded',function(){
     const payload={
       area:form.elements.area.value,sector:form.elements.sector.value,business_status:single('status'),
       support_received:single('support'),support_provider:form.elements.provider.value,equipment_use:single('equipment_use'),
-      barriers:barriers,premises:single('premises'),followup:single('followup'),priority:form.elements.priority.value,
+      barriers:barriers,equipment_type:form.elements.equipment_type.value,premises:single('premises'),followup:single('followup'),priority:form.elements.priority.value,
       consent_confirmed:true,consent_version:'2026-11-15'
     };
     send.disabled=true;send.textContent='Submitting...';status.style.display='none';
