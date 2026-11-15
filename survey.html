@@ -38,7 +38,7 @@ footer{padding:8px 15px 24px;font-size:13px;color:#55717d;text-align:center}
 <p class="note">Please do not share anyone else's confidential information. You can stop before submission. Select only answers you feel comfortable sharing; “prefer not to say” is available for sensitive questions.</p>
 </section>
 <section class="card" aria-labelledby="survey-title"><h2 id="survey-title">SMME survey — 10 questions</h2>
-<form id="survey" novalidate="false">
+<form id="survey">
 <fieldset><legend>1. Where does your business mainly operate? <span class="required">*</span></legend>
 <select name="area" required><option value="">Select area</option><option value="kathu">Kathu</option><option value="gamagara_other">Elsewhere in Gamagara</option><option value="kuruman">Kuruman</option><option value="jtg_other">Elsewhere in John Taolo Gaetsewe</option><option value="other">Other area</option><option value="prefer_not">Prefer not to say</option></select></fieldset>
 <fieldset><legend>2. What is your main business sector? <span class="required">*</span></legend>
@@ -97,8 +97,8 @@ footer{padding:8px 15px 24px;font-size:13px;color:#55717d;text-align:center}
 <label class="option"><input id="consent" type="checkbox" required> I am an adult entrepreneur or authorised business representative. I have read the information above and voluntarily consent to this research submission. <span class="required">*</span></label>
 <div style="position:absolute;left:-99999px" aria-hidden="true"><label for="website">Leave this blank</label><input id="website" type="text" tabindex="-1" autocomplete="off"></div>
 <p class="note">Please review your answers. Once submitted, you will see a confirmation message.</p>
-<button id="send" type="submit">Submit survey</button><p id="status" role="status" aria-live="polite"></p>
-</form></section></main>
+<button id="send" type="submit">Submit survey</button>
+</form><p id="status" role="status" aria-live="polite"></p></section></main>
 <footer>MzanConnect • Independent SMME research • © 2026 Mzan 102 (Pty) Ltd</footer>
 <script>
 document.addEventListener('DOMContentLoaded',function(){
