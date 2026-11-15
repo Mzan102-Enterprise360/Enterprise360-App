@@ -19,6 +19,12 @@ button{border:0;border-radius:11px;background:#087d84;color:white;font:inherit;f
 button:disabled{opacity:.6;cursor:wait}button:focus-visible,select:focus-visible,.option:focus-within{outline:3px solid #e5aa2a;outline-offset:3px}
 #status{display:none;border-radius:12px;background:#e8f4ee;color:#17492f;padding:15px;margin:14px 0;font-weight:600;line-height:1.5}
 #status.error{background:#fff0f0;color:#8d242c}
+.whatsapp-followup{margin-top:14px;padding:16px;background:#f0faf4;border:1px solid #b7ddc6;border-radius:12px}
+.whatsapp-followup p{margin:0 0 12px;line-height:1.5}
+.whatsapp-link{display:block;background:#166b48;color:#fff;text-align:center;text-decoration:none;font-weight:750;border-radius:11px;padding:13px 15px;min-height:48px}
+.whatsapp-link:focus-visible{outline:3px solid #e5aa2a;outline-offset:3px}
+.whatsapp-followup .note{margin:10px 0 0}
+[hidden]{display:none!important}
 footer{padding:8px 15px 24px;font-size:13px;color:#55717d;text-align:center}
 @media(min-width:700px){main{padding:22px 8px 34px}.card{padding:25px}}
 </style>
@@ -114,11 +120,17 @@ footer{padding:8px 15px 24px;font-size:13px;color:#55717d;text-align:center}
 <div style="position:absolute;left:-99999px" aria-hidden="true"><label for="website">Leave this blank</label><input id="website" type="text" tabindex="-1" autocomplete="off"></div>
 <p class="note">Please review your answers. Once submitted, you will see a confirmation message.</p>
 <button id="send" type="submit">Submit survey</button>
-</form><p id="status" role="status" aria-live="polite"></p></section></main>
+</form><p id="status" role="status" aria-live="polite"></p>
+<div id="whatsappFollowup" class="whatsapp-followup" hidden>
+<p><strong>Would you like to speak with MzanConnect?</strong> You can contact us directly on WhatsApp Business.</p>
+<a id="whatsappContact" class="whatsapp-link" href="https://wa.me/27732754385" target="_blank" rel="noopener noreferrer">Chat with MzanConnect on WhatsApp</a>
+<p class="note">Optional. WhatsApp opens separately with a draft message. Tap Send if you want to contact us. Your survey answers are not shared through WhatsApp.</p>
+</div></section></main>
 <footer>MzanConnect • Independent SMME research • © 2026 Mzan 102 (Pty) Ltd</footer>
 <script>
 document.addEventListener('DOMContentLoaded',function(){
   const form=document.getElementById('survey'),send=document.getElementById('send'),status=document.getElementById('status');
+  const whatsappFollowup=document.getElementById('whatsappFollowup'),whatsappContact=document.getElementById('whatsappContact');
   const client=window.supabase&&window.supabase.createClient('https://akxzubckdebawqwwwaoe.supabase.co','sb_publishable_XEeBfPCzJ0MzGpHWHygeug_rGptbzno');
   const single=function(name){const x=form.querySelector('[name="'+name+'"]:checked');return x?x.value:null};
   const contactPanel=document.getElementById('contact-details');
@@ -168,6 +180,11 @@ document.addEventListener('DOMContentLoaded',function(){
       const interested=payload.support_interest==='yes';
       try{localStorage.setItem('mzan-smme-survey-submitted-v2','1')}catch(e){}
       form.reset();form.hidden=true;
+      const whatsappText=interested
+        ?'Hello MzanConnect. I completed your SMME survey and would like to enquire about voluntary business follow-up.'
+        :'Hello MzanConnect. I completed your SMME survey and have a question.';
+      whatsappContact.href='https://wa.me/27732754385?text='+encodeURIComponent(whatsappText);
+      whatsappFollowup.hidden=false;
       message(interested?'Thank you. Your survey and voluntary request for follow-up have been received. We may contact you about relevant monitoring and support. No paid membership has been created.':'Thank you. Your survey response has been received. No membership or payment is required.',false);
     }catch(error){
       message('Your response could not be submitted. Check your connection and try again. Your answers have not been confirmed as saved.',true);
