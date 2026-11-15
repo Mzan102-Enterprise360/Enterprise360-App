@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#14283b"><title>MzanConnect | Private Survey Reports</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#173344;background:#edf3f5}
+*{box-sizing:border-box}body{margin:0}
+header{background:linear-gradient(120deg,#14283b,#12656b);color:white;padding:19px 15px 23px}
+.wrap{max-width:1000px;margin:auto}
+header .brand{font-weight:800;letter-spacing:.05em;font-size:15px}
+header h1{font-size:clamp(23px,5.7vw,34px);margin:12px 0 5px}
+header p{margin:4px 0;color:#d6e8eb;line-height:1.45}
+.back{display:inline-block;color:white;background:#245d68;border:1px solid #9dced0;border-radius:11px;padding:10px 15px;text-decoration:none;margin-top:13px;font-weight:700}
+main{max-width:1000px;margin:auto;padding:18px 12px 32px}
+.panel{background:white;border:1px solid #dbe7e9;border-radius:16px;padding:18px;margin-bottom:15px;box-shadow:0 5px 22px #1236400c}
+h2{font-size:20px;margin:0 0 12px}h3{font-size:16px;margin:0 0 8px}
+.subtitle{font-size:13px;color:#546977;line-height:1.55}
+#message{font-weight:700;line-height:1.5}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.kpi{border:1px solid #d6e8e8;border-radius:12px;padding:14px;background:#f6fbfa}
+.kpi strong{display:block;font-size:clamp(22px,5vw,31px);color:#105f65}
+.kpi span{font-size:12px;color:#536775}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+button,.action{border:0;border-radius:10px;padding:12px 16px;background:#116d70;color:white;font:inherit;font-weight:750;cursor:pointer;text-decoration:none}
+button.secondary{background:#14283b}button:disabled{opacity:.6;cursor:not-allowed}
+.results-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.result{border:1px solid #e0e9eb;border-radius:12px;padding:12px;break-inside:avoid}
+.result-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;font-size:13px;padding:8px 0;border-bottom:1px solid #edf2f3}
+.result-row:last-child{border-bottom:0}
+.result-row span:first-child{overflow-wrap:anywhere}
+.count{font-variant-numeric:tabular-nums;font-weight:700;color:#125c62}
+.track{grid-column:1/-1;height:5px;background:#e6edef;border-radius:9px;overflow:hidden;margin-top:-3px}
+.track b{display:block;height:100%;background:#14928c}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:10px 8px;border-bottom:1px solid #e0e8ea;text-align:left;vertical-align:top;overflow-wrap:anywhere}
+th{background:#f2f7f8}
+.small{font-size:12px;color:#526b78}
+[hidden]{display:none!important}
+@media(max-width:630px){.results-grid{grid-template-columns:1fr}.panel{padding:15px}.kpis{grid-template-columns:1fr 1fr}.kpi:last-child{grid-column:1/-1}table{font-size:12px}td,th{padding:7px 4px}}
+@media print{
+ @page{size:A4 portrait;margin:12mm}
+ body{background:white;color:#111;font-size:10pt}
+ header{color:#111;background:white!important;border-bottom:2px solid #222;padding:0 0 8px}
+ header p{color:#333}header h1{font-size:20pt}
+ main{padding:9px 0} .panel{box-shadow:none;border:0;border-bottom:1px solid #bbb;border-radius:0;margin:0 0 10px;padding:8px 0}
+ .no-print,#contactSection,.back,#message{display:none!important}
+ .results-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .result{padding:8px}.result-row{font-size:9pt;padding:5px 0}
+ .kpi{background:white!important;padding:8px}.kpi strong{font-size:18pt;color:#111}
+ h2{font-size:13pt;break-after:avoid}h3{font-size:10pt;break-after:avoid}
+ .track b{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+}
+</style>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+</head><body>
+<header><div class="wrap"><div class="brand">◈ MzanConnect · OWNER REPORTS</div><h1>SMME Survey Report 2026</h1>
+<p>Kathu · Gamagara · Surrounding communities</p><p>Independent business needs and sustainability research</p>
+<a class="back no-print" href="dashboard.html">← Back to Dashboard</a></div></header>
+<main>
+<section class="panel"><p id="message" role="status" aria-live="polite">Verifying administrator access…</p>
+<div class="actions no-print" id="controls" hidden>
+<button id="refresh" type="button">↻ Refresh responses</button>
+<button id="print" class="secondary" type="button" disabled>Print / Save as PDF</button>
+</div>
+<p class="subtitle" id="timestamp" hidden></p>
+<p class="subtitle" id="caution" hidden>Results are descriptive only. Responses may include tests or repeat submissions; these are not independently verified unique businesses. Do not publish individual responses or small identifiable groups.</p></section>
+<div id="report" hidden>
+<section class="panel"><h2>Survey overview</h2>
+<div class="kpis">
+<div class="kpi"><strong id="total">—</strong><span>Saved submissions</span></div>
+<div class="kpi"><strong id="supportCount">—</strong><span>Requested voluntary follow-up</span></div>
+<div class="kpi"><strong id="latest">—</strong><span>Most recent submission</span></div>
+</div></section>
+<section class="panel"><h2>Business needs &amp; sustainability findings</h2>
+<p class="subtitle">Each result shows a count of the saved responses. Multiple obstacles may be selected, so their totals may exceed the number of submissions.</p>
+<div class="results-grid" id="breakdowns"></div></section>
+<section class="panel no-print" id="contactSection">
+<h2>Private follow-up requests</h2>
+<p class="subtitle">Only respondents who requested contact and consented are listed. Use contact details solely for the survey and voluntary business support, not unrelated marketing. This section is excluded from printed reports.</p>
+<div style="overflow-x:auto"><table><thead><tr><th>Submitted</th><th>Area / sector</th><th>Contact method</th><th>Contact detail</th></tr></thead><tbody id="contacts"></tbody></table></div>
+<p class="small" id="contactEmpty" hidden>No consenting follow-up contacts yet.</p>
+</section>
+<section class="panel"><h2>Report notes</h2><p class="subtitle">Prepared by Mzanian 102 (Pty) Ltd, through MzanConnect. This is an independent exploratory survey, not a formal accredited academic study or a representative census. The printable report excludes personal contact details. Interpret findings cautiously until the sample grows.</p></section>
+</div>
+</main>
+<script>
+document.addEventListener('DOMContentLoaded',async function(){
+'use strict';
+const OWNER='820a18ee-3482-4b6c-bd75-469cf198b9df';
+const $=id=>document.getElementById(id);
+const message=$('message'),report=$('report'),controls=$('controls');
+const labels={
+ area:{kathu:'Kathu',gamagara_other:'Elsewhere in Gamagara',kuruman:'Kuruman',jtg_other:'Elsewhere in John Taolo Gaetsewe',other:'Other area',prefer_not:'Prefer not to say'},
+ sector:{manufacturing:'Manufacturing / production',construction:'Construction / welding',catering:'Catering / hospitality',cleaning:'Cleaning / maintenance',transport:'Transport / logistics',retail:'Retail / trading',services:'Professional / other services',other:'Other'},
+ business_status:{fully:'Fully operating',partly:'Partially operating',not_started:'Not yet operating',stopped:'Previously operating / stopped',prefer_not:'Prefer not to say'},
+ support_received:{equipment:'Equipment / machinery',funding:'Financial support',both:'Both equipment and finance',training:'Training / mentorship',none:'No support',unsure:'Not sure / prefer not to say'},
+ equipment_use:{regularly:'Used regularly',sometimes:'Used occasionally',unused:'Not currently used',not_working:'Broken / not ready',none:'No equipment / not applicable',prefer_not:'Prefer not to say'},
+ premises:{yes:'Suitable premises',home:'Operating from home',shared:'Shared / temporary premises',no:'No suitable premises',prefer_not:'Prefer not to say'},
+ followup:{ongoing:'Ongoing mentoring / site visits',ended:'Follow-up ended',none:'No follow-up',not_applicable:'Not applicable',unsure:'Unsure / prefer not to say'},
+ priority:{premises:'Shared workspace',sales:'Customers / contracts / markets',finance:'Working capital / finance',training:'Practical training',equipment:'Equipment repair / utilisation',mentoring:'Ongoing mentorship / monitoring',systems:'Bookkeeping / administration / compliance',other:'Other support',none:'No support needed'},
+ barriers:{premises:'Lack of work space',electricity:'Electricity / infrastructure',skills:'Technical skills / training',customers:'Too few customers / orders',cash:'Working capital / operating costs',transport:'Transport / logistics',maintenance:'Equipment maintenance / repair',management:'Management / record-keeping',other:'Other obstacles',none:'No major obstacles'},
+ support_provider:{kumba:'Kumba',khumani:'Khumani',sioc_cdt:'SIOC-CDT',reisa:'REISA',government:'Government programme',other:'Other source',multiple:'Multiple sources',none:'No applicable support',prefer_not:'Unknown / prefer not to say'},
+ equipment_type:{sewing:'Sewing / textiles',welding:'Welding / metal fabrication',catering:'Catering / food processing',production:'Production machinery',agriculture:'Agricultural equipment',construction:'Construction equipment',cleaning:'Cleaning equipment',office:'Computers / digital equipment',other:'Other',none:'No equipment',prefer_not:'Prefer not to say'},
+ support_interest:{yes:'Requested follow-up',no:'Survey only'}
+};
+const titles=[
+['area','Business operating areas'],['sector','Business sectors'],['business_status','Operating status'],
+['support_received','Development support received'],['support_provider','Support providers'],['equipment_use','Equipment utilisation'],['equipment_type','Equipment types'],['premises','Suitability of business premises'],
+['followup','Practical follow-up support'],['priority','Most important improvement'],['barriers','Business obstacles'],['support_interest','Interest in voluntary follow-up']
+];
+function pretty(value,key){
+ if(value===null||value===undefined||value==='')return 'Not provided';
+ const map=labels[key]||{};
+ const v=String(value);
+ return map[v] || v.replace(/_/g,' ').replace(/\b\w/g,ch=>ch.toUpperCase());
+}
+function friendlyDate(value){return value?new Date(value).toLocaleString('en-ZA',{dateStyle:'medium',timeStyle:'short'}):'—'}
+function setStatus(value,bad){message.textContent=value;message.style.color=bad?'#9a2431':'#17625b'}
+async function fetchRecords(db){
+ const out=[],limit=500,max=10000;
+ for(let offset=0;offset<max;offset+=limit){
+  const response=await db.from('smme_survey_2026_responses')
+   .select('id,submitted_at,area,sector,business_status,support_received,support_provider,equipment_use,equipment_type,barriers,premises,followup,priority,support_interest,support_contact_consent,support_contact_type,support_contact_details')
+   .order('submitted_at',{ascending:false}).range(offset,offset+limit-1);
+  if(response.error)throw response.error;
+  const rows=response.data;
+  if(!Array.isArray(rows))throw Error('No survey records were returned.');
+  out.push(...rows);
+  if(rows.length<limit)return out;
+ }
+ throw Error('The survey has more than 10,000 rows. Request a paginated export for complete results.');
+}
+function renderBreakdowns(rows){
+ const root=$('breakdowns');root.replaceChildren();
+ for(const entry of titles){
+  const [key,title]=entry;
+  const groups=new Map();
+  rows.forEach(r=>{
+   const values=key==='barriers'?(Array.isArray(r.barriers)?r.barriers:[]):[r[key]];
+   values.forEach(raw=>{const name=pretty(raw,key);groups.set(name,(groups.get(name)||0)+1)});
+  });
+  const block=document.createElement('section');block.className='result';
+  const heading=document.createElement('h3');heading.textContent=title;block.append(heading);
+  const values=[...groups.entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]));
+  if(!values.length){const p=document.createElement('p');p.className='small';p.textContent='No responses yet';block.append(p)}
+  values.forEach(([name,count])=>{
+   const line=document.createElement('div');line.className='result-row';
+   const label=document.createElement('span');label.textContent=name;
+   const number=document.createElement('span');number.className='count';number.textContent=count+' ('+(rows.length?Math.round(count/rows.length*100):0)+'%)';
+   line.append(label,number);
+   const track=document.createElement('div');track.className='track';
+   const bar=document.createElement('b');bar.style.width=(rows.length?Math.min(100,count/rows.length*100):0)+'%';track.append(bar);
+   block.append(line,track);
+  });root.append(block);
+ }
+}
+function renderContacts(rows){
+ const root=$('contacts');root.replaceChildren();
+ const contacts=rows.filter(x=>x.support_interest==='yes'&&x.support_contact_consent===true&&x.support_contact_details);
+ $('contactEmpty').hidden=contacts.length>0;
+ contacts.forEach(x=>{
+  const tr=document.createElement('tr');
+  [friendlyDate(x.submitted_at),pretty(x.area,'area')+' / '+pretty(x.sector,'sector'),pretty(x.support_contact_type),x.support_contact_details].forEach(v=>{
+   const td=document.createElement('td');td.textContent=String(v||'—');tr.append(td);
+  });root.append(tr);
+ });
+}
+let db;
+async function refresh(){
+ $('print').disabled=true;$('refresh').disabled=true;setStatus('Retrieving private survey records…',false);
+ try{
+  const rows=await fetchRecords(db);
+  $('total').textContent=String(rows.length);
+  $('supportCount').textContent=String(rows.filter(r=>r.support_interest==='yes').length);
+  $('latest').textContent=rows.length?friendlyDate(rows[0].submitted_at):'—';
+  $('timestamp').textContent='Report refreshed '+friendlyDate(new Date().toISOString())+' · Local South African time';
+  renderBreakdowns(rows);renderContacts(rows);
+  report.hidden=false;
+  $('print').disabled=false;
+  setStatus('Report ready. Print or save a PDF from your phone.',false);
+ }catch(err){report.hidden=true;setStatus('Survey report could not load. Check the connection or administrator permissions and try Refresh. '+(err.message||''),true)}
+ finally{$('refresh').disabled=false}
+}
+try{
+ if(!window.supabase)throw Error('Unable to load secure sign-in.');
+ db=window.supabase.createClient('https://akxzubckdebawqwwwaoe.supabase.co','sb_publishable_XEeBfPCzJ0MzGpHWHygeug_rGptbzno');
+ const auth=await db.auth.getUser();
+ if(auth.error||!auth.data.user){setStatus('Please sign in using your MzanConnect owner account.',true);
+  const a=document.createElement('a');a.href='login.html';a.className='action';a.textContent='Member Login';message.after(a);return;}
+ if(auth.data.user.id!==OWNER){setStatus('Administrator only. This account cannot view survey responses.',true);return}
+ controls.hidden=false;$('timestamp').hidden=false;$('caution').hidden=false;
+ $('refresh').addEventListener('click',refresh);$('print').addEventListener('click',()=>window.print());
+ await refresh();
+}catch(err){setStatus('Unable to verify owner access. Please sign in and try again.',true)}
+});
+</script>
+<script defer src="legal-notices.js?v=1"></script><script defer src="voice-accessibility.js?v=7"></script>
+</body></html>
