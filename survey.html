@@ -31,13 +31,14 @@ footer{padding:8px 15px 24px;font-size:13px;color:#55717d;text-align:center}
 <main>
 <section class="card" aria-labelledby="intro-title"><h2 id="intro-title">Your experience matters</h2>
 <p>We want to understand what helps small businesses operate successfully, especially after receiving funding, machinery, equipment or business-development support.</p>
-<p class="note"><strong>Independent, voluntary research.</strong> Approximately 5 minutes. No membership, payment, name, phone number or business registration number is required. This survey is not run on behalf of Kumba, Khumani, SIOC-CDT or any other funder. Your participation does not affect funding decisions.</p>
+<p class="note"><strong>Independent, voluntary research.</strong> Approximately 5–7 minutes. No paid membership or payment is required. No personal name or business registration number is requested. Contact details are needed only if you voluntarily request follow-up. This survey is not run on behalf of Kumba, Khumani, SIOC-CDT or any other funder. Your participation does not affect funding decisions.</p>
 </section>
 <section class="card" aria-labelledby="privacy-title"><h2 id="privacy-title">Privacy and consent</h2>
-<p class="note">Mzan 102 (Pty) Ltd, through MzanConnect, will use your answers to prepare summary research findings about local SMMEs. Responses are stored with a hosted database provider and may be processed outside South Africa. We do not request personal names or contact details. In public reports, small groups will be combined or omitted to reduce the risk of identifying participants. Results are not shared as individual business records with sponsors. Responses will be retained only as long as necessary for the research, with a planned maximum of 12 months after survey closure. For research privacy questions, email <a href="mailto:reception.mzan102@gmail.com">reception.mzan102@gmail.com</a>. As no identifying details are collected, we may not be able to locate and remove an individual answer after submission.</p>
-<p class="note">Please do not share anyone else's confidential information. You can stop before submission. Select only answers you feel comfortable sharing; “prefer not to say” is available for sensitive questions.</p>
+<p class="note">Mzan 102 (Pty) Ltd, through MzanConnect, organises this independent research. Responses will be used to prepare summary findings about local SMME challenges. Survey data is hosted by a database service provider and may be processed outside South Africa. We do not share identifiable survey records with funders or sponsors; small groups will be combined or omitted from public reports.</p>
+<p class="note">The final Yes/No question lets you express interest in <strong>voluntary business monitoring and support follow-up</strong>. If you select Yes, we request an email address or WhatsApp number and separate consent to contact you about this research or relevant business monitoring/support opportunities only. Selecting No does not require contact details. Neither answer creates a paid MzanConnect membership or guarantees services or funding. We will not use this permission for unrelated marketing.</p>
+<p class="note">We plan to keep responses for no longer than 12 months after survey closure. You may ask us to stop contacting you, or request access, correction or deletion of contact information, at <a href="mailto:reception.mzan102@gmail.com">reception.mzan102@gmail.com</a>. Without identifying information, we may be unable to identify a previously submitted anonymous response. Participation is voluntary and does not affect funding decisions. Please do not disclose anyone else's confidential information.</p>
 </section>
-<section class="card" aria-labelledby="survey-title"><h2 id="survey-title">SMME survey — 10 questions</h2>
+<section class="card" aria-labelledby="survey-title"><h2 id="survey-title">SMME survey — 11 questions</h2>
 <form id="survey">
 <fieldset><legend>1. Where does your business mainly operate? <span class="required">*</span></legend>
 <select name="area" required><option value="">Select area</option><option value="kathu">Kathu</option><option value="gamagara_other">Elsewhere in Gamagara</option><option value="kuruman">Kuruman</option><option value="jtg_other">Elsewhere in John Taolo Gaetsewe</option><option value="other">Other area</option><option value="prefer_not">Prefer not to say</option></select></fieldset>
@@ -97,6 +98,18 @@ footer{padding:8px 15px 24px;font-size:13px;color:#55717d;text-align:center}
 <option value="equipment">Equipment repair, set-up or utilisation</option><option value="mentoring">Ongoing mentorship or business monitoring</option>
 <option value="systems">Bookkeeping, administration or compliance</option><option value="other">Other support</option>
 <option value="none">No additional support needed</option></select></fieldset>
+<fieldset id="followup-interest">
+<legend>11. Would you like to be part of MzanConnect for future business monitoring and support? <span class="required">*</span></legend>
+<p class="note">This is a free expression of interest, not paid membership. We may contact you about relevant support; participation does not guarantee any services.</p>
+<label class="option"><input type="radio" name="support_interest" value="yes" required> Yes, I would like MzanConnect to contact me about monitoring and support.</label>
+<label class="option"><input type="radio" name="support_interest" value="no"> No, I only want to complete the survey.</label>
+<div id="contact-details" hidden>
+<label for="support_contact_type" style="display:block;margin-top:15px;font-weight:700">Preferred contact method <span class="required">*</span></label>
+<select id="support_contact_type" name="support_contact_type"><option value="">Choose one</option><option value="email">Email</option><option value="whatsapp">WhatsApp</option></select>
+<label for="support_contact_details" style="display:block;margin-top:12px;font-weight:700">Email or WhatsApp number <span class="required">*</span></label>
+<input id="support_contact_details" name="support_contact_details" maxlength="160" type="text" autocomplete="off" style="width:100%;min-height:48px;padding:11px;font:inherit;border:1px solid #9babb4;border-radius:10px" placeholder="Select a contact method first">
+<label class="option"><input id="support_contact_consent" type="checkbox"> I agree that MzanConnect may use this contact detail to contact me only about this survey and voluntary business monitoring/support. I may withdraw permission by emailing reception.mzan102@gmail.com. <span class="required">*</span></label>
+</div></fieldset>
 <label class="option"><input id="consent" type="checkbox" required> I am an adult entrepreneur or authorised business representative. I have read the information above and voluntarily consent to this research submission. <span class="required">*</span></label>
 <div style="position:absolute;left:-99999px" aria-hidden="true"><label for="website">Leave this blank</label><input id="website" type="text" tabindex="-1" autocomplete="off"></div>
 <p class="note">Please review your answers. Once submitted, you will see a confirmation message.</p>
@@ -108,6 +121,27 @@ document.addEventListener('DOMContentLoaded',function(){
   const form=document.getElementById('survey'),send=document.getElementById('send'),status=document.getElementById('status');
   const client=window.supabase&&window.supabase.createClient('https://akxzubckdebawqwwwaoe.supabase.co','sb_publishable_XEeBfPCzJ0MzGpHWHygeug_rGptbzno');
   const single=function(name){const x=form.querySelector('[name="'+name+'"]:checked');return x?x.value:null};
+  const contactPanel=document.getElementById('contact-details');
+  const contactType=form.elements.support_contact_type;
+  const contactDetail=form.elements.support_contact_details;
+  const contactConsent=document.getElementById('support_contact_consent');
+  function updateContactMethod(){
+    const method=contactType.value;
+    contactDetail.type=method==='email'?'email':'tel';
+    contactDetail.inputMode=method==='whatsapp'?'tel':'email';
+    contactDetail.placeholder=method==='whatsapp'?'+27 82 123 4567':'name@example.com';
+    contactDetail.pattern=method==='whatsapp'?'[+]?[0-9 ()-]{8,20}':'';
+  }
+  function updateSupportChoice(){
+    const yes=single('support_interest')==='yes';
+    contactPanel.hidden=!yes;
+    contactType.required=yes;contactDetail.required=yes;contactConsent.required=yes;
+    if(!yes){contactType.value='';contactDetail.value='';contactConsent.checked=false}
+    updateContactMethod();
+  }
+  form.querySelectorAll('input[name="support_interest"]').forEach(r=>r.addEventListener('change',updateSupportChoice));
+  contactType.addEventListener('change',updateContactMethod);
+  updateSupportChoice();
   function message(value,isError){status.style.display='block';status.className=isError?'error':'';status.textContent=value;status.scrollIntoView({behavior:'smooth',block:'nearest'})}
   form.addEventListener('submit',async function(ev){
     ev.preventDefault();
@@ -120,13 +154,21 @@ document.addEventListener('DOMContentLoaded',function(){
       area:form.elements.area.value,sector:form.elements.sector.value,business_status:single('status'),
       support_received:single('support'),support_provider:form.elements.provider.value,equipment_use:single('equipment_use'),
       barriers:barriers,equipment_type:form.elements.equipment_type.value,premises:single('premises'),followup:single('followup'),priority:form.elements.priority.value,
-      consent_confirmed:true,consent_version:'2026-11-15'
+      support_interest:single('support_interest'),
+      support_contact_type:single('support_interest')==='yes'?contactType.value:null,
+      support_contact_details:single('support_interest')==='yes'?contactDetail.value.trim():null,
+      support_contact_consent:single('support_interest')==='yes'&&contactConsent.checked,
+      support_consent_version:single('support_interest')==='yes'?'2026-11-15-followup-1':null,
+      consent_confirmed:true,consent_version:'2026-11-15-v2'
     };
     send.disabled=true;send.textContent='Submitting...';status.style.display='none';
     try {
       const response=await client.from('smme_survey_2026_responses').insert(payload);
       if(response.error)throw response.error;
-      form.reset();form.hidden=true;message('Thank you. Your survey response has been received. No membership or payment is required.',false);
+      const interested=payload.support_interest==='yes';
+      try{localStorage.setItem('mzan-smme-survey-submitted-v2','1')}catch(e){}
+      form.reset();form.hidden=true;
+      message(interested?'Thank you. Your survey and voluntary request for follow-up have been received. We may contact you about relevant monitoring and support. No paid membership has been created.':'Thank you. Your survey response has been received. No membership or payment is required.',false);
     }catch(error){
       message('Your response could not be submitted. Check your connection and try again. Your answers have not been confirmed as saved.',true);
     }finally{send.disabled=false;send.textContent='Submit survey'}
