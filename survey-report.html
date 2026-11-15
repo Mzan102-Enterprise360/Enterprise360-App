@@ -86,7 +86,7 @@ th{background:#f2f7f8}
 <script>
 document.addEventListener('DOMContentLoaded',async function(){
 'use strict';
-const OWNER='820a18ee-3482-4b6c-bd75-469cf198b9df';
+const OWNER='38bbc6d6-cac2-4e7d-be68-b53c810ab8b8';
 const $=id=>document.getElementById(id);
 const message=$('message'),report=$('report'),controls=$('controls');
 const labels={
@@ -187,7 +187,24 @@ try{
  const auth=await db.auth.getUser();
  if(auth.error||!auth.data.user){setStatus('Please sign in using your MzanConnect owner account.',true);
   const a=document.createElement('a');a.href='login.html';a.className='action';a.textContent='Member Login';message.after(a);return;}
- if(auth.data.user.id!==OWNER){setStatus('Administrator only. This account cannot view survey responses.',true);return}
+ if(auth.data.user.id!==OWNER){
+  setStatus('You are signed in to a different MzanConnect account'+(auth.data.user.email?' ('+auth.data.user.email+')':'')+'. Survey reports are available only to the designated owner.',true);
+  const b=document.createElement('button');b.type='button';b.className='secondary no-print';
+  b.textContent='Switch to Owner Login';
+  b.addEventListener('click',async()=>{
+    b.disabled=true;b.textContent='Signing out…';
+    try{
+      const {error}=await db.auth.signOut();
+      if(error)throw error;
+      location.replace('login.html');
+    }catch(error){
+      setStatus('Unable to switch accounts automatically. Please log out from the dashboard and sign in with the owner account.',true);
+      b.disabled=false;b.textContent='Switch to Owner Login';
+    }
+  });
+  message.after(b);
+  return;
+ }
  controls.hidden=false;$('timestamp').hidden=false;$('caution').hidden=false;
  $('refresh').addEventListener('click',refresh);$('print').addEventListener('click',()=>window.print());
  await refresh();
