@@ -1,5 +1,18 @@
 name: Billing browser checks
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'billing.html'
+      - 'support.html'
+      - 'member.html'
+      - 'bookkeeping.html'
+      - 'dashboard.html'
+      - 'register.html'
+      - 'login.html'
+      - 'reset-password.html'
+      - 'tests/*.cjs'
+      - '.github/workflows/billing-browser.yml'
   pull_request:
     paths:
       - 'billing.html'
@@ -7,7 +20,10 @@ on:
       - 'member.html'
       - 'bookkeeping.html'
       - 'dashboard.html'
-      - 'tests/billing-browser.cjs'
+      - 'register.html'
+      - 'login.html'
+      - 'reset-password.html'
+      - 'tests/*.cjs'
       - '.github/workflows/billing-browser.yml'
   workflow_dispatch:
 jobs:
