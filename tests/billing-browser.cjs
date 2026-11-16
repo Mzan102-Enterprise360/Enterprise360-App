@@ -170,7 +170,7 @@ async function main(){
     await page.route('**/supabase.min.js',async route=>route.fulfill({status:200,contentType:'text/javascript',body:clientMock(true,true)}));
     await page.goto(base+'dashboard.html',{waitUntil:'domcontentloaded'});
     await page.locator('body').waitFor({state:'visible'});
-    assert.equal(await page.locator('.grid .tile').count(),5,'dashboard should show five navigation tiles after removing duplicate Opportunities, including Bookkeeping');
+    assert.equal(await page.locator('.grid .tile').count(),4,'dashboard should show four member tools after removing duplicate Opportunities, including Bookkeeping');
     assert.equal(await page.locator('.grid .tile').filter({hasText:'Opportunities'}).count(),0,'duplicate Opportunities dashboard tile should be absent');
     await page.getByRole('link',{name:/Billing & Membership/}).click();
     await page.waitForURL('**/billing.html');
