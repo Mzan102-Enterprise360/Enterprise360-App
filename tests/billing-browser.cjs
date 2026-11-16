@@ -60,7 +60,7 @@ async function checkDashboardFeatures(browser){
   const sources=page.locator('.opportunity-item:visible');
   assert.equal(await sources.count(),7);
   await page.getByLabel('Opportunity Category').selectOption('mining');
-  assert.equal(await sources.count(),4);
+  assert.equal(await sources.count(),6,'mining filter should show the six current mining-related sources');
   await page.getByLabel('Search official sources').fill('Kumba');
   assert.equal(await sources.count(),1);
   assert.match(await sources.getByRole('link').getAttribute('href'),/angloamericankumba/);
