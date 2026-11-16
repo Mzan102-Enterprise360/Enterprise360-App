@@ -223,6 +223,7 @@ main{padding:14px}
           if(!error&&Number.isInteger(count))surveyLink.textContent='Survey Reports & Print ('+count+' responses)';
         });
     }
+    if(user.app_metadata?.mzanconnect_role==='owner')$('ownerSecurity').hidden=false;
     $('profilePlan').textContent=user.app_metadata?.mzanconnect_role==='owner'?'MzanConnect Owner':'MzanConnect Member';
   }catch(error){location.replace('login.html');return;}
 
