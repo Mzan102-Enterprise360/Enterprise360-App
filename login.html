@@ -106,6 +106,17 @@ form.addEventListener("submit", async (event) => {
         console.warn("Member profile setup can be completed from the dashboard.",profileError);
       }
     }
+    // An owner with an enrolled authenticator must complete MFA before proceeding.
+    // Members without owner privileges retain their existing sign-in flow.
+    if (data.user?.app_metadata?.mzanconnect_role === "owner") {
+      if (!mzanSupabase.auth.mfa?.getAuthenticatorAssuranceLevel)
+        throw Error("Owner verification is temporarily unavailable.");
+      const {data:level,error:mfaError}=await mzanSupabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      if (mfaError || !level) throw Error("Unable to confirm owner verification. Try again.");
+      if (level.nextLevel === "aal2" && level.currentLevel !== "aal2") {
+        window.location.replace("owner-security.html?verify=1");return;
+      }
+    }
     window.location.replace("dashboard.html");
   } catch (error) {
     showMessage(error.message || "Unable to sign in. Please try again.", true);
