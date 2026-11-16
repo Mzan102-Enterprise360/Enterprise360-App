@@ -181,6 +181,7 @@ async function main(){
     await checkDashboardFeatures(browser);
     await checkVerifiedReceipts(browser);
     await require('./public-registration.cjs')(browser,base);
+    await require('./owner-mfa.cjs')(browser,base);
   }finally{await browser.close()}
 }
 (async()=>{try{await new Promise(r=>setTimeout(r,1000));await main()}catch(e){console.error(e);process.exitCode=1}finally{server.kill()}})();
