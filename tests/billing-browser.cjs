@@ -87,7 +87,7 @@ async function checkVerifiedReceipts(browser){
   const page=await browser.newPage();
   await page.route('**/supabase.min.js',route=>route.fulfill({
     status:200,contentType:'text/javascript',
-    body:`const user={id:'owner-test',app_metadata:{mzanconnect_role:'owner'}};
+    body:`const user={id:'receipt-member-test',app_metadata:{mzanconnect_role:'member'}};
     window.supabase={createClient:()=>({
       auth:{getUser:async()=>({data:{user}})},
       functions:{invoke:async (name, options)=>{
@@ -95,6 +95,8 @@ async function checkVerifiedReceipts(browser){
         return {data:{redirect_url:'https://example.com/wrong-host'}}
       }},
       from(table){
+        if(table==='founding_memberships')return {select(){return this},eq(){return this},maybeSingle:async()=>({data:null,error:null})};
+        if(table==='membership_subscriptions')return {select(){return this},eq(){return this},gt(){return this},order(){return this},limit:async()=>({data:[],error:null})};
         if(table!=='membership_payments')throw Error('Unexpected payment query');
         return {
           select(fields){if(!fields.includes('membership_receipts('))throw Error('Missing receipts');return this},
@@ -115,8 +117,13 @@ async function checkVerifiedReceipts(browser){
       }
     })};`
   }));
+  await page.route('**/functions/v1/mzan-yoco-live/status',route=>route.fulfill({
+    status:200,contentType:'application/json',body:'{"ready":true}'
+  }));
   await page.addInitScript(()=>{window.print=()=>{window.printed=true}});
   await page.goto(base+'billing.html');
+  await page.locator('#paymentRecordsPanel').waitFor({state:'visible'});
+  await page.locator('#paymentRecordsPanel summary').click();
   const buttons=page.locator('#paymentHistory').getByRole('button',{name:'View / Print Receipt'});
   await buttons.first().waitFor();
   assert.equal(await buttons.count(),1);
@@ -126,14 +133,12 @@ async function checkVerifiedReceipts(browser){
   assert.equal(await page.evaluate(()=>window.printed),true);
   await page.getByRole('button',{name:'Close receipt'}).click();
   assert.equal(await page.locator('#receiptPrint').isVisible(),false);
-  await page.locator('#testPaymentHistory').getByRole('button',{name:'View / Print Receipt'}).click();
-  await page.getByText('TEST RECEIPT — no money was collected.').waitFor();
-  await page.getByLabel('Plan to test').selectOption('premium');
-  await page.getByRole('button',{name:'Start test checkout'}).click();
-  await page.getByText('Yoco returned an invalid link.').waitFor();
+  await page.locator('#startLiveCheckout').click();
+  await page.getByText('Invalid checkout destination.').waitFor();
+  assert.match(page.url(),/\/billing\.html$/,'Unsafe checkout destination must not redirect');
   const request=await page.evaluate(()=>window.checkoutRequest);
-  assert.equal(request.name,'mzan-yoco-sandbox');
-  assert.equal(request.body.plan,'premium');
+  assert.equal(request.name,'mzan-yoco-live');
+  assert.equal(request.body.plan,'starter');
   assert.match(request.body.attempt,/^[a-f0-9-]{36}$/i);
   await page.close();
   console.log('PASS: verified receipt opens and prints, pending or unverified payments have no receipt');
@@ -152,10 +157,10 @@ async function main(){
       await page.waitForFunction(expectedPath=>location.pathname.endsWith(expectedPath),expected,{timeout:10000}).catch(async e=>{console.error('Navigation diagnostic',{signedIn,active,owner,expected,actual:page.url(),body:await page.locator('body').innerText().catch(()=>'<unavailable>')});throw e});
       if(signedIn){
         await page.locator('body').waitFor({state:'visible'});
-        assert.match(await page.locator('#status').innerText(),owner?/MzanConnect Owner/:/MzanConnect Member/);
-        assert.match(await page.locator('main').innerText(),/Owner access does not require payment|Paid membership activation requires a verified Yoco payment/);
+        assert.match(await page.locator('#status').innerText(),owner?/Owner membership/:active?/Founding member/:/Monthly membership/);
+        assert.match(await page.locator('main').innerText(),/One payment covers one month/);
         assert.equal(await page.locator('form').count(),0);
-        assert.equal(await page.locator('#yocoSandbox').isVisible(),owner);
+        assert.equal(await page.locator('#liveMembership').isVisible(),!owner&&!active);
         await page.getByRole('link',{name:/Back to dashboard/}).click();
         await page.waitForURL('**/dashboard.html');
       }
