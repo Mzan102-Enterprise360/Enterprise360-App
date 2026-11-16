@@ -1,1 +1,26 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><title>MzanConnect</title><rect width="512" height="512" fill="#14283b"/><rect x="100" y="100" width="312" height="312" rx="88" fill="#063b4b" stroke="#80f0d7" stroke-width="12"/><path d="M256 151 C278 207 305 234 361 256 C305 278 278 305 256 361 C234 305 207 278 151 256 C207 234 234 207 256 151Z" fill="#80f0d7"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+<title id="title">MzanConnect M orbital connection logo</title>
+<defs>
+ <radialGradient id="navy" cx="50%" cy="52%" r="84%"><stop offset="0" stop-color="#003e56"/><stop offset=".57" stop-color="#022d49"/><stop offset="1" stop-color="#001326"/></radialGradient>
+ <linearGradient id="aqua" x1="0" y1="1" x2=".85" y2=".1"><stop stop-color="#018f8b"/><stop offset=".4" stop-color="#00f3d8"/><stop offset="1" stop-color="#02d9df"/></linearGradient>
+ <linearGradient id="arc" x1="0" y1="1" x2=".5" y2="0"><stop stop-color="#005a73"/><stop offset=".5" stop-color="#01e1d6"/><stop offset="1" stop-color="#044263"/></linearGradient>
+ <radialGradient id="spark"><stop stop-color="#fff"/><stop offset=".27" stop-color="#aafffc"/><stop offset=".8" stop-color="#32eee0"/><stop offset="1" stop-color="#13d4dd"/></radialGradient>
+ <filter id="softGlow" x="-70%" y="-70%" width="240%" height="240%"><feGaussianBlur stdDeviation="10"/></filter>
+ <clipPath id="crop"><rect x="11" y="11" width="490" height="490" rx="65"/></clipPath>
+</defs>
+<rect width="512" height="512" fill="#001528"/>
+<g clip-path="url(#crop)">
+ <rect x="11" y="11" width="490" height="490" fill="url(#navy)"/>
+ <ellipse cx="253" cy="30" rx="186" ry="18" fill="#04e9de" opacity=".12" filter="url(#softGlow)"/>
+ <path d="M0 476Q256 365 512 480" stroke="#0af7df" stroke-width="28" opacity=".55" fill="none" filter="url(#softGlow)"/>
+ <path d="M25 485Q256 383 495 483" stroke="url(#arc)" stroke-width="5" opacity=".75" fill="none"/>
+ <path d="M118 121H182L252 218L323 121H383L394 331H325L319 215L254 298L193 217L188 331H111Z" fill="#fff"/>
+ <path d="M58 310C27 362 115 372 256 317C356 277 420 210 443 147" fill="none" stroke="#11f5e2" stroke-width="24" opacity=".45" filter="url(#softGlow)" stroke-linecap="round"/>
+ <path d="M58 310C27 362 115 372 256 317C356 277 420 210 443 147" fill="none" stroke="url(#aqua)" stroke-width="17" stroke-linecap="round"/>
+ <path d="M77 334C142 356 286 315 398 226" fill="none" stroke="#bcfffd" stroke-opacity=".6" stroke-width="2.3"/>
+ <path d="M427 77C434 103 444 111 469 117C444 123 434 131 427 157C421 131 409 123 385 117C409 111 421 103 427 77Z" fill="#22eee7" opacity=".65" filter="url(#softGlow)"/>
+ <path d="M427 77C434 103 444 111 469 117C444 123 434 131 427 157C421 131 409 123 385 117C409 111 421 103 427 77Z" fill="url(#spark)"/>
+ <text x="56" y="400" font-family="Arial,Helvetica,sans-serif" font-size="48" font-weight="900" letter-spacing="-.7"><tspan fill="white">MZAN</tspan><tspan fill="#00f3df">CONNECT</tspan></text>
+</g>
+<rect x="11" y="11" width="490" height="490" rx="65" fill="none" stroke="#05e4d5" stroke-width="7"/>
+</svg>
