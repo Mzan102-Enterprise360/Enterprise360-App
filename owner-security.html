@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>MzanConnect | Owner Account Security</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f2f6f8;color:#14283b;font:16px/1.5 Arial,sans-serif;visibility:hidden}
+header{background:#14283b;color:#fff;padding:18px;text-align:center}
+header h1{font-size:clamp(22px,5vw,29px);margin:0 0 5px}
+header p{margin:0;font-size:14px}
+main{max-width:740px;margin:auto;padding:16px}
+.card{background:#fff;border:1px solid #d9e7e9;border-radius:14px;margin-bottom:12px;padding:17px}
+h2{font-size:21px;margin:2px 0 10px}
+p{margin:8px 0}label{display:block;font-weight:bold;margin:10px 0 5px}
+input{width:100%;max-width:420px;font-size:18px;padding:12px;border:1px solid #8eabb1;border-radius:9px}
+#setupKey{font-family:monospace;font-size:17px;letter-spacing:1px}
+button,.back{border:0;border-radius:10px;background:#126f73;color:#fff;padding:12px 18px;font:bold 16px Arial,sans-serif;cursor:pointer;display:inline-block;text-decoration:none;min-height:45px;margin:6px 7px 6px 0}
+button:disabled{opacity:.55;cursor:wait}.back{background:#14283b}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #e0a32b;outline-offset:2px}
+.note{color:#486372;font-size:14px}.error{color:#9b1d1d;font-weight:bold}.success{color:#176245;font-weight:bold}
+[hidden]{display:none!important}
+@media print{body{visibility:visible!important}button,#keyPanel,.back{display:none!important}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+<header><h1>◈ MzanConnect</h1><p>Owner Account Security · Two-step verification</p></header>
+<main>
+<div class="card">
+<h2>Protect administrator access</h2>
+<p id="status" role="status" aria-live="polite">Checking the owner account…</p>
+<p class="note">This screen works only for the MzanConnect owner account. Your current members and billing arrangements are not affected.</p>
+<a class="back" href="dashboard.html">← Back to Dashboard</a>
+</div>
+<section id="setupCard" class="card" hidden>
+<h2>Set up an authenticator</h2>
+<p>Use an authenticator application that generates six-digit codes. On the same phone, add an account using the <strong>manual setup key</strong> instead of scanning a QR code.</p>
+<p class="note">Keep your setup key and verification codes private. Do not send them by email, WhatsApp, or screenshots. Supabase does not supply recovery codes; register a backup authenticator when possible.</p>
+<button type="button" id="begin">Begin secure setup</button>
+<div id="keyPanel" hidden>
+<label for="setupKey">Private setup key — copy into your authenticator</label>
+<input id="setupKey" type="text" readonly autocomplete="off" spellcheck="false" aria-describedby="keyHelp">
+<p id="keyHelp" class="note">Choose “Enter a setup key” in your authenticator app. Account name: MzanConnect Owner. Type: Time based.</p>
+<form id="enrollForm">
+<label for="enrollCode">Six-digit code from the authenticator</label>
+<input id="enrollCode" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" minlength="6" maxlength="6" required>
+<button type="submit" id="enrollSubmit">Verify and activate</button>
+</form>
+</div>
+</section>
+<section id="verifyCard" class="card" hidden>
+<h2>Verify your sign-in</h2>
+<p>Open your authenticator and enter the current six-digit code to access owner functions.</p>
+<form id="verifyForm">
+<label for="verifyCode">Authenticator code</label>
+<input id="verifyCode" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" minlength="6" maxlength="6" required>
+<button type="submit" id="verifySubmit">Verify owner sign-in</button>
+</form>
+</section>
+<section id="securedCard" class="card" hidden>
+<h2>Two-step verification active</h2>
+<p class="success">Your owner session has been verified.</p>
+<p class="note">A verification code is required for a new owner sign-in. For recovery, add a backup authenticator while you still have access.</p>
+<button type="button" id="backup">Add a backup authenticator</button>
+</section>
+</main>
+<script>
+(async function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const say=(text,bad=false)=>{const el=$('status');el.textContent=text;el.className=bad?'error':''};
+let client, enrollment=null, factor=null;
+try{
+  if(!window.supabase)throw Error('Authentication is unavailable.');
+  client=window.supabase.createClient('https://akxzubckdebawqwwwaoe.supabase.co','sb_publishable_XEeBfPCzJ0MzGpHWHygeug_rGptbzno');
+  const {data,error}=await client.auth.getUser();
+  if(error||!data?.user){location.replace('login.html');return}
+  if(data.user.app_metadata?.mzanconnect_role!=='owner'){location.replace('dashboard.html');return}
+  if(!client.auth.mfa?.listFactors||!client.auth.mfa?.getAuthenticatorAssuranceLevel)throw Error('Two-step verification is temporarily unavailable.');
+  document.body.style.visibility='visible';
+  const factors=await client.auth.mfa.listFactors();
+  if(factors.error)throw factors.error;
+  const verified=(factors.data?.totp||[]).filter(f=>f.status==='verified');
+  const assurance=await client.auth.mfa.getAuthenticatorAssuranceLevel();
+  if(assurance.error)throw assurance.error;
+  if(verified.length && assurance.data?.currentLevel==='aal2'){
+    $('securedCard').hidden=false;
+    say('Protected. Your current owner session has two-step verification.');
+  }else if(verified.length){
+    factor=verified[0].id;
+    $('verifyCard').hidden=false;
+    say('Enter your authenticator code to complete owner sign-in.');
+  }else{
+    $('setupCard').hidden=false;
+    say('Two-step verification is not yet enabled for this owner account.');
+  }
+}catch(error){
+  document.body.style.visibility='visible';
+  say('Account security could not be verified. '+(error?.message||'Please sign in again.'),true);
+  return;
+}
+$('begin').addEventListener('click', async()=>{
+  const button=$('begin');button.disabled=true;
+  try{
+    if(enrollment)return;
+    const {data,error}=await client.auth.mfa.enroll({factorType:'totp',friendlyName:'MzanConnect Owner'});
+    if(error||!data?.totp?.secret||!data.id)throw error||Error('No setup key was supplied.');
+    enrollment=data.id;
+    $('setupKey').value=data.totp.secret;
+    $('keyPanel').hidden=false;
+    say('Enter this private key into your authenticator, then type the generated six-digit code.');
+  }catch(error){say(error.message||'Could not start two-step setup.',true);button.disabled=false}
+});
+async function checkCode(factorId,code){
+  const challenge=await client.auth.mfa.challenge({factorId});
+  if(challenge.error||!challenge.data?.id)throw challenge.error||Error('Could not start verification.');
+  const verified=await client.auth.mfa.verify({factorId,challengeId:challenge.data.id,code});
+  if(verified.error)throw verified.error;
+}
+$('enrollForm').addEventListener('submit',async(event)=>{
+  event.preventDefault();
+  if(!enrollment)return;
+  const button=$('enrollSubmit');button.disabled=true;
+  const code=$('enrollCode').value.trim();
+  $('enrollCode').value='';
+  try{
+    await checkCode(enrollment,code);
+    enrollment=null;
+    $('setupKey').value='';
+    $('keyPanel').hidden=true;$('setupCard').hidden=true;
+    $('securedCard').hidden=false;
+    say('Two-step verification activated for the owner account.');
+  }catch(error){say('Code not accepted. Check your authenticator and try again.',true)}
+  finally{button.disabled=false}
+});
+$('verifyForm').addEventListener('submit',async(event)=>{
+  event.preventDefault();
+  if(!factor)return;
+  const button=$('verifySubmit');button.disabled=true;
+  const code=$('verifyCode').value.trim();$('verifyCode').value='';
+  try{
+    await checkCode(factor,code);
+    $('verifyCard').hidden=true;$('securedCard').hidden=false;
+    say('Owner sign-in verified. You may now open the dashboard.');
+  }catch(error){say('Code not accepted. Try the current six-digit code.',true)}
+  finally{button.disabled=false}
+});
+$('backup').addEventListener('click',()=>{
+  $('securedCard').hidden=true;$('setupCard').hidden=false;$('begin').disabled=false;
+  say('Register a different authenticator as your backup. Keep its key confidential.');
+});
+})();
+</script>
+<script defer src="legal-notices.js?v=1"></script><script defer src="voice-accessibility.js?v=7"></script><script defer src="app-shell.js?v=4"></script>
+</body>
+</html>
