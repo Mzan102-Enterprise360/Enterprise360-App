@@ -73,7 +73,7 @@ module.exports = async function checkPublicRegistration(browser, base) {
   await page.waitForURL('**/dashboard.html');
   assert.equal(await page.locator('#inviteCode').count(),0);
   await page.locator('#logoutButton').click();
-  await page.waitForURL('**/index.html');
+  await page.waitForURL(url=>new URL(url).pathname.endsWith('/index.html'));
   assert.deepEqual(errors,[]);
   await page.close();
   const signedOut=await browser.newPage();
