@@ -11,7 +11,10 @@ const mock=String.raw`(()=>{
  window.supabase={createClient:()=>({
    auth:{getUser:async()=>({data:{user},error:null})},
    from(table){
-    if(table!=='compliance_items')throw Error('Unexpected table '+table);
+    if(table!=='compliance_items')return {
+     select(){return this},eq(){return this},gt(){return this},order(){return this},
+     limit:async()=>({data:[],error:null}),maybeSingle:async()=>({data:null,error:null})
+    };
     return {
      select(){return this},
      eq(field,value){if(field!=='user_id'||value!==user.id)throw Error('Unexpected user');return this},
