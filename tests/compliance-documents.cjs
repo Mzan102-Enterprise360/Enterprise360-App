@@ -74,7 +74,7 @@ async function testCompliance(browser){
  assert.equal(await page.getByRole('button',{name:/Upload document for/}).count(),6);
  for(let i=0;i<names.length;i++){
   const row=page.locator('.compliance-item').nth(i);
-  assert.match(await row.innerText(),new RegExp(names[i].replace(/[()]/g,'\\$&'),'i'));
+  assert.ok((await row.innerText()).includes(names[i]),'Missing compliance title: '+names[i]);
   assert.equal(await row.locator('input[type=checkbox]').isChecked(),false);
  }
  // A normal document upload must also persist and check the matching compliance box.
