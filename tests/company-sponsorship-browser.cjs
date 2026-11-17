@@ -27,6 +27,7 @@ function mock(role){
  return [
  '(function(){',
  'const user='+JSON.stringify(user)+';',
+ 'const owner='+JSON.stringify(owner)+';',
  'const rows='+JSON.stringify(existing)+';',
  'window.mockFunding={rows,updates:[],checkoutCalls:0};',
  'window.supabase={createClient:()=>({auth:{getUser:async()=>({data:{user},error:null})},',
@@ -34,7 +35,7 @@ function mock(role){
  ' select(){return this},eq(k,v){filters[k]=v;return this},gt(){return this},order(){return this},',
  ' async maybeSingle(){if(table!=="founding_memberships")throw Error("Unexpected single on "+table);return {data:'+(role==='founder'?'{pilot_status:"active"}':'null')+',error:null}},',
  ' async limit(){',
- '  if(table==="company_membership_sponsorship_requests"){const data=rows.filter(x=>owner||x.user_id===user.id).filter(x=>Object.entries(filters).every(([k,v])=>x[k]===v));return {data,error:null}},',
+ '  if(table==="company_membership_sponsorship_requests"){const data=rows.filter(x=>owner||x.user_id===user.id).filter(x=>Object.entries(filters).every(([k,v])=>x[k]===v));return {data,error:null};}',
  '  if(["membership_payments","membership_subscriptions"].includes(table))return {data:[],error:null};',
  '  throw Error("Unknown query "+table)',
  ' },',
