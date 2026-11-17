@@ -152,7 +152,7 @@ function textForPage(){
    return 'Your payment receipt is displayed. Review the details carefully. You can print the receipt or save a PDF for your records, then close it to return to Billing and Membership.';
   }
   if(document.getElementById('status')?.textContent?.includes('Owner membership')){
-   return 'This is Billing and Membership. As the owner, you do not need to pay for membership. Members have one monthly membership at one hundred and ninety rand. Business plans, company profiles and other personal services are quoted separately. Use Business Support to review service requests.';
+   return 'This is Billing and Membership. Choose Self-Funded Subscription to pay for your own membership using Yoco, or Company-Funded Subscription to submit a sponsorship enquiry with the sponsoring company's name and contact details. Tick the confirmation box before submitting a sponsorship request. Company sponsorship must be reviewed and independently verified before any access is activated.  As the owner, you do not need to pay for membership. Members have one monthly membership at one hundred and ninety rand. Business plans, company profiles and other personal services are quoted separately. Use Business Support to review service requests.';
   }
   return 'This is Billing and Membership. Your MzanConnect membership costs one hundred and ninety rand for one month. It includes access to the business tools on your dashboard. Business plans, company profiles and other hands-on services are quoted and paid separately. Review your membership status and receipts, then use the secure Yoco checkout if you need to activate your membership.';
  }
