@@ -129,7 +129,7 @@ function requestRow(r,admin){
    });
   }
   available.forEach(status=>{
-   const button=create('button',statusText(status),'status-action');
+   const button=create('button',r.service_type==='donation_request'&&status==='completed'?'Review completed':statusText(status),'status-action');
    button.type='button';
    button.setAttribute('aria-label','Mark '+(titles[r.service_type]||'request')+' as '+statusText(status));
    button.addEventListener('click',async()=>{
@@ -142,7 +142,7 @@ function requestRow(r,admin){
      if(error||!data)throw error||new Error('No updated request returned');
      r.status=data.status;
      heading.textContent=(titles[r.service_type]||'Business assistance')+' · '+requestStatus(r);
-     feedback.textContent='Saved: '+statusText(r.status)+'. The member will see this when opening their requests.';
+     feedback.textContent='Saved: '+requestStatus(r)+'. The member will see this when opening their requests.';
     }catch(e){
      feedback.textContent='Status was not saved. Please try again.';
     }finally{setButtons(false);}
