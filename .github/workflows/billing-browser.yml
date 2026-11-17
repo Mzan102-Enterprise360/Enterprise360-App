@@ -60,3 +60,5 @@ jobs:
         run: node tests/donation-browser.cjs
       - name: Test consolidated donation report and printing
         run: node tests/donation-report-browser.cjs
+      - name: Test compliance uploads and auto-checks
+        run: node tests/compliance-documents.cjs
