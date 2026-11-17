@@ -192,6 +192,7 @@ main{padding:14px}
 <div class="actions">
 <a href="support.html">Member Support</a>
 <a id="ownerSurveyReports" href="survey-report.html" hidden>Survey Reports &amp; Print</a>
+<a id="ownerDonationInbox" href="donations.html#owner-inbox" hidden>🤝 Donation Requests Inbox</a>
 <a id="ownerSecurity" href="owner-security.html" hidden>🔒 Owner Account Security</a>
 <a href="index.html?from=app-nav">Home</a>
 </div>
@@ -226,6 +227,7 @@ main{padding:14px}
         });
     }
     if(user.app_metadata?.mzanconnect_role==='owner')$('ownerSecurity').hidden=false;
+    if(user.id==='820a18ee-3482-4b6c-bd75-469cf198b9df'||user.app_metadata?.mzanconnect_role==='owner')$('ownerDonationInbox').hidden=false;
     $('profilePlan').textContent=user.app_metadata?.mzanconnect_role==='owner'?'MzanConnect Owner':'MzanConnect Member';
   }catch(error){location.replace('login.html');return;}
 
