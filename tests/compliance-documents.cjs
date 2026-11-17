@@ -124,12 +124,14 @@ async function testGrowthUnchanged(browser){
  await page.goto(base+'member.html?section=growth',{waitUntil:'domcontentloaded'});
  await page.locator('#growthPanel').waitFor({state:'visible'});
  assert.equal(await page.locator('.compliance-item').count(),0);
- assert.equal(await page.locator('#growthChecks input[type=checkbox]').count(),5);
+ await page.locator('.growth-card').first().waitFor({state:'visible'});
+ assert.equal(await page.locator('.growth-card').count(),5);
+ assert.equal(await page.locator('#growthChecks input[type=checkbox]').count(),0,'Growth Passport stages cannot be self-ticked');
  await page.close();
 }
 (async()=>{try{
  await new Promise(resolve=>setTimeout(resolve,1100));
  const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
  try{await testCompliance(browser);await testGrowthUnchanged(browser)}finally{await browser.close()}
- console.log('PASS: six compliance uploads, auto-ticking on persisted save, private files, error handling, growth unchanged');
+ console.log('PASS: six compliance uploads, auto-ticking on persisted save, private files, error handling, Growth Passport read-only');
 }catch(error){console.error(error);process.exitCode=1}finally{server.kill()}})();
