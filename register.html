@@ -66,13 +66,11 @@ a{color:#147b59}
 <select id="sector" required><option value="">Select business sector</option></select>
 <input id="sectorOther" class="profile-other" aria-label="Specify your business sector" maxlength="100" placeholder="Specify sector" hidden>
 <fieldset class="registration-location"><legend>Business Location (optional now)</legend>
-<p class="note">You can finish this on your member dashboard after registering. Location options use <a href="https://github.com/open-admin-data/south-africa-administrative-divisions" target="_blank" rel="noopener noreferrer">Open Admin Data (CC BY 4.0)</a>.</p>
+<p class="note">You can complete this later on your member dashboard. Choose your province and type your own district and municipality.</p>
 <label for="province">Province</label><select id="province"><option value="">Select province</option></select>
 <input id="provinceOther" class="profile-other" aria-label="Specify province" maxlength="90" placeholder="Specify province" hidden>
-<label for="district">District</label><select id="district"><option value="">Select district or metro</option></select>
-<input id="districtOther" class="profile-other" aria-label="Specify district" maxlength="120" placeholder="Specify district" hidden>
-<label for="municipality">Municipality</label><select id="municipality"><option value="">Select municipality</option></select>
-<input id="municipalityOther" class="profile-other" aria-label="Specify municipality" maxlength="120" placeholder="Specify municipality" hidden>
+<label for="district">District</label><input id="district" type="text" maxlength="120" placeholder="Type your district, e.g. John Taolo Gaetsewe">
+<label for="municipality">Municipality</label><input id="municipality" type="text" maxlength="120" placeholder="Type your municipality, e.g. Gamagara">
 </fieldset>
 
 <p class="note">Create your MzanConnect account to access business tools and opportunities.</p>
@@ -115,7 +113,7 @@ MzanConnect is a business opportunities and supplier development platform, not a
 </div>
 </main>
 
-<script src="business-profile-options.js?v=1"></script>
+<script src="business-profile-options.js?v=2"></script>
 <script>
 const mzanSupabase = window.supabase.createClient(
   "https://akxzubckdebawqwwwaoe.supabase.co",
