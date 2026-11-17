@@ -5,9 +5,11 @@ on:
     paths:
       - 'billing.html'
       - 'support.html'
-      - 'member.html'
       - 'bookkeeping.html'
       - 'dashboard.html'
+      - 'member.html'
+      - 'growth-passport-status.js'
+      - 'survey.html'
       - 'donations.html'
       - 'donation-report.html'
       - 'donation-report.js'
@@ -24,9 +26,11 @@ on:
     paths:
       - 'billing.html'
       - 'support.html'
-      - 'member.html'
       - 'bookkeeping.html'
       - 'dashboard.html'
+      - 'member.html'
+      - 'growth-passport-status.js'
+      - 'survey.html'
       - 'donations.html'
       - 'donation-report.html'
       - 'donation-report.js'
@@ -62,3 +66,5 @@ jobs:
         run: node tests/donation-report-browser.cjs
       - name: Test compliance uploads and auto-checks
         run: node tests/compliance-documents.cjs
+      - name: Test live growth passport and survey linking
+        run: node tests/growth-passport-browser.cjs

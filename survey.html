@@ -40,7 +40,7 @@ footer{padding:8px 15px 24px;font-size:13px;color:#55717d;text-align:center}
 <p class="note"><strong>Independent, voluntary research.</strong> Approximately 5–7 minutes. No paid membership or payment is required. No personal name or business registration number is requested. Contact details are needed only if you voluntarily request follow-up. This survey is not run on behalf of Kumba, Khumani, SIOC-CDT or any other funder. Your participation does not affect funding decisions.</p>
 </section>
 <section class="card" aria-labelledby="privacy-title"><h2 id="privacy-title">Privacy and consent</h2>
-<p class="note">Mzan 102 (Pty) Ltd, through MzanConnect, organises this independent research. Responses will be used to prepare summary findings about local SMME challenges. Survey data is hosted by a database service provider and may be processed outside South Africa. We do not share identifiable survey records with funders or sponsors; small groups will be combined or omitted from public reports.</p>
+<p class="note">Mzanian 102 (Pty) Ltd, through MzanConnect, organises this independent research. Responses will be used to prepare summary findings about local SMME challenges. Survey data is hosted by a database service provider and may be processed outside South Africa. We do not share identifiable survey records with funders or sponsors; small groups will be combined or omitted from public reports.</p>
 <p class="note">The final Yes/No question lets you express interest in <strong>voluntary business monitoring and support follow-up</strong>. If you select Yes, we request an email address or WhatsApp number and separate consent to contact you about this research or relevant business monitoring/support opportunities only. Selecting No does not require contact details. Neither answer creates a paid MzanConnect membership or guarantees services or funding. We will not use this permission for unrelated marketing.</p>
 <p class="note">We plan to keep responses for no longer than 12 months after survey closure. You may ask us to stop contacting you, or request access, correction or deletion of contact information, at <a href="mailto:reception.mzan102@gmail.com">reception.mzan102@gmail.com</a>. Without identifying information, we may be unable to identify a previously submitted anonymous response. Participation is voluntary and does not affect funding decisions. Please do not disclose anyone else's confidential information.</p>
 </section>
@@ -116,22 +116,39 @@ footer{padding:8px 15px 24px;font-size:13px;color:#55717d;text-align:center}
 <input id="support_contact_details" name="support_contact_details" maxlength="160" type="text" autocomplete="off" style="width:100%;min-height:48px;padding:11px;font:inherit;border:1px solid #9babb4;border-radius:10px" placeholder="Select a contact method first">
 <label class="option"><input id="support_contact_consent" type="checkbox"> I agree that MzanConnect may use this contact detail to contact me only about this survey and voluntary business monitoring/support. I may withdraw permission by emailing reception.mzan102@gmail.com. <span class="required">*</span></label>
 </div></fieldset>
+<div id="passportSurveyLink" class="card" hidden style="margin:14px 0;padding:13px;background:#eaf7f4">
+<p><strong>Optional: Connect this completed survey to your Growth Passport</strong></p>
+<label class="option"><input id="passportSurveyConsent" type="checkbox"> I am signed in to MzanConnect and agree to link this response to my member account so my <strong>Completed Business Survey</strong> milestone updates automatically. My survey answers remain subject to the Privacy Notice. Without this consent, my survey stays anonymous to the Growth Passport.</label>
+</div>
 <label class="option"><input id="consent" type="checkbox" required> I am an adult entrepreneur or authorised business representative. I have read the information above and voluntarily consent to this research submission. <span class="required">*</span></label>
 <div style="position:absolute;left:-99999px" aria-hidden="true"><label for="website">Leave this blank</label><input id="website" type="text" tabindex="-1" autocomplete="off"></div>
 <p class="note">Please review your answers. Once submitted, you will see a confirmation message.</p>
 <button id="send" type="submit">Submit survey</button>
 </form><p id="status" role="status" aria-live="polite"></p>
+<p id="growthSurveyReturn" class="whatsapp-followup" hidden><a class="whatsapp-link" style="background:#14283b" href="member.html?section=growth">Return to My Growth Passport</a></p>
 <div id="whatsappFollowup" class="whatsapp-followup" hidden>
 <p><strong>Would you like to speak with MzanConnect?</strong> You can contact us directly on WhatsApp Business.</p>
 <a id="whatsappContact" class="whatsapp-link" href="https://wa.me/27732754385" target="_blank" rel="noopener noreferrer">Chat with MzanConnect on WhatsApp</a>
 <p class="note">Optional. WhatsApp opens separately with a draft message. Tap Send if you want to contact us. Your survey answers are not shared through WhatsApp.</p>
 </div></section></main>
-<footer>MzanConnect • Independent SMME research • © 2026 Mzan 102 (Pty) Ltd</footer>
+<footer>MzanConnect • Independent SMME research • © 2026 Mzanian 102 (Pty) Ltd</footer>
 <script>
 document.addEventListener('DOMContentLoaded',function(){
   const form=document.getElementById('survey'),send=document.getElementById('send'),status=document.getElementById('status');
   const whatsappFollowup=document.getElementById('whatsappFollowup'),whatsappContact=document.getElementById('whatsappContact');
   const client=window.supabase&&window.supabase.createClient('https://akxzubckdebawqwwwaoe.supabase.co','sb_publishable_XEeBfPCzJ0MzGpHWHygeug_rGptbzno');
+  const passportPanel=document.getElementById('passportSurveyLink');
+  const passportConsent=document.getElementById('passportSurveyConsent');
+  const fromGrowth=new URLSearchParams(location.search).get('from')==='growth';
+  if(client){
+    client.auth.getUser().then(({data,error})=>{
+      if(!error&&data?.user&&!data.user.is_anonymous){
+        passportPanel.hidden=false;
+        if(fromGrowth)passportPanel.scrollIntoView({block:'nearest'});
+      }
+    }).catch(()=>{});
+  }
+
   const single=function(name){const x=form.querySelector('[name="'+name+'"]:checked');return x?x.value:null};
   const contactPanel=document.getElementById('contact-details');
   const contactType=form.elements.support_contact_type;
@@ -173,6 +190,19 @@ document.addEventListener('DOMContentLoaded',function(){
       support_consent_version:single('support_interest')==='yes'?'2026-11-15-followup-1':null,
       consent_confirmed:true,consent_version:'2026-11-15-v2'
     };
+    let linkedSurvey=false;
+    if(passportConsent.checked){
+      if(!client){message('Sign in to link this survey to your Growth Passport.',true);return;}
+      try{
+        const {data:account,error:accountError}=await client.auth.getUser();
+        if(accountError||!account?.user||account.user.is_anonymous)throw Error('Member sign-in required');
+        payload.member_user_id=account.user.id;
+        linkedSurvey=true;
+      }catch(error){
+        message('Please sign in to your member account to link this survey, or untick the linking option to submit anonymously.',true);
+        return;
+      }
+    }
     send.disabled=true;send.textContent='Submitting...';status.style.display='none';
     try {
       const response=await client.from('smme_survey_2026_responses').insert(payload);
@@ -185,7 +215,8 @@ document.addEventListener('DOMContentLoaded',function(){
         :'Hello MzanConnect. I completed your SMME survey and have a question.';
       whatsappContact.href='https://wa.me/27732754385?text='+encodeURIComponent(whatsappText);
       whatsappFollowup.hidden=false;
-      message(interested?'Thank you. Your survey and voluntary request for follow-up have been received. We may contact you about relevant monitoring and support. No paid membership has been created.':'Thank you. Your survey response has been received. No membership or payment is required.',false);
+      document.getElementById('growthSurveyReturn').hidden=!linkedSurvey;
+      message(linkedSurvey?'Your survey is linked to your Growth Passport. The Completed Business Survey milestone will update when you return to your member account.':interested?'Thank you. Your survey and voluntary request for follow-up have been received. We may contact you about relevant monitoring and support. No paid membership has been created.':'Thank you. Your survey response has been received. No membership or payment is required.',false);
     }catch(error){
       message('Your response could not be submitted. Check your connection and try again. Your answers have not been confirmed as saved.',true);
     }finally{send.disabled=false;send.textContent='Submit survey'}
