@@ -23,7 +23,8 @@ async function checkDashboardFeatures(browser){
       from(table){
         return {
           select(){return this},
-          eq(field,value){if(field!=='user_id'||value!==user.id)throw Error('Wrong account');return this},
+          eq(field,value){if(!['user_id','member_user_id'].includes(field)||value!==user.id)throw Error('Wrong account');return this},
+          limit:async()=>({data:table==='smme_survey_2026_responses'&&window.mockSurveyDone?[{id:'linked-survey'}]:[],error:null}),
           in(field,keys){
             if(table!=='compliance_items'||field!=='item_key')throw Error('Wrong checklist');
             const stored=JSON.parse(sessionStorage.getItem('checklist')||'{}');
@@ -44,18 +45,21 @@ async function checkDashboardFeatures(browser){
   }));
   await page.goto(base+'dashboard.html');
   await page.getByRole('link',{name:/Growth Passport/}).click();
-  await page.getByLabel('Prepare funding documents').check();
-  await page.getByRole('button',{name:'Save milestones'}).click();
-  await page.getByText('Growth milestones saved successfully.').waitFor();
-  await page.reload();
-  assert.equal(await page.getByLabel('Prepare funding documents').isChecked(),true);
+  await page.getByText('2 of 5 readiness milestones achieved').waitFor();
+  assert.equal(await page.locator('#growthChecks input[type=checkbox]').count(),0,'Growth Passport must not be self-tickable');
+  assert.equal(await page.getByRole('button',{name:'Save milestones'}).count(),0);
+  assert.equal(await page.locator('.growth-card').count(),5);
+  await page.evaluate(()=>{window.mockSurveyDone=true});
+  await page.getByRole('button',{name:'Refresh My Readiness'}).click();
+  await page.getByText('3 of 5 readiness milestones achieved').waitFor();
   await page.goto(base+'member.html?section=compliance');
   await page.locator('#c0').check();
   await page.getByRole('button',{name:'Save checklist'}).click();
   await page.getByText('Checklist saved successfully.').waitFor();
   await page.goto(base+'member.html?section=growth');
-  assert.equal(await page.getByLabel('Prepare funding documents').isChecked(),true);
+  await page.getByText('1 of 6 checklist categories marked complete.',{exact:false}).waitFor();
   assert.equal(await page.locator('#c0').count(),0);
+  assert.equal(await page.locator('.growth-card').count(),5);
   await page.goto(base+'index.html#opportunities');
   const sources=page.locator('.opportunity-item:visible');
   assert.equal(await sources.count(),7);
@@ -80,7 +84,7 @@ async function checkDashboardFeatures(browser){
   await page.getByText('The confirmation request could not be completed.',{exact:false}).waitFor();
   assert.deepEqual(pageErrors,[]);
   await page.close();
-  console.log('PASS: owner Growth Passport saves and reloads, compliance stays separate, official sources filter, and confirmation resend handles success and failure');
+  console.log('PASS: auto Growth Passport tracks linked survey and compliance without manual ticking, official sources filter and confirmation resend');
 }
 
 async function checkVerifiedReceipts(browser){
