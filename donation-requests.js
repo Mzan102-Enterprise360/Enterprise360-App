@@ -8,6 +8,65 @@ let db=null,user=null,owner=false;
 function message(text,error=false){const target=$('donationStatus');target.textContent=text;target.style.color=error?'#972b2b':'#08715f';}
 function field(id){return $(id).value.trim();}
 function make(tag,text,className){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el;}
+let myRecords=[];
+let historyStage='all';
+const IN_PROGRESS_STATUSES=new Set(['reviewing','awaiting_documents','quoted','in_progress']);
+function memberStage(status){
+ if(status==='new')return 'submitted';
+ if(IN_PROGRESS_STATUSES.has(status))return 'in_progress';
+ if(status==='completed')return 'completed';
+ return 'other';
+}
+function renderHistory(){
+ const list=$('donationHistory');
+ const filtered=historyStage==='all'?myRecords:myRecords.filter(r=>memberStage(r.status)===historyStage);
+ const counts={all:myRecords.length,submitted:0,in_progress:0,completed:0};
+ for(const record of myRecords){
+  const stage=memberStage(record.status);
+  if(Object.hasOwn(counts,stage))counts[stage]++;
+ }
+ $('donationCountAll').textContent=String(counts.all);
+ $('donationCountSubmitted').textContent=String(counts.submitted);
+ $('donationCountProgress').textContent=String(counts.in_progress);
+ $('donationCountCompleted').textContent=String(counts.completed);
+ for(const button of $('donationHistoryFilters').querySelectorAll('button[data-donation-stage]')){
+  button.setAttribute('aria-pressed',String(button.dataset.donationStage===historyStage));
+ }
+ list.replaceChildren();
+ if(!filtered.length){
+  list.textContent=myRecords.length?(historyStage==='all'?'No requests to display.':'No requests at this stage yet.'):'No donation requests submitted yet.';
+  return;
+ }
+ const stepNames=['Submitted','In progress','Review completed'];
+ for(const record of filtered){
+  const card=make('article',undefined,'request');
+  const status=make('strong',STATUS[record.status]||'Submitted for review');
+  const date=new Date(record.created_at);
+  card.append(status,make('small',(Number.isNaN(date.getTime())?'':date.toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'}))+' · '+(record.business_name||'Donation request')));
+  const currentStep={submitted:0,in_progress:1,completed:2}[memberStage(record.status)];
+  if(currentStep!==undefined){
+   const stages=make('div',undefined,'history-stages');
+   stages.setAttribute('aria-label','Current stage: '+stepNames[currentStep]);
+   for(let index=0;index<stepNames.length;index++){
+    const marker=make('span',stepNames[index]);
+    if(index<currentStep)marker.classList.add('is-done');
+    if(index===currentStep)marker.classList.add('is-current');
+    stages.append(marker);
+   }
+   card.append(stages);
+  }
+  card.append(make('p',record.details||''));
+  list.append(card);
+ }
+}
+$('donationHistoryFilters').addEventListener('click',event=>{
+ const button=event.target.closest('button[data-donation-stage]');
+ if(!button||!$('donationHistoryFilters').contains(button))return;
+ const stage=button.dataset.donationStage;
+ if(!['all','submitted','in_progress','completed'].includes(stage))return;
+ historyStage=stage;
+ renderHistory();
+});
 async function loadHistory(){
  if(!db||!user)return;
  const list=$('donationHistory');list.textContent='Loading your requests…';
@@ -15,17 +74,9 @@ async function loadHistory(){
   .select('id,business_name,details,status,created_at')
   .eq('user_id',user.id).eq('service_type','donation_request')
   .order('created_at',{ascending:false}).limit(30);
- list.replaceChildren();
  if(error){list.textContent='Could not load your requests. Please refresh.';return;}
- if(!data?.length){list.textContent='No donation requests submitted yet.';return;}
- for(const record of data){
-   const card=make('article',undefined,'request');
-   const status=make('strong',STATUS[record.status]||'Submitted for review');
-   const date=new Date(record.created_at);
-   card.append(status,make('small',(Number.isNaN(date.getTime())?'':date.toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'}))+' · '+record.business_name));
-   card.append(make('p',record.details||''));
-   list.append(card);
- }
+ myRecords=Array.isArray(data)?data:[];
+ renderHistory();
 }
 
 /* Owner records are only fetched after server-authenticated owner identity is known.
