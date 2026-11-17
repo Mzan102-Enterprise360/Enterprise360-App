@@ -715,14 +715,19 @@ navigator.serviceWorker.register('./sw.js').catch(()=>{});
   dialog.addEventListener('cancel',remember);
   dialog.addEventListener('close',stopVoice);
   dialog.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>{remember();stopVoice();}));
-  if(location.hash&&location.hash!=='#home')return;
+  const welcomeRequested=new URLSearchParams(location.search).get('welcome')==='1';
+  if(!welcomeRequested&&location.hash&&location.hash!=='#home')return;
   try{
+    if(!welcomeRequested){
     if(localStorage.getItem('mzan-welcome-seen-v1')==='1')return;
     if(localStorage.getItem('mzan-smme-survey-submitted-v2')==='1')return;
     if(sessionStorage.getItem('mzan-welcome-shown-v1')==='1')return;
-    sessionStorage.setItem('mzan-welcome-shown-v1','1');
+    }
   }catch(e){/* Storage restrictions must not prevent browsing. */}
-  try{dialog.showModal()}catch(e){}
+  try{
+    dialog.showModal();
+    try{sessionStorage.setItem('mzan-welcome-shown-v1','1')}catch(e){}
+  }catch(e){}
 })();
 </script>
 <!-- Member access buttons appear only on the Home view. -->
