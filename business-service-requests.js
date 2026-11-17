@@ -141,7 +141,7 @@ function requestRow(r,admin){
       .eq('id',r.id).select('id,status').single();
      if(error||!data)throw error||new Error('No updated request returned');
      r.status=data.status;
-     heading.textContent=(titles[r.service_type]||'Business assistance')+' · '+statusText(r.status);
+     heading.textContent=(titles[r.service_type]||'Business assistance')+' · '+requestStatus(r);
      feedback.textContent='Saved: '+statusText(r.status)+'. The member will see this when opening their requests.';
     }catch(e){
      feedback.textContent='Status was not saved. Please try again.';
