@@ -31,6 +31,7 @@ function entry(record,owner=false){
  card.append(title,status);
  card.append(make('small',fmtDate(record.created_at)+' · '+Number(record.requested_months||1)+' month(s) requested'));
  if(owner){
+  if(record.applicant_email)card.append(make('p','Member contact email: '+record.applicant_email));
   if(record.company_contact_name)card.append(make('p','Company contact: '+record.company_contact_name));
   if(record.company_contact_email)card.append(make('p','Company email: '+record.company_contact_email));
   if(record.company_contact_phone)card.append(make('p','Company phone: '+record.company_contact_phone));
@@ -74,7 +75,7 @@ async function mount({client,user,owner,checkoutAvailable}){
    root.replaceChildren();
    try{
     const {data,error}=await client.from('company_membership_sponsorship_requests')
-     .select('id,user_id,company_name,company_contact_name,company_contact_email,company_contact_phone,requested_months,request_note,status,created_at')
+     .select('id,user_id,applicant_email,company_name,company_contact_name,company_contact_email,company_contact_phone,requested_months,request_note,status,created_at')
      .order('created_at',{ascending:false}).limit(100);
     if(error)throw error;
     const list=Array.isArray(data)?data:[];
@@ -173,6 +174,7 @@ async function mount({client,user,owner,checkoutAvailable}){
   try{
    const {error}=await client.from('company_membership_sponsorship_requests').insert({
     user_id:user.id,
+    applicant_email:user.email,
     company_name:companyName,
     company_contact_name:$('sponsorContactName').value.trim(),
     company_contact_email:$('sponsorEmail').value.trim(),
