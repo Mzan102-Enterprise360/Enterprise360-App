@@ -81,11 +81,11 @@ async function member(browser){
  await page.locator('#contactEmail').fill('hello@example.test');
  await page.locator('#sector').selectOption('Hairdressing, Beauty and Wellness');
  await page.locator('#province').selectOption('Northern Cape');
- await page.locator('#district').selectOption('John Taolo Gaetsewe');
- assert.deepEqual(await page.locator('#municipality option').allTextContents(),[
-   'Select local / metropolitan municipality','Ga-Segonyana','Gamagara','Joe Morolong','Other / Not listed (specify)'
- ]);
- await page.locator('#municipality').selectOption('Gamagara');
+ assert.equal(await page.locator('#district').evaluate(el=>el.tagName),'INPUT','District must be a free-text field');
+ assert.equal(await page.locator('#municipality').evaluate(el=>el.tagName),'INPUT','Municipality must be a free-text field');
+ assert.equal(await page.locator('#district option,#municipality option').count(),0,'No preset district or municipality choices');
+ await page.locator('#district').fill('John Taolo Gaetsewe');
+ await page.locator('#municipality').fill('Gamagara');
  await page.getByRole('button',{name:'Save Business Profile'}).click();
  await page.getByText('Business profile saved successfully.',{exact:false}).waitFor();
  const state=await page.evaluate(()=>window.mockBusiness);
@@ -105,7 +105,13 @@ async function member(browser){
  await page.reload();
  await page.locator('#municipality').waitFor({state:'visible'});
  assert.equal(await page.locator('#municipality').inputValue(),'Gamagara');
+ assert.equal(await page.locator('#district').inputValue(),'John Taolo Gaetsewe');
  assert.equal(await page.locator('#sector').inputValue(),'Hairdressing, Beauty and Wellness');
+ // Free text accepts a member's own wording, without forcing any predefined municipality.
+ await page.locator('#municipality').fill('My Custom Municipality');
+ await page.getByRole('button',{name:'Save Business Profile'}).click();
+ await page.getByText('Business profile saved successfully.',{exact:false}).waitFor();
+ assert.equal(await page.evaluate(()=>mockBusiness.profile.municipality),'My Custom Municipality');
  await page.evaluate(()=>{
   const profile={...mockBusiness.profile,sector:'Funeral and Memorial Services'};
   sessionStorage.setItem('mock-business-profile',JSON.stringify(profile));
@@ -132,8 +138,8 @@ async function register(browser){
  await page.locator('#contactPhone').fill('0720001234');
  await page.locator('#sector').selectOption('Retail and Trading');
  await page.locator('#province').selectOption('Northern Cape');
- await page.locator('#district').selectOption('John Taolo Gaetsewe');
- await page.locator('#municipality').selectOption('Gamagara');
+ await page.locator('#district').fill('John Taolo Gaetsewe');
+ await page.locator('#municipality').fill('Gamagara');
  await page.locator('#email').fill('sample@example.test');
  await page.locator('#password').fill('example-long-passphrase-456!');
  await page.getByRole('button',{name:'Create My Account'}).click();
@@ -181,5 +187,5 @@ async function firstLogin(browser){
  const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
  try{await member(browser);await register(browser);await report(browser);await firstLogin(browser)}
  finally{await browser.close()}
- console.log('PASS: business registered/trading names, contacts, sector and municipality options, privacy, registration and PDF');
+ console.log('PASS: business registered/trading names, contacts, sector and free-text district/municipality, privacy, registration and PDF');
 }catch(error){console.error(error);process.exitCode=1}finally{server.kill()}})();
