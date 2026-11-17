@@ -159,10 +159,10 @@ main{padding:14px}
 <div class="actions"><a href="member.html?section=compliance&v=20261110b">Update Checklist</a></div>
 </section>
 <section class="panel print-only" data-report="growth">
-<h3>📈 Business Growth Passport</h3>
-<p><strong>Growth milestones:</strong> <span id="growthCount">0 of 5 completed</span></p>
+<h3>📈 Business Growth Passport — Evidence-based Readiness</h3>
+<p><strong>Growth milestones:</strong> <span id="growthCount">Checking account records…</span></p>
 <div id="growthPrintList"></div>
-<p class="note">Progress based on the milestones saved in your member account.</p>
+<p class="note">Automatic indicators based on linked survey, self-reported compliance, member access and verified billing. These indicators are not external certification, grant approval or automatic renewal.</p>
 </section>
 <section class="panel" data-report="readiness">
 
@@ -199,6 +199,7 @@ main{padding:14px}
 </div>
 </section>
 </main>
+<script src="growth-passport-status.js?v=1"></script>
 <script>
 (async function initializeDashboard(){
   const $=id=>document.getElementById(id);
@@ -208,7 +209,7 @@ main{padding:14px}
   const logoutMessage=$('logoutMessage');
   const money=value=>new Intl.NumberFormat('en-ZA',{style:'currency',currency:'ZAR'}).format(value);
   const requirements=['CIPC Records (Director + Shareholder)','SARS Compliance','CSD Compliance','BBBEE Certificates','Relevant Industry Licences','Proof of Residence'];
-  const growthLabels=['Complete business assessment','Review compliance','Prepare funding documents','Identify procurement opportunities','Complete monthly business review'];
+  const growthLabels=['Completed Business Survey','Business 100% Compliant','Donation Request Ready','Service Request Readiness','Subscription Up to Date'];
   let client,user;
   try{
     if(!window.supabase)throw Error('Authentication library unavailable');
@@ -287,10 +288,11 @@ main{padding:14px}
     printStatus.className='note';
     printStatus.textContent='Preparing your complete saved dashboard report…';
     try{
-      const [profileResponse,checklistResponse,records]=await Promise.all([
+      const [profileResponse,checklistResponse,records,growth]=await Promise.all([
         client.from('business_profiles').select('business_name,sector,contact_name,region,description').eq('user_id',user.id).maybeSingle(),
         client.from('compliance_items').select('item_key,completed').eq('user_id',user.id),
-        fetchAllBookkeeping()
+        fetchAllBookkeeping(),
+        window.MzanGrowthPassport.load(client,user)
       ]);
       if(profileResponse.error)throw profileResponse.error;
       if(checklistResponse.error)throw checklistResponse.error;
@@ -312,9 +314,18 @@ main{padding:14px}
       $('compliancePercent').textContent=compliancePercent+'%';
       $('complianceBar').style.width=compliancePercent+'%';
       $('complianceCount').textContent=completed+' of '+requirements.length+' requirements completed';
-      const growthCompleted=addChecklist('growthPrintList',growthLabels,'g',complianceMap);
-      $('growthCount').textContent=growthCompleted+' of '+growthLabels.length+' milestones completed ('+Math.round(growthCompleted/growthLabels.length*100)+'%)';
-      const readiness=Math.round((profileFieldsCompleted+completed)/7*100);
+      const growthList=$('growthPrintList');
+      growthList.replaceChildren();
+      for(const m of growth.milestones){
+        const line=document.createElement('p');
+        line.className='report-milestone';
+        const achieved=window.MzanGrowthPassport.isAchieved(m.state);
+        const label=({complete:'Completed',ready:'Ready',exempt:'Exempt (active)',available:'Available',pending:'Pending',locked:'Prerequisites incomplete',unknown:'Not verified'})[m.state]||'Pending';
+        line.textContent=(achieved?'✓ ':'○ ')+m.title+' — '+label+'. '+m.detail;
+        growthList.append(line);
+      }
+      $('growthCount').textContent=growth.achieved+' of '+growth.total+' milestones achieved ('+Math.round(growth.achieved/growth.total*100)+'%)'+(growth.verified?'':' — some evidence unavailable');
+      const readiness=Math.round((profileFieldsCompleted+completed)/(2+requirements.length)*100);
       $('readinessPercent').textContent=readiness+'%';
       $('readinessBar').style.width=readiness+'%';
       $('readinessExplanation').textContent=profileFieldsCompleted+' of 2 profile fields and '+completed+' of 6 self-reported compliance items completed. Not an official certification.';
@@ -349,7 +360,7 @@ main{padding:14px}
       $('reportDate').textContent=new Date().toLocaleString('en-ZA',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
       printButton.disabled=false;
       printStatus.className='note report-ready';
-      printStatus.textContent='Complete report ready: My Business, Compliance, Growth, Readiness and all '+records.length+' saved bookkeeping transaction(s).';
+      printStatus.textContent='Complete report ready: My Business, live Growth Passport, self-reported Compliance, Readiness and all '+records.length+' saved bookkeeping transaction(s).';
     }catch(error){
       printStatus.className='note report-error';
       printStatus.textContent='Full report could not be prepared: '+(error.message||'Please reload and try again.')+' Printing is disabled to avoid an incomplete report.';
