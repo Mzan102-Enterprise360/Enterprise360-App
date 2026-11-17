@@ -26,6 +26,12 @@ main{max-width:760px;margin:20px auto;padding:0 16px 28px}.panel{background:whit
 .membership-benefits li{padding:2px 0}
 #businessServicesNotice .button{min-height:44px;box-sizing:border-box}
 
+
+/* Direct EFT requests: banking details are not published before owner verification. */
+#eftMembership .eft-action{min-height:44px;width:100%;max-width:400px;margin:7px 0;align-items:center;justify-content:center;text-align:center}
+#eftMembership .eft-action:focus-visible{outline:3px solid #0d9c94;outline-offset:3px}
+#eftMembership .eft-beneficiary{font-size:14px;line-height:1.4;color:#294b55}
+
 button,select{font:inherit;padding:11px 13px;margin:6px 0;border-radius:9px}button{cursor:pointer}button:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid #0d9c94;outline-offset:3px}#startLiveCheckout{background:#147b59;color:#fff;border:0;font-weight:700;min-height:44px}#livePlan{min-height:44px;max-width:100%;width:100%;border:1px solid #b9c8ce}button:disabled{opacity:.55}a.button{display:inline-block;background:#147b59;color:white;text-decoration:none;padding:12px 16px;border-radius:10px;font-weight:bold}
 small,.note{color:#5b6c77;line-height:1.5}ul{line-height:1.9}.disabled{border:1px solid #d8e0e5;border-radius:10px;background:#f5f7f8;padding:13px;color:#536570}
 @media print{body:has(#receiptPrint:not([hidden])) header,body:has(#receiptPrint:not([hidden])) main>.panel:not(#receiptPrint),.no-print{display:none!important}body{visibility:visible!important;background:#fff;color:#111}main{margin:0;padding:0}#receiptPrint:not([hidden]){display:block!important;box-shadow:none;border-radius:0}@page{size:A4;margin:15mm}}
@@ -105,6 +111,14 @@ main{padding:7px 10px 16px!important}
     <p id="liveCheckoutStatus" class="note" role="status">Checking secure payment availability…</p>
   </div>
   <p class="note service-note">Business plans, business profiles and other professional services are quoted and paid separately through Business Support.</p>
+</section>
+<section class="panel" id="eftMembership" aria-label="Direct EFT payment information">
+  <h2>Direct EFT — bank transfer</h2>
+  <p class="note"><strong>Optional manual payment.</strong> Use direct bank EFT for your R199 monthly membership or a separately approved business-service quotation.</p>
+  <p class="eft-beneficiary"><strong>Account beneficiary:</strong> Mzanian 102 (Pty) Ltd</p>
+  <p class="note">Bank name, account number, branch code and your payment reference will be provided by official MzanConnect support after verification. Do not transfer funds to unconfirmed banking details.</p>
+  <a class="button eft-action" href="https://wa.me/27732754385?text=Good%20day%20MzanConnect.%20Please%20provide%20verified%20direct%20EFT%20banking%20instructions%20for%20Mzanian%20102%20(Pty)%20Ltd.%20I%20want%20to%20pay%20my%20R199%20monthly%20membership%20or%20a%20separately%20quoted%20business%20service.%20Please%20confirm%20the%20correct%20reference%20and%20how%20payment%20will%20be%20verified." target="_blank" rel="noopener noreferrer">Request verified EFT instructions on WhatsApp</a>
+  <p class="note"><strong>Important:</strong> Direct EFT is not an automatic subscription. Your membership is only activated or renewed once the payment is confirmed in the business bank account. A proof-of-payment screenshot alone does not establish payment. Never share your banking password, PIN or OTP.</p>
 </section>
 <details class="panel receipts-panel" id="paymentRecordsPanel" hidden>
   <summary>My verified payment receipts</summary>
