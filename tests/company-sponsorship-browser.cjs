@@ -68,6 +68,7 @@ async function scene(browser,role){
   await page.close();return;
  }
  await page.locator('body').waitFor({state:'visible'});
+ if((await page.locator('#fundingSelf').count())!==1)throw Error('Funding controls missing for '+role+'; url='+page.url()+'; errors='+errors.join('; ')+'; body='+(await page.locator('body').innerText()).slice(0,450));
  assert.equal(await page.locator('#fundingSelf').isChecked(),true);
  assert.equal(await page.locator('#fundingCompany').count(),1);
  await page.locator('#fundingCompany').check();
