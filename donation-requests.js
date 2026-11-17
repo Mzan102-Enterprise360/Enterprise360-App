@@ -91,7 +91,6 @@ function ownerView(){
  const rows=ownerRecords.filter(r=>selected==='all'||
    (selected==='open'&&OPEN_STATES.has(r.status))||r.status===selected);
  const open=ownerRecords.filter(r=>OPEN_STATES.has(r.status)).length;
- $('donationOwnerPrint').disabled=ownerRecords.length===0;
  $('donationOwnerSummary').textContent=ownerRecords.length+' recent request'+(ownerRecords.length===1?'':'s')+
   ' · '+open+' awaiting action';
  container.replaceChildren();
@@ -159,12 +158,6 @@ async function loadOwnerInbox(){
 }
 $('donationOwnerFilter').addEventListener('change',()=>{if(owner)ownerView()});
 $('donationOwnerRefresh').addEventListener('click',()=>void loadOwnerInbox());
-$('donationOwnerPrint').addEventListener('click',()=>{
- if(!owner||!ownerRecords.length)return;
- document.body.classList.add('print-donation-report');
- window.print();
-});
-window.addEventListener('afterprint',()=>document.body.classList.remove('print-donation-report'));
 
 $('donationRefresh').addEventListener('click',()=>void loadHistory());
 $('donationForm').addEventListener('submit',async event=>{
