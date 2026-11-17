@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - 'billing.html'
+      - 'company-sponsorship.js'
       - 'support.html'
       - 'bookkeeping.html'
       - 'dashboard.html'
@@ -28,6 +29,7 @@ on:
   pull_request:
     paths:
       - 'billing.html'
+      - 'company-sponsorship.js'
       - 'support.html'
       - 'bookkeeping.html'
       - 'dashboard.html'
@@ -66,6 +68,8 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Test billing navigation and access
         run: node tests/billing-browser.cjs
+      - name: Test self-funded and company-funded memberships
+        run: node tests/company-sponsorship-browser.cjs
       - name: Test donation request journeys
         run: node tests/donation-browser.cjs
       - name: Test consolidated donation report and printing

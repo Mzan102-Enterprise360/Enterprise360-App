@@ -85,6 +85,33 @@ main{padding:7px 10px 16px!important}
 .plans li span,.plans li strong{font-size:14px!important;line-height:1.2!important;white-space:nowrap}
 .status{font-size:14px!important;padding:5px 9px!important}
 }
+/* Self-funded or verified company sponsorship selection */
+.membership-route-title{font-size:16px;margin:15px 0 8px}
+.membership-route-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.membership-route-choice{display:flex;gap:9px;align-items:flex-start;border:2px solid #cbdfe2;border-radius:12px;padding:11px;cursor:pointer;background:#f9fcfc;min-width:0}
+.membership-route-choice:has(input:checked){border-color:#116a71;background:#e8f7f3}
+.membership-route-choice input{flex:0 0 auto;width:19px;height:19px;margin:2px 0;accent-color:#116a71}
+.membership-route-choice strong{display:block;color:#14283b;font-size:14px;line-height:1.3}
+.membership-route-choice small{display:block;font-size:12px;margin:4px 0}
+#sponsorMembership .sponsor-form{display:grid;gap:9px}
+#sponsorMembership .sponsor-form[hidden]{display:none!important}
+#sponsorMembership label{display:block;font-weight:700;font-size:13px}
+#sponsorMembership input:not([type=checkbox]),#sponsorMembership select,#sponsorMembership textarea{width:100%;font:inherit;min-height:44px;margin:5px 0 0;padding:10px;border:1px solid #b9ced1;border-radius:9px;background:#fff;color:#14283b}
+#sponsorMembership textarea{resize:vertical;min-height:75px}
+#sponsorMembership .sponsor-consent{display:flex;gap:8px;align-items:flex-start;font-size:13px;line-height:1.4}
+#sponsorMembership .sponsor-consent input{margin-top:3px;accent-color:#147b59}
+#sponsorMembership button,#ownerSponsorInbox button{font:700 13px Arial,sans-serif;min-height:44px;padding:10px 13px;background:#116a71;color:white;border:0;border-radius:10px;cursor:pointer}
+#sponsorMembership button:disabled,#ownerSponsorInbox button:disabled{opacity:.55}
+.sponsor-entry{padding:10px 0;border-bottom:1px solid #dce9e9;overflow-wrap:anywhere}
+.sponsor-entry strong{display:block}
+.sponsor-entry small{font-size:12px}
+.sponsor-entry p{font-size:13px;margin:5px 0}
+.sponsor-entry .status-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.sponsor-entry .status-actions button{min-height:36px;font-size:12px;padding:7px 9px;background:#edf4f4;color:#14283b;border:1px solid #b7d2ce}
+.sponsor-entry .status-actions button[aria-pressed=true]{background:#116a71;color:#fff}
+.sponsor-hint{font-size:13px;color:#465f6a;line-height:1.5}
+#companyFundingMessage{font-size:13px;margin:10px 0}
+@media(max-width:390px){.membership-route-choices{grid-template-columns:1fr}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 </head>
@@ -99,12 +126,69 @@ main{padding:7px 10px 16px!important}
   <p class="note">Access Explore, My Business, Compliance, Bookkeeping, Growth Passport, printing and Member Support.</p>
   <p id="status" role="status">Checking your membership…</p>
   <p id="explanation" class="note"></p>
+  <section id="membershipFundingChoice" aria-label="Choose how membership is funded">
+    <h3 class="membership-route-title">Choose your subscription option</h3>
+    <div class="membership-route-choices" role="radiogroup" aria-label="Membership funding option">
+      <label class="membership-route-choice">
+        <input type="radio" name="membershipFunding" id="fundingSelf" value="self" checked>
+        <span><strong>Self-Funded Subscription</strong><small>I pay R199 for my own monthly membership.</small></span>
+      </label>
+      <label class="membership-route-choice">
+        <input type="radio" name="membershipFunding" id="fundingCompany" value="company">
+        <span><strong>Company-Funded Subscription</strong><small>Request a company or organisation to sponsor my membership.</small></span>
+      </label>
+    </div>
+    <p id="companyFundingMessage" role="status" aria-live="polite">Self-funded monthly membership is selected.</p>
+  </section>
   <div id="liveMembership">
     <input type="hidden" id="livePlan" value="starter">
     <button id="startLiveCheckout" type="button" disabled>Pay R199 securely with Yoco</button>
     <p id="liveCheckoutStatus" class="note" role="status">Checking secure payment availability…</p>
   </div>
+  <section id="sponsorMembership" hidden aria-label="Company funded membership application">
+    <h3>Request Company-Funded Membership</h3>
+    <p class="sponsor-hint">A company may agree to sponsor your R199 monthly subscription. This application is an enquiry only. No company is charged, and no membership is activated until sponsorship is independently verified and arranged.</p>
+    <form id="sponsorForm" class="sponsor-form">
+      <label for="sponsorCompany">Sponsoring Company / Organisation Name
+        <input id="sponsorCompany" name="sponsorCompany" required maxlength="160" placeholder="Company or organisation name">
+      </label>
+      <label for="sponsorContactName">Company Contact Person (optional)
+        <input id="sponsorContactName" name="sponsorContactName" maxlength="120" placeholder="Contact person's name">
+      </label>
+      <label for="sponsorEmail">Company Contact Email (optional)
+        <input id="sponsorEmail" type="email" name="sponsorEmail" maxlength="160" placeholder="contact@company.co.za">
+      </label>
+      <label for="sponsorPhone">Company Contact Telephone (optional)
+        <input id="sponsorPhone" type="tel" name="sponsorPhone" maxlength="40" placeholder="Business contact number">
+      </label>
+      <label for="sponsorMonths">Months of Sponsorship Requested
+        <select id="sponsorMonths" name="sponsorMonths">
+          <option value="1">1 month</option>
+          <option value="3">3 months</option>
+          <option value="6">6 months</option>
+          <option value="12">12 months</option>
+        </select>
+      </label>
+      <label for="sponsorNote">Reason / Sponsorship Programme (optional)
+        <textarea id="sponsorNote" name="sponsorNote" maxlength="650" rows="3" placeholder="For example: corporate enterprise development programme"></textarea>
+      </label>
+      <label class="sponsor-consent" for="sponsorConsent">
+        <input id="sponsorConsent" type="checkbox" required>
+        <span>I confirm that I am requesting sponsorship, not claiming approval. MzanConnect may review this application and contact the company regarding this enquiry. No payment or membership entitlement is created by submitting.</span>
+      </label>
+      <button type="submit" id="sponsorSubmit">Submit Sponsorship Request</button>
+    </form>
+    <p id="sponsorFormStatus" class="sponsor-hint" role="status" aria-live="polite"></p>
+    <div id="sponsorMyRequests" aria-live="polite"></div>
+  </section>
   <p class="note service-note">Business plans, business profiles and other professional services are quoted and paid separately through Business Support.</p>
+</section>
+<section class="panel" id="ownerSponsorInbox" hidden>
+  <h2>Owner — Company Sponsorship Requests</h2>
+  <p class="sponsor-hint">Review member enquiries and record the outcome. Status changes here never activate a membership or charge a company. Sponsorship and payment must be confirmed separately.</p>
+  <button type="button" id="sponsorOwnerRefresh">Refresh Sponsorship Requests</button>
+  <p id="sponsorOwnerStatus" role="status" aria-live="polite">Loading sponsorship requests…</p>
+  <div id="sponsorOwnerRequests" aria-live="polite"></div>
 </section>
 <details class="panel receipts-panel" id="paymentRecordsPanel" hidden>
   <summary>My verified payment receipts</summary>
@@ -119,6 +203,7 @@ main{padding:7px 10px 16px!important}
   <button class="no-print" id="closeReceipt" type="button">Close receipt</button>
 </section>
 </main>
+<script src="company-sponsorship.js?v=1"></script>
 <script>
 (async function(){
   try{
@@ -193,6 +278,19 @@ main{padding:7px 10px 16px!important}
           location.assign(target.href);
         }catch(e){liveStatus.textContent=e.message||"Checkout unavailable.";liveButton.disabled=false;livePlan.disabled=false;}
       });
+    }
+
+    try{
+      await window.MzanCompanySponsorship.mount({
+        client,
+        user:data.user,
+        owner:isOwner,
+        checkoutAvailable:!isOwner&&!isFoundingPilot&&!activeMembership&&foundingStatusAvailable
+      });
+    }catch(sponsorshipError){
+      const message=document.getElementById('companyFundingMessage');
+      message.textContent='Sponsorship requests are temporarily unavailable. Self-payment remains unchanged.';
+      console.warn('Sponsorship service error:',sponsorshipError?.message);
     }
 
     const history = document.getElementById("paymentHistory");

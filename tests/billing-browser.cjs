@@ -163,7 +163,9 @@ async function main(){
         await page.locator('body').waitFor({state:'visible'});
         assert.match(await page.locator('#status').innerText(),owner?/Owner membership/:active?/Founding member/:/Monthly membership/);
         assert.match(await page.locator('main').innerText(),/One payment covers one month/);
-        assert.equal(await page.locator('form').count(),0);
+        assert.equal(await page.locator('form').count(),1,'Sponsored-membership enquiry form exists and does not replace Yoco');
+        assert.equal(await page.locator('#fundingSelf').isChecked(),true);
+        assert.equal(await page.locator('#fundingCompany').count(),1);
         assert.equal(await page.locator('#liveMembership').isVisible(),!owner&&!active);
         await page.getByRole('link',{name:/Back to dashboard/}).click();
         await page.waitForURL('**/dashboard.html');

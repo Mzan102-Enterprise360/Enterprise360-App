@@ -30,7 +30,7 @@ jobs:
                   if tag == 'script': self.inside = False
               def handle_data(self, data):
                   if self.inside: self.scripts[-1] += data
-          for name in ('index.html','login.html','register.html','dashboard.html','member.html','business-report.html','owner-security.html'):
+          for name in ('index.html','login.html','register.html','dashboard.html','member.html','business-report.html','billing.html','owner-security.html'):
               parser = Scripts()
               parser.feed(Path(name).read_text(encoding='utf-8'))
               for i, script in enumerate(parser.scripts):
@@ -45,6 +45,7 @@ jobs:
         run: |
           node --check donation-requests.js
           node --check growth-passport-status.js
+          node --check company-sponsorship.js
           node --check business-profile-options.js
           node --check business-profile-bootstrap.js
           node --check donation-report.js
