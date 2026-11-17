@@ -202,7 +202,7 @@ if(section==='growth'){
 if(!checklist){
 try{await window.MzanBusinessProfileBootstrap.ensure(db,user);}catch(error){console.warn('First-time profile could not be restored:',error.message);}
 const {data,error:readError}=await db.from('business_profiles')
- .select('business_name,registered_name,registration_number,contact_name,contact_phone,contact_email,sector,province,district,municipality')
+ .select('business_name,registered_name,registration_number,contact_name,contact_phone,contact_email,sector,province,district,municipality,region,description')
  .eq('user_id',user.id).maybeSingle();
 if(readError)throw readError;
 for(const [field,id] of [
@@ -231,9 +231,11 @@ profileForm.addEventListener('submit',async event=>{
    contact_name:document.getElementById('contact').value.trim(),
    contact_phone:document.getElementById('contactPhone').value.trim(),
    contact_email:document.getElementById('contactEmail').value.trim(),
-   sector:opts.sector,province:opts.province,district:opts.district,municipality:opts.municipality
+   sector:opts.sector,province:opts.province,district:opts.district,municipality:opts.municipality,
+   // Explicitly preserve the older Region and Description on upsert.
+   region:data?.region||'',description:data?.description||''
   };
-  // Legacy region and description are intentionally omitted to preserve older records.
+  // Historical Region and Description are copied back unchanged for safe upserts.
   const {error}=await db.from('business_profiles').upsert(values,{onConflict:'user_id'});
   if(error)throw error;
   showMessage('Business profile saved successfully. Updated details will appear on your dashboard and printed reports.');
