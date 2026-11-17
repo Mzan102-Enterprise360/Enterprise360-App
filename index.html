@@ -388,13 +388,25 @@ body:has(.welcome-cover) .home-disclaimer-detail{display:block;font-size:clamp(1
 </nav>
 <dialog id="mzanSurveyDialog" aria-labelledby="mzanSurveyHeading" aria-describedby="mzanSurveyText">
 <div class="mzan-survey-invite">
-<div class="eyebrow">Help shape local business support</div>
-<h2 id="mzanSurveyHeading">Your business experience matters.</h2>
-<p id="mzanSurveyText">Are you a small-business owner or aspiring entrepreneur in Kathu or Gamagara? Help us understand business challenges and equipment utilisation.</p>
-<p><strong>Free, independent, voluntary survey • 5–7 minutes</strong></p>
+<div class="eyebrow">One Connection. Endless Possibilities.</div>
+<h2 id="mzanSurveyHeading">Let's grow your business.</h2>
+<p id="mzanSurveyText">New to MzanConnect? Answer two optional questions to find your next step.</p>
+<button type="button" id="mzanWelcomeListen">▶ Listen</button>
+<button type="button" id="mzanWelcomeStop">■ Stop</button>
+<div style="text-align:left;margin-top:12px">
+<label for="mzanBusinessStage">1. Do you have a business?</label>
+<select id="mzanBusinessStage"><option value="">Choose an answer (optional)</option><option value="starting">I want to start one</option><option value="running">Yes, I run a business</option><option value="browsing">I'm just exploring</option></select>
+<label for="mzanBusinessNeed">2. What help do you need most?</label>
+<select id="mzanBusinessNeed"><option value="">Choose an answer (optional)</option><option value="opportunities">Finding business opportunities</option><option value="documents">Registration and business documents</option><option value="records">Compliance and bookkeeping</option></select>
+</div>
+<p id="mzanWelcomeAdvice" role="status">Join MzanConnect to take your next business step.</p>
+<a class="mzan-survey-start" id="mzanWelcomeJoin" href="register.html">Join MzanConnect</a>
+<p><small>Membership: R199 per month. Services are charged separately. Joining here opens registration; it does not charge you.</small></p>
 <a class="mzan-survey-start" id="mzanSurveyStart" href="survey.html">Take the free SMME survey</a>
-<button id="mzanSurveySkip" type="button">Not now — Continue to MzanConnect</button>
-<small>The survey is not paid membership. You can still use Join MzanConnect or Member Login.</small>
+<small>Help us assess business needs and sustainability. The survey is voluntary, takes 5–7 minutes and does not require paid membership.</small>
+<p><a href="login.html">Already a member? Log in</a></p>
+<button id="mzanSurveySkip" type="button">Not now — Continue browsing</button>
+<small>Your two welcome answers are only used on this screen and are not submitted.</small>
 </div></dialog>
 
 <script>
@@ -682,29 +694,38 @@ navigator.serviceWorker.register('./sw.js').catch(()=>{});
 </script>
 
 <script>
-/* First homepage opening: invite without forcing a redirect or interrupting members. */
+/* Optional welcome prompt. Choices stay in memory; dismissal is remembered on this browser. */
 (function(){
   const dialog=document.getElementById('mzanSurveyDialog');
   if(!dialog||typeof dialog.showModal!=='function')return;
+  const stage=document.getElementById('mzanBusinessStage');
+  const need=document.getElementById('mzanBusinessNeed');
+  const advice=document.getElementById('mzanWelcomeAdvice');
+  function recommend(){
+    const intro=stage.value==='starting'?'Start your business journey with MzanConnect. ':stage.value==='running'?'Build on the business you have started. ':'Explore what MzanConnect can offer. ';
+    const tips={opportunities:'Join to organise your business readiness, and use Explore to find opportunity sources.',documents:'Join to request assistance with registration, business plans or profiles. Services are quoted separately.',records:'Join to organise your compliance checklist and bookkeeping records.'};
+    advice.textContent=intro+(tips[need.value]||'Join when you are ready, or take the free survey to share your needs.');
+  }
+  stage.addEventListener('change',recommend);need.addEventListener('change',recommend);
+  function remember(){try{localStorage.setItem('mzan-welcome-seen-v1','1')}catch(e){}}
+  function stopVoice(){document.dispatchEvent(new Event('mzan-stop-guidance'));}
+  document.getElementById('mzanWelcomeListen').addEventListener('click',()=>document.dispatchEvent(new Event('mzan-listen-guidance')));
+  document.getElementById('mzanWelcomeStop').addEventListener('click',stopVoice);
+  document.getElementById('mzanSurveySkip').addEventListener('click',()=>{remember();dialog.close();});
+  dialog.addEventListener('cancel',remember);
+  dialog.addEventListener('close',stopVoice);
+  dialog.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>{remember();stopVoice();}));
   if(location.hash&&location.hash!=='#home')return;
   try{
+    if(localStorage.getItem('mzan-welcome-seen-v1')==='1')return;
     if(localStorage.getItem('mzan-smme-survey-submitted-v2')==='1')return;
-    if(Number(localStorage.getItem('mzan-smme-survey-dismissed-until')||0)>Date.now())return;
-    if(sessionStorage.getItem('mzan-smme-survey-invite-seen')==='1')return;
-    sessionStorage.setItem('mzan-smme-survey-invite-seen','1');
-  }catch(e){/* Browser storage restrictions must not prevent access. */}
-  function dismissed(){
-    try{localStorage.setItem('mzan-smme-survey-dismissed-until',String(Date.now()+30*24*60*60*1000))}catch(e){}
-  }
-  document.getElementById('mzanSurveySkip').addEventListener('click',()=>{dismissed();dialog.close()});
-  dialog.addEventListener('cancel',dismissed);
-  document.getElementById('mzanSurveyStart').addEventListener('click',()=>{
-    try{sessionStorage.setItem('mzan-smme-survey-invite-seen','1')}catch(e){}
-  });
-  try{dialog.showModal()}catch(e){/* No invitation if the browser does not support dialogs. */}
+    if(sessionStorage.getItem('mzan-welcome-shown-v1')==='1')return;
+    sessionStorage.setItem('mzan-welcome-shown-v1','1');
+  }catch(e){/* Storage restrictions must not prevent browsing. */}
+  try{dialog.showModal()}catch(e){}
 })();
 </script>
 <!-- Member access buttons appear only on the Home view. -->
-<script defer src="legal-notices.js?v=4"></script><script defer src="voice-accessibility.js?v=13"></script><script defer src="app-shell.js?v=4"></script></body>
+<script defer src="legal-notices.js?v=4"></script><script defer src="voice-accessibility.js?v=14"></script><script defer src="app-shell.js?v=4"></script></body>
 </html>
 

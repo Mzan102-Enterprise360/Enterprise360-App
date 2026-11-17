@@ -82,6 +82,8 @@ function preferredVoice(){
 function stop(){if(supported){synth.cancel();current=null;}pause.textContent='⏸ Pause';info.textContent='Stopped.';}
 function visible(el){if(el.closest('[hidden],[aria-hidden="true"],#mzan-voice-tools,form,[data-private],.receipt,[autocomplete="cc-number"]'))return false;const s=getComputedStyle(el);return s.display!=='none'&&s.visibility==='visible'&&el.getClientRects().length>0;}
 function textForPage(){
+ const welcome=document.getElementById('mzanSurveyDialog');
+ if(welcome?.open)return "New to MzanConnect? Let's find your next business step. Question one: do you have a business? Choose I want to start one, yes I run a business, or I am just exploring. Question two: what help do you need most? Choose finding business opportunities, registration and business documents, or compliance and bookkeeping. "+(document.getElementById('mzanWelcomeAdvice')?.textContent||'')+" Select Join MzanConnect to open registration. Membership is one hundred and ninety rand per month, with services charged separately. Opening registration does not charge you. You can also take the free SMME survey to help us assess business needs and sustainability. The survey is voluntary, takes five to seven minutes, and does not require paid membership. Already a member? Select Log in. Choose Not now to continue browsing. Your two welcome answers are not submitted.";
  const page=location.pathname.split('/').pop()||'index.html';
  const shown=id=>{const el=document.getElementById(id);return !!(el&&!el.closest('[hidden]')&&getComputedStyle(el).display!=='none');};
  if(page==='index.html'){
@@ -92,7 +94,7 @@ function textForPage(){
    return 'You are exploring business funding, tenders, and supplier opportunities. Begin with a keyword or choose a category'+(selected&&selected!=='All Categories'?', currently '+selected.toLowerCase():'')+'. Review the sources shown, then open the relevant official website to confirm requirements and deadlines. For hands-on assistance, select Business Support below.';
   }
   if(view?.querySelector('.welcome-cover')){
-   return 'MzanConnect brings business opportunities and practical support together. If this is your first visit, choose Join MzanConnect to create your account. Already a member? Choose Member Login. You can also use Explore to find opportunities, or Business Support to request help with your business.';
+   return 'MzanConnect brings business opportunities and practical support together. If this is your first visit, choose Join MzanConnect to create your account. Already a member? Choose Member Login. Please also select Take the free SMME survey on this home page. It helps us assess business needs and sustainability, including equipment use. It is voluntary, takes five to seven minutes, and does not require paid membership. You can also use Explore to find opportunities, or Business Support to request help with your business.';
   }
   if(view?.querySelector('#business')){
    return 'This is a local business profile preview. Enter your business name and sector, then save the demo information on this device. To manage your registered business details securely, open My Business from your member dashboard.';
@@ -107,6 +109,9 @@ function textForPage(){
    return 'This is a preview of business growth milestones. Review the suggested steps, then open Growth Passport through your dashboard to save your progress to your account.';
   }
   return 'Use the available options to explore the business tools on this page. Your dashboard contains your personal business information and member support.';
+ }
+ if(page==='survey.html'){
+  return 'This is the free MzanConnect SMME Readiness and Equipment Utilisation Survey. Your answers help us understand business needs and sustainability. Read the introduction and privacy information, then answer the eleven questions about your business, equipment and support needs. At the end, choose whether you would like us to contact you. Contact details are only needed if you request follow-up. Review the consent statement and select Submit survey when ready. Participation is voluntary and does not create a paid membership.';
  }
  if(page==='business-support.html'){
   if(shown('serviceRequestPanel')){
@@ -171,6 +176,8 @@ function textForPage(){
  return 'You are viewing '+heading+'. Review the information on screen, then choose the action you need. Use the navigation below to move to another section.';
 }
 function speak(){pause.textContent='⏸ Pause';if(!supported){info.textContent='Voice reading is not available. Try Android TalkBack in Accessibility settings.';return;}if(getComputedStyle(document.body).visibility==='hidden'){info.textContent='Please wait for the page to load.';return;}synth.cancel();const u=new SpeechSynthesisUtterance(textForPage());const voice=preferredVoice();if(voice){u.voice=voice;u.lang=voice.lang;}else{u.lang='en-ZA';}u.rate=.83;u.pitch=1.02;u.volume=1;u.onend=()=>{if(current===u){info.textContent='Finished reading.';current=null;}};u.onerror=()=>{if(current===u){info.textContent='Unable to read aloud. Try your phone screen reader.';current=null;}};current=u;synth.speak(u);info.textContent='Speaking guidance for this section.';}
+document.addEventListener('mzan-listen-guidance',speak);
+document.addEventListener('mzan-stop-guidance',stop);
 const listen=button('▶ Listen',speak);
 const pause=button('⏸ Pause',()=>{if(!supported)return;if(synth.paused){synth.resume();pause.textContent='⏸ Pause';info.textContent='Reading resumed.';}else if(synth.speaking){synth.pause();pause.textContent='▶ Resume';info.textContent='Paused.';}});
 button('■ Stop',stop);
