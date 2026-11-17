@@ -35,7 +35,7 @@ header p:not(.header-brand){margin:0;color:#dce8eb;line-height:1.45;font-size:15
 <section class="card"><h2>Growth Passport</h2><p id="growthSummary"></p><ul id="growth"></ul></section>
 <section class="card"><h2>Financial Summary</h2><p id="financialPeriod"></p><dl><dt>Total income / turnover</dt><dd id="income">—</dd><dt>Total expenses</dt><dd id="expenses">—</dd><dt>Net profit / loss</dt><dd id="profit">—</dd><dt>VAT</dt><dd>Not separately recorded in the current bookkeeping system</dd></dl><p class="muted">Figures reflect saved bookkeeping transactions for the stated period only. No individual transaction records are included. This is not an audited financial statement or tax return.</p></section>
 </main>
-<script src="growth-passport-status.js?v=1"></script>
+<script src="business-profile-bootstrap.js?v=1"></script><script src="growth-passport-status.js?v=1"></script>
 <script>
 (async()=>{
 const $=id=>document.getElementById(id);
@@ -70,6 +70,7 @@ const db=window.supabase.createClient('https://akxzubckdebawqwwwaoe.supabase.co'
 const {data:{user},error:authError}=await db.auth.getUser();
 if(authError||!user){location.replace('login.html');return}
 document.body.style.visibility='visible';
+try{await window.MzanBusinessProfileBootstrap.ensure(db,user);}catch(error){console.warn('First-time profile could not be restored:',error.message);}
 const [p,c,records,growth]=await Promise.all([
 db.from('business_profiles')
  .select('business_name,registered_name,registration_number,contact_name,contact_phone,contact_email,sector,province,district,municipality')
