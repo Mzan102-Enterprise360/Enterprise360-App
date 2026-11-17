@@ -8,6 +8,10 @@ on:
       - 'member.html'
       - 'bookkeeping.html'
       - 'dashboard.html'
+      - 'donations.html'
+      - 'donation-requests.js'
+      - 'business-service-requests.js'
+      - 'business-support.html'
       - 'register.html'
       - 'login.html'
       - 'owner-security.html'
@@ -21,6 +25,10 @@ on:
       - 'member.html'
       - 'bookkeeping.html'
       - 'dashboard.html'
+      - 'donations.html'
+      - 'donation-requests.js'
+      - 'business-service-requests.js'
+      - 'business-support.html'
       - 'register.html'
       - 'login.html'
       - 'owner-security.html'
@@ -44,3 +52,5 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Test billing navigation and access
         run: node tests/billing-browser.cjs
+      - name: Test donation request journeys
+        run: node tests/donation-browser.cjs

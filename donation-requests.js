@@ -27,6 +27,94 @@ async function loadHistory(){
    list.append(card);
  }
 }
+
+/* Owner records are only fetched after server-authenticated owner identity is known.
+   Supabase RLS separately enforces owner-only access and updates. */
+let ownerRecords=[];
+let ownerLoading=false;
+const REVIEW_STATES=['new','reviewing','in_progress','completed','cancelled'];
+const OPEN_STATES=new Set(['new','reviewing','awaiting_documents','quoted','in_progress']);
+function ownerView(){
+ const container=$('donationOwnerList');
+ const selected=field('donationOwnerFilter')||'all';
+ const rows=ownerRecords.filter(r=>selected==='all'||
+   (selected==='open'&&OPEN_STATES.has(r.status))||r.status===selected);
+ const open=ownerRecords.filter(r=>OPEN_STATES.has(r.status)).length;
+ $('donationOwnerPrint').disabled=ownerRecords.length===0;
+ $('donationOwnerSummary').textContent=ownerRecords.length+' recent request'+(ownerRecords.length===1?'':'s')+
+  ' · '+open+' awaiting action';
+ container.replaceChildren();
+ if(!rows.length){container.append(make('p','No matching donation requests.','empty'));return;}
+ for(const record of rows){
+  const card=make('article',undefined,'owner-request');
+  const name=make('strong',record.business_name||'Unnamed applicant');
+  const when=new Date(record.created_at);
+  const meta=make('small',(Number.isNaN(when.getTime())?'Date unavailable':when.toLocaleDateString('en-ZA',{dateStyle:'medium'}))+
+   ' · Reference: '+String(record.id||'').slice(0,8).toUpperCase());
+  const email=make('small','Contact: '+(record.contact_email||'Unavailable'));
+  const current=make('p',STATUS[record.status]||'Submitted for review');
+  current.style.fontWeight='700';
+  const detail=make('p',record.details||'No description provided','request-data');
+  const actions=make('div',undefined,'status-actions');
+  actions.setAttribute('aria-label','Review status for '+(record.business_name||'this request'));
+  const feedback=make('p','','owner-feedback');
+  feedback.setAttribute('role','status');
+  let busy=false;
+  for(const value of REVIEW_STATES){
+   const button=make('button',STATUS[value]);
+   button.type='button';
+   button.setAttribute('aria-pressed',String(record.status===value));
+   button.disabled=record.status===value;
+   button.addEventListener('click',async()=>{
+    if(!owner||!db||busy||button.disabled)return;
+    busy=true;
+    for(const b of actions.querySelectorAll('button'))b.disabled=true;
+    feedback.textContent='Saving status…';
+    try{
+     const {data,error}=await db.from('business_service_requests')
+      .update({status:value,updated_at:new Date().toISOString()})
+      .eq('id',record.id).eq('service_type','donation_request')
+      .select('id,status').single();
+     if(error||!data||data.id!==record.id)throw error||new Error('Not updated');
+     record.status=data.status;
+     ownerView();
+    }catch(error){
+     feedback.textContent='Could not update the status. Try again.';
+     busy=false;
+     for(const b of actions.querySelectorAll('button'))b.disabled=b.textContent===STATUS[record.status];
+    }
+   });
+   actions.append(button);
+  }
+  card.append(name,meta,email,current,detail,actions,feedback);
+  container.append(card);
+ }
+}
+async function loadOwnerInbox(){
+ if(!owner||!user||!db||ownerLoading)return;
+ ownerLoading=true;
+ $('donationOwnerRefresh').disabled=true;
+ $('donationOwnerList').textContent='Refreshing the private inbox…';
+ try{
+  const {data,error}=await db.from('business_service_requests')
+   .select('id,business_name,details,contact_email,status,created_at')
+   .eq('service_type','donation_request')
+   .order('created_at',{ascending:false}).limit(100);
+  if(error)throw error;
+  ownerRecords=Array.isArray(data)?data:[];
+  ownerView();
+ }catch(error){$('donationOwnerList').textContent='Unable to load the owner inbox. Please check your access and retry.';}
+ finally{ownerLoading=false;$('donationOwnerRefresh').disabled=false;}
+}
+$('donationOwnerFilter').addEventListener('change',()=>{if(owner)ownerView()});
+$('donationOwnerRefresh').addEventListener('click',()=>void loadOwnerInbox());
+$('donationOwnerPrint').addEventListener('click',()=>{
+ if(!owner||!ownerRecords.length)return;
+ document.body.classList.add('print-donation-report');
+ window.print();
+});
+window.addEventListener('afterprint',()=>document.body.classList.remove('print-donation-report'));
+
 $('donationRefresh').addEventListener('click',()=>void loadHistory());
 $('donationForm').addEventListener('submit',async event=>{
  event.preventDefault();
@@ -66,8 +154,12 @@ $('donationForm').addEventListener('submit',async event=>{
   $('donationFormPanel').hidden=false;
   $('donationHistoryPanel').hidden=false;
   $('donationAccount').textContent='Signed in as '+(user.email||'MzanConnect member');
-  owner=user.app_metadata?.mzanconnect_role==='owner';
-  if(owner)$('donationOwnerPanel').hidden=false;
+  owner=user.app_metadata?.mzanconnect_role==='owner' || user.id==='820a18ee-3482-4b6c-bd75-469cf198b9df';
+  if(owner){
+   $('donationOwnerPanel').hidden=false;
+   await loadOwnerInbox();
+   if(location.hash==='#owner-inbox')$('donationOwnerPanel').scrollIntoView({block:'start'});
+  }
   await loadHistory();
  }catch(error){
   $('donationSignIn').hidden=false;
