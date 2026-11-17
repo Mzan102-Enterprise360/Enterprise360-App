@@ -63,6 +63,14 @@ input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-vis
  body.print-donation-report header p,body.print-donation-report header small{color:#222!important}
 }
 
+.history-status-filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0 14px}
+.history-status-filters button{min-height:48px;min-width:0;padding:9px 7px;background:#eaf4f3;color:#14283b;border:1px solid #bedbd7;border-radius:10px;display:flex;flex-direction:column;gap:1px}
+.history-status-filters button[aria-pressed="true"]{background:#116a71;color:#fff;border-color:#116a71}
+.history-status-filters button span{font-size:12px;font-weight:600;opacity:.9}
+.history-stages{display:flex;align-items:center;justify-content:space-between;gap:4px;margin:9px 0;flex-wrap:wrap}
+.history-stages span{padding:5px 7px;flex:1 1 80px;text-align:center;background:#f0f4f5;color:#4c626e;border:1px solid #d4e0e3;border-radius:8px;font-size:12px;font-weight:700}
+.history-stages span.is-done{background:#e4f4ee;color:#0c6657;border-color:#b5dacf}
+.history-stages span.is-current{background:#116a71;color:#fff;border-color:#116a71}
 .request{padding:12px 0;border-top:1px solid #dbe7e7;overflow-wrap:anywhere}
 .request strong{color:#0d5961}
 .request p{white-space:pre-wrap;overflow-wrap:anywhere;color:#38525d;font-size:13px}
@@ -133,8 +141,14 @@ input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-vis
 </section>
 <section id="donationHistoryPanel" class="card" hidden>
 <h2>My Donation Requests</h2>
-<p class="small">Submitted → In progress → Review completed. A completed review does not mean a donation was awarded.</p>
+<p class="small">Tap a status button to see requests at that stage. Only the owner can change a request's status. Review completed does not mean a donation was awarded.</p>
 <p id="donationAccount" class="small"></p>
+<div id="donationHistoryFilters" class="history-status-filters" role="group" aria-label="Filter my donation requests by status">
+<button type="button" data-donation-stage="all" aria-pressed="true">All requests <span id="donationCountAll">0</span></button>
+<button type="button" data-donation-stage="submitted" aria-pressed="false">Submitted <span id="donationCountSubmitted">0</span></button>
+<button type="button" data-donation-stage="in_progress" aria-pressed="false">In progress <span id="donationCountProgress">0</span></button>
+<button type="button" data-donation-stage="completed" aria-pressed="false">Review completed <span id="donationCountCompleted">0</span></button>
+</div>
 <div id="donationHistory" aria-live="polite">Loading your requests…</div>
 <div class="actions"><button id="donationRefresh" type="button" class="secondary">Refresh status</button></div>
 </section>
@@ -164,7 +178,7 @@ input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-vis
 <a class="button-link secondary" href="./business-support.html">Explore Business Support</a>
 </section>
 </main>
-<script defer src="./donation-requests.js?v=1"></script>
+<script defer src="./donation-requests.js?v=2"></script>
 <script defer src="./legal-notices.js?v=1"></script>
 <script defer src="./voice-accessibility.js?v=13"></script>
 <script defer src="./app-shell.js?v=4"></script>

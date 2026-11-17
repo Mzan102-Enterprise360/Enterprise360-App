@@ -50,6 +50,18 @@ async function scenario(browser,role){
   await page.getByRole('button',{name:'Submit Donation Request'}).click();
   await page.locator('#donationHistory').getByText('Member Food Enterprise',{exact:false}).waitFor();
   assert.equal(await page.evaluate(()=>window.testDb.records.length),3);
+  assert.equal(await page.locator('#donationHistoryFilters button').count(),4,'Show status buttons even before requests');
+  assert.match(await page.locator('#donationCountSubmitted').innerText(),/2/);
+  await page.locator('[data-donation-stage="submitted"]').click();
+  assert.equal(await page.locator('#donationHistory article').count(),2);
+  assert.equal(await page.locator('[data-donation-stage="submitted"]').getAttribute('aria-pressed'),'true');
+  await page.locator('[data-donation-stage="in_progress"]').click();
+  await page.getByText('No requests at this stage yet.').waitFor();
+  assert.equal(await page.locator('[data-donation-stage="in_progress"]').getAttribute('aria-pressed'),'true');
+  await page.locator('[data-donation-stage="completed"]').click();
+  await page.getByText('No requests at this stage yet.').waitFor();
+  await page.locator('[data-donation-stage="all"]').click();
+  assert.equal(await page.locator('#donationHistory .history-stages span').count(),6,'Member requests have progress markers');
   const saved=await page.evaluate(()=>window.testDb.records.at(-1));
   assert.match(saved.details,/Estimated value: R15000/);
   assert.equal(saved.status,'new');
@@ -58,7 +70,7 @@ async function scenario(browser,role){
   await page.getByText('Kathu Catering Collective',{exact:true}).waitFor();
   assert.equal(await page.getByText('Paid business plan',{exact:false}).count(),0);
   assert.match(await page.locator('#donationOwnerSummary').innerText(),/1 awaiting action/);
-  await page.getByRole('button',{name:'Review completed'}).click();
+  await page.locator('#donationOwnerList').getByRole('button',{name:'Review completed'}).click();
   await page.getByText('0 awaiting action',{exact:false}).waitFor();
   const updated=await page.evaluate(()=>window.testDb.updates.at(-1));
   assert.equal(updated.status,'completed');
