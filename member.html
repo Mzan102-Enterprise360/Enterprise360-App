@@ -56,6 +56,22 @@ main{width:100%;max-width:650px;margin:0 auto;padding:10px 14px 20px}
 .compliance-file-list a{font-size:13px;font-weight:700}
 #compliancePanel .compliance-hint{font-size:13px;line-height:1.4;color:#526875;margin:6px 0 14px}
 @media(max-width:500px){.compliance-item{padding:11px}.compliance-item .compliance-check-label{font-size:15px}}
+
+/* Executive-ready live Growth Passport; no manually editable status checkboxes. */
+.growth-intro{font-size:14px;color:#4e6674;line-height:1.5}
+.growth-score{background:#eaf7f3;border:1px solid #c1e2d8;border-radius:12px;padding:14px;margin:13px 0}
+.growth-score strong{font-size:24px;color:#0d6166}
+.growth-score progress{width:100%;height:16px;accent-color:#147b59;display:block;margin-top:9px}
+.growth-card{border:1px solid #d7e6e6;border-radius:12px;background:#fcfefe;padding:13px;margin:12px 0}
+.growth-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.growth-card h3{font-size:17px;margin:0;line-height:1.3;flex:1 1 170px}
+.growth-state{font-size:12px;font-weight:800;border:1px solid #c3d6d8;background:#f0f5f5;border-radius:30px;padding:5px 9px}
+.growth-state.achieved{background:#e1f2ed;border-color:#acdbc7;color:#126248}
+.growth-card p{font-size:13px;line-height:1.5;color:#49616b;margin:10px 0}
+.growth-card a{display:inline-flex;text-decoration:none;background:#116a71;color:white;font-size:13px;font-weight:700;border-radius:9px;padding:10px 13px;min-height:41px;align-items:center}
+.growth-card a:focus-visible{outline:3px solid #e6af38;outline-offset:2px}
+.growth-disclaimer{font-size:12px;color:#52636e;background:#f5f8f8;border-left:3px solid #116a71;border-radius:5px;padding:10px;line-height:1.5}
+#growthRefresh{background:#14283b}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script></head>
 <body><header><p class="header-brand">◈ MzanConnect</p><h1 id="sectionTitle">My Business</h1><p id="sectionDescription">Manage and update your business profile.</p></header>
 <main><div class="dashboard-return"><a href="dashboard.html" aria-label="Back to dashboard">← Back to Dashboard</a></div><p id="message" role="status" aria-live="polite"></p>
@@ -69,10 +85,19 @@ main{width:100%;max-width:650px;margin:0 auto;padding:10px 14px 20px}
 <section class="card" id="compliancePanel" hidden><h2>My Compliance Checklist</h2>
 <p class="compliance-hint">Upload a document for each category (PDF, Word, JPG or PNG; up to 10 MB). Your checkbox ticks automatically after a successful upload and save. Documents are private to your account. This does not verify official compliance.</p>
 <form id="complianceForm"><div id="checks"></div><p><button type="submit">Save checklist</button></p></form></section>
-<section class="card" id="growthPanel" hidden><h2>Business Growth Passport</h2>
-<p>Track your business development milestones. Your progress is saved to your account.</p>
-<form id="growthForm"><div id="growthChecks"></div><p><button type="submit">Save milestones</button></p></form></section>
-</main><script>
+<section class="card" id="growthPanel" hidden>
+<h2>Business Growth Passport</h2>
+<p class="growth-intro">Five evidence-based readiness milestones, automatically updated from your MzanConnect records. Members cannot mark these milestones complete manually.</p>
+<div class="growth-score">
+<strong id="growthScoreText">Checking readiness…</strong>
+<progress id="growthProgress" max="5" value="0" aria-label="Readiness milestones achieved"></progress>
+</div>
+<div id="growthChecks" aria-live="polite">Checking your account and readiness records…</div>
+<p class="growth-disclaimer">Corporate-ready progress indicators, not external accreditation: six completed compliance checkboxes reflect self-declared records, not a CIPC or SARS certificate of good standing. Donation requests do not promise funding, and the membership indicator does not imply automatic renewal.</p>
+<p><button type="button" id="growthRefresh">Refresh My Readiness</button></p>
+<p id="growthFeedback" role="status" aria-live="polite"></p>
+</section>
+</main><script src="growth-passport-status.js?v=1"></script><script>
 (async()=>{
 const message=document.getElementById('message');
 const showMessage=(text)=>{message.textContent=text};
@@ -93,13 +118,58 @@ const checklists = {
   },
   growth: {
     panel: 'growthPanel', form: 'growthForm', root: 'growthChecks', prefix: 'g',
-    labels: ['Complete business assessment', 'Review compliance', 'Prepare funding documents', 'Identify procurement opportunities', 'Complete monthly business review'],
+    labels: ['Completed Business Survey', 'Business 100% Compliant', 'Donation Request Ready', 'Service Request Readiness', 'Subscription Up to Date'],
     savedMessage: 'Growth milestones saved successfully.'
   }
 };
 const checklist = Object.hasOwn(checklists, section) ? checklists[section] : null;
 document.getElementById(checklist?.panel || 'profilePanel').hidden = false;
 document.body.style.visibility = 'visible';
+if(section==='growth'){
+  const target=document.getElementById('growthChecks');
+  const feedback=document.getElementById('growthFeedback');
+  const refresh=document.getElementById('growthRefresh');
+  const stateNames={
+    complete:'Completed',ready:'Ready',exempt:'Exempt — Active',
+    available:'Available',pending:'Not yet complete',locked:'Complete prerequisites',unknown:'Unable to verify'
+  };
+  async function refreshPassport(){
+    refresh.disabled=true;
+    target.textContent='Verifying your account, survey, compliance and billing records…';
+    feedback.textContent='';
+    try{
+      if(!window.MzanGrowthPassport)throw Error('Readiness library could not load.');
+      const status=await window.MzanGrowthPassport.load(db,user);
+      target.replaceChildren();
+      document.getElementById('growthProgress').value=status.achieved;
+      document.getElementById('growthScoreText').textContent=
+        status.achieved+' of '+status.total+' readiness milestones achieved';
+      for(const milestone of status.milestones){
+        const article=document.createElement('article');
+        article.className='growth-card';
+        const heading=document.createElement('div');
+        heading.className='growth-card-head';
+        const title=document.createElement('h3');title.textContent=milestone.title;
+        const state=document.createElement('span');
+        state.className='growth-state'+(window.MzanGrowthPassport.isAchieved(milestone.state)?' achieved':'');
+        state.textContent=stateNames[milestone.state]||'Pending';
+        const detail=document.createElement('p');detail.textContent=milestone.detail;
+        const link=document.createElement('a');
+        link.href=milestone.href;link.textContent=milestone.action;
+        heading.append(title,state);
+        article.append(heading,detail,link);
+        target.append(article);
+      }
+      feedback.textContent=status.verified?'All available readiness records checked.':'Some records could not be verified; no unsupported completion claims were made.';
+    }catch(error){
+      target.textContent='Could not load the Growth Passport. Please refresh or try signing in again.';
+      feedback.textContent='Readiness status was not confirmed.';
+    }finally{refresh.disabled=false;}
+  }
+  refresh.addEventListener('click',()=>void refreshPassport());
+  await refreshPassport();
+  return;
+}
 if(!checklist){
 const {data,error:readError}=await db.from('business_profiles').select('business_name,contact_name,sector,region,description').eq('user_id',user.id).maybeSingle();
 if(readError)throw readError;
