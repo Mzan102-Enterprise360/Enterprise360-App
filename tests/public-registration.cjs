@@ -26,7 +26,8 @@ module.exports = async function checkPublicRegistration(browser, base) {
   await page.locator('#category').selectOption('aspiring_entrepreneur');
   await page.locator('#business').fill('Public Business');
   await page.locator('#contact').fill('Test Member');
-  await page.locator('#sector').selectOption('Other');
+  await page.locator('#sector').selectOption('__other__');
+  await page.locator('#sectorOther').fill('Community Services');
   await page.locator('#email').fill('test@example.invalid');
   // New registrations must not submit a short password; existing logins stay unchanged.
   await page.locator('#password').fill('short123');
@@ -37,6 +38,8 @@ module.exports = async function checkPublicRegistration(browser, base) {
   await page.locator('#submitButton').click();
   await page.getByText('Registration request received.',{exact:false}).waitFor();
   assert.equal(await page.evaluate(()=>JSON.parse(sessionStorage.getItem('signup')).requested_package),'Member');
+  assert.equal(await page.evaluate(()=>JSON.parse(sessionStorage.getItem('signup')).business_sector),'Community Services');
+
   await page.goto(base+'login.html');
   await page.locator('#email').fill('test@example.invalid');
   await page.locator('#password').fill('TestPassword-123');
