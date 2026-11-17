@@ -694,7 +694,7 @@ navigator.serviceWorker.register('./sw.js').catch(()=>{});
 </script>
 
 <script>
-/* Optional welcome prompt. Choices stay in memory; dismissal is remembered on this browser. */
+/* Optional welcome prompt on direct Home visits; internal navigation stays uninterrupted. */
 (function(){
   const dialog=document.getElementById('mzanSurveyDialog');
   if(!dialog||typeof dialog.showModal!=='function')return;
@@ -707,27 +707,20 @@ navigator.serviceWorker.register('./sw.js').catch(()=>{});
     advice.textContent=intro+(tips[need.value]||'Join when you are ready, or take the free survey to share your needs.');
   }
   stage.addEventListener('change',recommend);need.addEventListener('change',recommend);
-  function remember(){try{localStorage.setItem('mzan-welcome-seen-v1','1')}catch(e){}}
   function stopVoice(){document.dispatchEvent(new Event('mzan-stop-guidance'));}
   document.getElementById('mzanWelcomeListen').addEventListener('click',()=>document.dispatchEvent(new Event('mzan-listen-guidance')));
   document.getElementById('mzanWelcomeStop').addEventListener('click',stopVoice);
-  document.getElementById('mzanSurveySkip').addEventListener('click',()=>{remember();dialog.close();});
-  dialog.addEventListener('cancel',remember);
+  document.getElementById('mzanSurveySkip').addEventListener('click',()=>{dialog.close();});
   dialog.addEventListener('close',stopVoice);
-  dialog.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>{remember();stopVoice();}));
-  const welcomeRequested=new URLSearchParams(location.search).get('welcome')==='1';
-  if(!welcomeRequested&&location.hash&&location.hash!=='#home')return;
-  try{
-    if(!welcomeRequested){
-    if(localStorage.getItem('mzan-welcome-seen-v1')==='1')return;
-    if(localStorage.getItem('mzan-smme-survey-submitted-v2')==='1')return;
-    if(sessionStorage.getItem('mzan-welcome-shown-v1')==='1')return;
-    }
-  }catch(e){/* Storage restrictions must not prevent browsing. */}
-  try{
-    dialog.showModal();
-    try{sessionStorage.setItem('mzan-welcome-shown-v1','1')}catch(e){}
-  }catch(e){}
+  dialog.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>{stopVoice();}));
+  const params=new URLSearchParams(location.search);
+  const welcomeRequested=params.get('welcome')==='1';
+  if(!welcomeRequested){
+    if(params.get('from')==='app-nav')return;
+    if(location.hash&&location.hash!=='#home')return;
+  }
+  // Previous dismissal or survey completion must not permanently hide this invitation.
+  try{dialog.showModal();}catch(e){}
 })();
 </script>
 <!-- Member access buttons appear only on the Home view. -->
