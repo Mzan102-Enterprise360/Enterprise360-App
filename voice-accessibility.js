@@ -111,7 +111,7 @@ function textForPage(){
   return 'Use the available options to explore the business tools on this page. Your dashboard contains your personal business information and member support.';
  }
  if(page==='survey.html'){
-  return 'This is the free MzanConnect SMME Readiness and Equipment Utilisation Survey. Your answers help us understand business needs and sustainability. Read the introduction and privacy information, then answer the eleven questions about your business, equipment and support needs. At the end, choose whether you would like us to contact you. Contact details are only needed if you request follow-up. Review the consent statement and select Submit survey when ready. Participation is voluntary and does not create a paid membership.';
+  return 'This is the free MzanConnect SMME Readiness and Equipment Utilisation Survey. Answer the eleven questions and review the research consent. If you are signed in, an optional account-link consent can connect your completed survey to your Growth Passport. Leave it unticked if you want the research response to stay anonymous to your member account. Contact details are only requested if you voluntarily ask for follow-up. Neither action creates paid membership.';
  }
  if(page==='donation-report.html'){
   if(shown('reportLoaded'))return 'This is the complete consolidated donation report for the authorised MzanConnect owner. It includes all saved donation applications, their status, support type, estimated requested values, applicant details, and expected impact. Select Print or Save Complete PDF to print the full report. All stated rand amounts are requests, not awarded donations. Protect this confidential report.';
@@ -143,7 +143,7 @@ function textForPage(){
    return 'You are viewing your business compliance checklist. Each category has an Upload Document button. Choose a PDF, Word, JPG or PNG document up to ten megabytes. Once your file is securely uploaded and the checklist is saved, the matching box ticks automatically. You can view your saved documents under each category. You may also tick items manually and select Save checklist. Uploading a document does not mean official compliance has been verified.';
   }
   if(shown('growthPanel')){
-   return 'You are viewing your Growth Passport. Review the business milestones, update your progress, and save your changes. You can return later to continue where you left off.';
+   return 'Your Growth Passport shows five milestones automatically: Completed Business Survey, Business 100 percent Compliant, Donation Request Ready, Service Request Readiness, and Subscription Up to Date. Registration unlocks the survey and service request readiness. Link a completed survey to your account to achieve the survey milestone. All six self-declared compliance items must be completed to show donation readiness. Billing requires an active verified membership, or a valid owner or complimentary exemption. No checkbox can manually mark these milestones complete. This is business readiness, not official certification or a funding guarantee.';
   }
   return 'This is My Business. Review your business name, contact details, sector, region, and description. Make any changes you need, then select Save business profile. Your information will be linked to your member account.';
  }
