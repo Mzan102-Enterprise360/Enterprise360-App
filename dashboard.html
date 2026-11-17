@@ -128,20 +128,25 @@ main{padding:14px}
 <section class="panel" data-report="profile">
 
 <h3>🏢 My Business</h3>
-<p><strong>Business Name:</strong> <span id="profileBusiness">Not provided</span></p>
+<p><strong>Business Trading Name:</strong> <span id="profileBusiness">Not provided</span></p>
+<p><strong>Business Registered Name:</strong> <span id="profileRegistered">Not provided</span></p>
+<p class="print-only"><strong>Business Registration Number:</strong> <span id="profileRegistration">Not provided</span></p>
 <p><strong>Business Sector:</strong> <span id="profileSector">Not provided</span></p>
 <p class="print-only"><strong>Contact Person:</strong> <span id="profileContact">Not provided</span></p>
-<p class="print-only"><strong>Region:</strong> <span id="profileRegion">Not provided</span></p>
-<p class="print-only"><strong>Business Description:</strong> <span id="profileDescription">Not provided</span></p>
+<p class="print-only"><strong>Contact Telephone / WhatsApp:</strong> <span id="profilePhone">Not provided</span></p>
+<p class="print-only"><strong>Contact Email:</strong> <span id="profileEmail">Not provided</span></p>
+<p class="print-only"><strong>Province:</strong> <span id="profileProvince">Not provided</span></p>
+<p><strong>District:</strong> <span id="profileDistrict">Not provided</span></p>
+<p><strong>Municipality:</strong> <span id="profileMunicipality">Not provided</span></p>
 <p><strong>Membership Package:</strong> <span id="profilePlan">Not selected</span></p>
 <h4>Profile Completion: <span id="profilePercent">0%</span></h4>
 <div class="progress"><div id="profileBar"></div></div>
 <p class="note">Secure member profile.</p>
-<div class="actions"><a href="member.html?v=20261110b">Edit My Business</a></div>
+<div class="actions"><a href="member.html?v=20261117profile1">Edit My Business</a></div>
 </section>
 <div class="actions" style="margin-bottom:18px"><a href="business-report.html" style="background:#14283b">📄 Full Business Report / Save as PDF</a></div>
 <div class="grid">
-<a class="tile" href="member.html?v=20261110b"><span>🏢</span>My Business<small>Manage business details</small></a>
+<a class="tile" href="member.html?v=20261117profile1"><span>🏢</span>My Business<small>Manage business details</small></a>
 <a class="tile" href="member.html?section=compliance&v=20261110b"><span>🛡️</span>Compliance<small>Business requirements</small></a>
 
 <a class="tile" href="member.html?section=growth"><span>📈</span>Growth Passport<small>Track your progress</small></a>
@@ -199,7 +204,7 @@ main{padding:14px}
 </div>
 </section>
 </main>
-<script src="growth-passport-status.js?v=1"></script>
+<script src="business-profile-bootstrap.js?v=1"></script><script src="growth-passport-status.js?v=1"></script>
 <script>
 (async function initializeDashboard(){
   const $=id=>document.getElementById(id);
@@ -235,6 +240,7 @@ main{padding:14px}
   }catch(error){location.replace('login.html');return;}
 
   document.body.style.visibility='visible';
+  try{await window.MzanBusinessProfileBootstrap.ensure(client,user);}catch(error){console.warn('First-time profile could not be restored:',error.message);}
   logoutButton.addEventListener('click',async()=>{
     logoutButton.disabled=true;
     logoutButton.textContent='Signing out...';
@@ -289,7 +295,7 @@ main{padding:14px}
     printStatus.textContent='Preparing your complete saved dashboard report…';
     try{
       const [profileResponse,checklistResponse,records,growth]=await Promise.all([
-        client.from('business_profiles').select('business_name,sector,contact_name,region,description').eq('user_id',user.id).maybeSingle(),
+        client.from('business_profiles').select('business_name,registered_name,registration_number,sector,contact_name,contact_phone,contact_email,province,district,municipality').eq('user_id',user.id).maybeSingle(),
         client.from('compliance_items').select('item_key,completed').eq('user_id',user.id),
         fetchAllBookkeeping(),
         window.MzanGrowthPassport.load(client,user)
@@ -299,12 +305,21 @@ main{padding:14px}
       const profile=profileResponse.data||{};
       const getField=key=>String(profile[key]||'').trim();
       $('profileBusiness').textContent=getField('business_name')||'Not provided';
+      $('profileRegistered').textContent=getField('registered_name')||'Not provided';
+      $('profileRegistration').textContent=getField('registration_number')||'Not provided';
       $('profileSector').textContent=getField('sector')||'Not provided';
       $('profileContact').textContent=getField('contact_name')||'Not provided';
-      $('profileRegion').textContent=getField('region')||'Not provided';
-      $('profileDescription').textContent=getField('description')||'Not provided';
-      const profileFieldsCompleted=[getField('business_name'),getField('sector')].filter(Boolean).length;
-      const profilePercent=Math.round(profileFieldsCompleted/2*100);
+      $('profilePhone').textContent=getField('contact_phone')||'Not provided';
+      $('profileEmail').textContent=getField('contact_email')||'Not provided';
+      $('profileProvince').textContent=getField('province')||'Not provided';
+      $('profileDistrict').textContent=getField('district')||'Not provided';
+      $('profileMunicipality').textContent=getField('municipality')||'Not provided';
+      // Legal registration is optional for aspiring entrepreneurs.
+      const essentialFields=['business_name','contact_name','sector','province','district','municipality'];
+      const profileFieldsCompleted=essentialFields.filter(getField).length+
+        (getField('contact_phone')||getField('contact_email')?1:0);
+      const profileFieldsTotal=essentialFields.length+1;
+      const profilePercent=Math.round(profileFieldsCompleted/profileFieldsTotal*100);
       $('profilePercent').textContent=profilePercent+'%';
       $('profileBar').style.width=profilePercent+'%';
       if(getField('business_name'))$('memberWelcome').textContent='Welcome, '+getField('business_name')+'!';
@@ -325,10 +340,10 @@ main{padding:14px}
         growthList.append(line);
       }
       $('growthCount').textContent=growth.achieved+' of '+growth.total+' milestones achieved ('+Math.round(growth.achieved/growth.total*100)+'%)'+(growth.verified?'':' — some evidence unavailable');
-      const readiness=Math.round((profileFieldsCompleted+completed)/(2+requirements.length)*100);
+      const readiness=Math.round((profileFieldsCompleted+completed)/(profileFieldsTotal+requirements.length)*100);
       $('readinessPercent').textContent=readiness+'%';
       $('readinessBar').style.width=readiness+'%';
-      $('readinessExplanation').textContent=profileFieldsCompleted+' of 2 profile fields and '+completed+' of 6 self-reported compliance items completed. Not an official certification.';
+      $('readinessExplanation').textContent=profileFieldsCompleted+' of '+profileFieldsTotal+' core profile fields and '+completed+' of '+requirements.length+' self-reported compliance items completed. Not an official certification.';
 
       let income=0,expense=0;
       const rows=$('financeRows');

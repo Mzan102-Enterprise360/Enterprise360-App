@@ -35,6 +35,7 @@ header p:not(.header-brand){margin:0;color:#dce8eb;line-height:1.45;font-size:15
 <section class="card"><h2>Growth Passport</h2><p id="growthSummary"></p><ul id="growth"></ul></section>
 <section class="card"><h2>Financial Summary</h2><p id="financialPeriod"></p><dl><dt>Total income / turnover</dt><dd id="income">—</dd><dt>Total expenses</dt><dd id="expenses">—</dd><dt>Net profit / loss</dt><dd id="profit">—</dd><dt>VAT</dt><dd>Not separately recorded in the current bookkeeping system</dd></dl><p class="muted">Figures reflect saved bookkeeping transactions for the stated period only. No individual transaction records are included. This is not an audited financial statement or tax return.</p></section>
 </main>
+<script src="business-profile-bootstrap.js?v=1"></script><script src="growth-passport-status.js?v=1"></script>
 <script>
 (async()=>{
 const $=id=>document.getElementById(id);
@@ -42,8 +43,8 @@ const text=(id,value)=>$(id).textContent=String(value);
 const money=n=>new Intl.NumberFormat('en-ZA',{style:'currency',currency:'ZAR'}).format(n);
 const today=new Date();text('generated',today.toLocaleDateString('en-ZA',{year:'numeric',month:'long',day:'numeric'}));
 const appendPair=(root,label,value)=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value||'Not provided';root.append(dt,dd)};
-const labelsC=['CIPC records','SARS tax status','CSD registration','B-BBEE documents','Relevant industry licences'];
-const labelsG=['Complete business assessment','Review compliance','Prepare funding documents','Identify procurement opportunities','Complete monthly business review'];
+const labelsC=['CIPC Records (Director + Shareholder)','SARS Compliance','CSD Compliance','BBBEE Certificates','Relevant Industry Licences','Proof of Residence'];
+// Growth Passport status now comes from verified account records, not historical manual ticks.
 // Load every saved bookkeeping entry, rather than silently truncating financial totals.
 // Keep reports disabled when the complete history cannot be confirmed.
 async function allTransactions(db,memberId){
@@ -69,22 +70,47 @@ const db=window.supabase.createClient('https://akxzubckdebawqwwwaoe.supabase.co'
 const {data:{user},error:authError}=await db.auth.getUser();
 if(authError||!user){location.replace('login.html');return}
 document.body.style.visibility='visible';
-const [p,c,records]=await Promise.all([
-db.from('business_profiles').select('business_name,contact_name,sector,region,description').eq('user_id',user.id).maybeSingle(),
+try{await window.MzanBusinessProfileBootstrap.ensure(db,user);}catch(error){console.warn('First-time profile could not be restored:',error.message);}
+const [p,c,records,growth]=await Promise.all([
+db.from('business_profiles')
+ .select('business_name,registered_name,registration_number,contact_name,contact_phone,contact_email,sector,province,district,municipality')
+ .eq('user_id',user.id).maybeSingle(),
 db.from('compliance_items').select('item_key,completed').eq('user_id',user.id),
-allTransactions(db,user.id)
+allTransactions(db,user.id),
+window.MzanGrowthPassport.load(db,user)
 ]);
 if(p.error||c.error)throw Error([p.error,c.error].filter(Boolean).map(e=>e.message).join('; '));
 const profile=p.data||{};
-for(const [field,label] of [['business_name','Business name'],['contact_name','Contact person'],['sector','Business sector'],['region','Region'],['description','Business description']])appendPair($('profile'),label,profile[field]);
+for(const [field,label] of [
+ ['business_name','Business Trading Name'],
+ ['registered_name','Business Registered Name'],
+ ['registration_number','Business Registration Number'],
+ ['contact_name','Contact Person'],
+ ['contact_phone','Contact Telephone / WhatsApp'],
+ ['contact_email','Contact Email'],
+ ['sector','Business Sector'],
+ ['province','Province'],
+ ['district','District'],
+ ['municipality','Municipality']
+])appendPair($('profile'),label,profile[field]);
 const map=new Map((c.data||[]).map(x=>[x.item_key,x.completed===true]));
 const list=(id,labels,prefix)=>{let done=0;labels.forEach((label,i)=>{const ok=map.get(prefix+i)===true;if(ok)done++;const li=document.createElement('li');li.textContent=(ok?'Completed: ':'Not completed: ')+label;$(id).append(li)});return done};
-const completed=list('compliance',labelsC,'c');const grown=list('growth',labelsG,'g');
-text('complianceSummary',completed+' of 5 checklist items marked complete ('+completed*20+'%).');
-text('growthSummary',grown+' of 5 growth milestones marked complete ('+grown*20+'%).');
-const fields=[profile.business_name,profile.sector].filter(x=>String(x||'').trim()).length;
-const readiness=Math.round((fields+completed)/7*100);
-text('readiness','Business readiness: '+readiness+'% (profile '+fields+'/2 fields; compliance '+completed+'/5 items).');
+const completed=list('compliance',labelsC,'c');
+text('complianceSummary',completed+' of '+labelsC.length+' self-reported checklist items marked complete ('+Math.round(completed/labelsC.length*100)+'%).');
+const growthList=$('growth');growthList.replaceChildren();
+const stateNames={complete:'Completed',ready:'Ready',exempt:'Active exemption',available:'Available',pending:'Not yet completed',locked:'Prerequisites incomplete',unknown:'Not verified'};
+for(const milestone of growth.milestones){
+ const row=document.createElement('li');
+ row.textContent=milestone.title+' — '+(stateNames[milestone.state]||'Pending')+'. '+milestone.detail;
+ growthList.append(row);
+}
+text('growthSummary',growth.achieved+' of '+growth.total+' evidence-based milestones achieved'+(growth.verified?'.':' (some checks unavailable).'));
+const core=['business_name','contact_name','sector','province','district','municipality'];
+const fields=core.filter(key=>String(profile[key]||'').trim()).length+
+  (String(profile.contact_phone||profile.contact_email||'').trim()?1:0);
+const coreTotal=core.length+1;
+const readiness=Math.round((fields+completed)/(coreTotal+labelsC.length)*100);
+text('readiness','Business readiness: '+readiness+'% (core profile '+fields+'/'+coreTotal+' fields; self-reported compliance '+completed+'/'+labelsC.length+' items).');
 
 let income=0,expenses=0;
 for(const r of records){

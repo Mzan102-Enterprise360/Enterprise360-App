@@ -16,6 +16,9 @@ on:
       - 'donation-requests.js'
       - 'business-service-requests.js'
       - 'business-support.html'
+      - 'business-report.html'
+      - 'business-profile-options.js'
+      - 'business-profile-bootstrap.js'
       - 'register.html'
       - 'login.html'
       - 'owner-security.html'
@@ -37,6 +40,9 @@ on:
       - 'donation-requests.js'
       - 'business-service-requests.js'
       - 'business-support.html'
+      - 'business-report.html'
+      - 'business-profile-options.js'
+      - 'business-profile-bootstrap.js'
       - 'register.html'
       - 'login.html'
       - 'owner-security.html'
@@ -68,3 +74,5 @@ jobs:
         run: node tests/compliance-documents.cjs
       - name: Test live growth passport and survey linking
         run: node tests/growth-passport-browser.cjs
+      - name: Test corporate business profile fields and printed reports
+        run: node tests/business-profile-browser.cjs
