@@ -145,7 +145,7 @@ function textForPage(){
   if(shown('growthPanel')){
    return 'Your Growth Passport shows five milestones automatically: Completed Business Survey, Business 100 percent Compliant, Donation Request Ready, Service Request Readiness, and Subscription Up to Date. Registration unlocks the survey and service request readiness. Link a completed survey to your account to achieve the survey milestone. All six self-declared compliance items must be completed to show donation readiness. Billing requires an active verified membership, or a valid owner or complimentary exemption. No checkbox can manually mark these milestones complete. This is business readiness, not official certification or a funding guarantee.';
   }
-  return 'This is My Business. Review your business name, contact details, sector, region, and description. Make any changes you need, then select Save business profile. Your information will be linked to your member account.';
+  return 'This is My Business. Enter your registered business name and registration number if applicable, then confirm your business trading name. Add a contact person, telephone or WhatsApp number and business contact email. Choose a business sector. Select your province to see available districts, then your district to see its local municipalities. Other choices can be entered manually. Save Business Profile when finished. Your details are stored privately and reflected in your printed business reports.';
  }
  if(page==='billing.html'){
   if(shown('receiptPrint')){
@@ -169,7 +169,7 @@ function textForPage(){
   return 'You are on the Member Login page. Enter the email address and password linked to your account, then select Log In. If you need a new password, use the Forgot Password option.';
  }
  if(page==='register.html'){
-  return 'You are creating a MzanConnect account. Select your account category and complete the registration details. Review the information, then submit the form. If email confirmation is required, follow the instructions sent to your registered address before signing in.';
+  return 'You are creating a MzanConnect account. Choose your account category and enter your trading name or proposed business name, contact person and sector. Registered businesses can add their CIPC registered name and number. Business contact details and province, district and municipality can be completed now or later in My Business. Enter your own email and create a secure password. No payment is taken during registration. Complete email confirmation if requested, then sign in.';
  }
  if(page==='reset-password.html'){
   if(shown('updateForm'))return 'You can now set a new password. Enter and confirm your new password, then save it. Use your registered email address to sign in afterwards.';
