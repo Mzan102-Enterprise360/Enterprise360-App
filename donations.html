@@ -154,7 +154,7 @@ input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-vis
 </section>
 <section id="donationOwnerPanel" class="card" hidden>
 <h2>Owner Donation Requests Inbox</h2>
-<p class="small">Private owner view. Read new applications, change their review status and print a confidential summary. Requests are not approvals of funding.</p>
+<p class="small">Private owner view. Read new applications, change their review status, and open the complete consolidated report to print every saved application. Requests are not approvals of funding.</p>
 <p id="donationOwnerSummary" class="owner-summary" role="status" aria-live="polite"></p>
 <div class="owner-controls">
 <label for="donationOwnerFilter">Show requests
@@ -167,10 +167,10 @@ input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-vis
 <option value="cancelled">Closed</option>
 </select></label>
 <button type="button" id="donationOwnerRefresh" class="secondary">Refresh inbox</button>
-<button type="button" id="donationOwnerPrint">Print / Save PDF</button>
+<a class="button-link" href="./donation-report.html">Print Complete Consolidated Report</a>
 </div>
 <div id="donationOwnerList" aria-live="polite">Loading donation requests…</div>
-<p class="notice">This view shows up to 100 recent applications. Protect applicant contact details when printing or sharing. You can also review the same applications in the <a href="./business-support.html">Business Support owner inbox</a>.</p>
+<p class="notice">This inbox shows up to 100 recent applications. The Complete Consolidated Report includes all saved applications, not just the latest 100. Protect applicant contact details when printing or sharing. You can also review the same applications in the <a href="./business-support.html">Business Support owner inbox</a>.</p>
 </section>
 <section class="card">
 <h2>Other business support</h2>

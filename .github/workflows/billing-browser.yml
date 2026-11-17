@@ -9,6 +9,8 @@ on:
       - 'bookkeeping.html'
       - 'dashboard.html'
       - 'donations.html'
+      - 'donation-report.html'
+      - 'donation-report.js'
       - 'donation-requests.js'
       - 'business-service-requests.js'
       - 'business-support.html'
@@ -26,6 +28,8 @@ on:
       - 'bookkeeping.html'
       - 'dashboard.html'
       - 'donations.html'
+      - 'donation-report.html'
+      - 'donation-report.js'
       - 'donation-requests.js'
       - 'business-service-requests.js'
       - 'business-support.html'
@@ -54,3 +58,5 @@ jobs:
         run: node tests/billing-browser.cjs
       - name: Test donation request journeys
         run: node tests/donation-browser.cjs
+      - name: Test consolidated donation report and printing
+        run: node tests/donation-report-browser.cjs

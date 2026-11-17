@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#14283b">
+<meta name="robots" content="noindex,nofollow">
+<title>Consolidated Donation Requests Report | MzanConnect</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="./mzanconnect-icon-192.png">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f2f6f7;color:#14283b;font:15px/1.5 Arial,sans-serif}
+header{background:linear-gradient(115deg,#14283b,#116a71);color:white;padding:20px 18px}
+header small{display:block;font-weight:800;letter-spacing:.08em;color:#bde9e4}
+header h1{font-size:clamp(23px,5vw,32px);line-height:1.2;margin:7px 0}
+header p{font-size:14px;margin:5px 0;color:#e4f3f2}
+main{max-width:1100px;margin:auto;padding:15px}
+.card{background:white;border:1px solid #d6e4e5;border-radius:14px;padding:17px;margin-bottom:13px}
+h2{font-size:21px;margin:0 0 10px}
+h3{font-size:17px;margin:0 0 8px}
+p{margin:8px 0}
+.note{color:#536773;font-size:13px}
+.warning{background:#fff5dd;padding:10px;border-left:4px solid #ad7820;border-radius:6px;font-size:13px}
+.controls{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+button,.btn{display:inline-flex;align-items:center;justify-content:center;min-height:45px;border:0;border-radius:9px;background:#116a71;color:#fff;font:700 14px Arial,sans-serif;padding:11px 16px;text-decoration:none;cursor:pointer}
+.btn.secondary,button.secondary{background:#14283b}
+button:disabled{opacity:.5;cursor:not-allowed}
+button:focus-visible,a:focus-visible{outline:3px solid #bd9229;outline-offset:2px}
+.summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.metric{background:#f4fbf9;border:1px solid #d6e9e5;border-radius:10px;padding:12px;min-width:0}
+.metric strong{display:block;font-size:23px;line-height:1.25;color:#0f6870;overflow-wrap:anywhere}
+.metric span{display:block;color:#51636c;font-size:12px;margin-top:3px}
+.table-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:9px 10px;border:1px solid #d7e1e3;vertical-align:top}
+th{background:#e9f4f2}
+td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.donation-entry{border:1px solid #d8e4e7;border-radius:10px;padding:12px;margin:0 0 12px;break-inside:avoid;overflow-wrap:anywhere}
+.donation-entry h3{color:#0c626e}
+.detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 16px}
+.detail-grid p{margin:0;font-size:13px}
+.detail-grid dt{font-size:12px;color:#526570;font-weight:700}
+.detail-grid dd{margin:2px 0 0;white-space:pre-wrap}
+.wide{grid-column:1/-1}
+.report-footer{color:#51636c;font-size:12px;margin:16px 0}
+[hidden]{display:none!important}
+@media(max-width:650px){.summary{grid-template-columns:repeat(2,minmax(0,1fr))}.detail-grid{grid-template-columns:1fr}.metric strong{font-size:20px}.card{padding:13px}}
+@page{size:A4 portrait;margin:13mm}
+@media print{
+ html,body{height:auto!important;overflow:visible!important;background:#fff;color:#111;font-size:10pt}
+ header{background:white!important;color:#111!important;padding:0 0 10px;border-bottom:2px solid #333}
+ header small,header p{color:#222!important}
+ header h1{font-size:21pt;margin:4px 0}
+ main{max-width:none!important;overflow:visible!important;margin:0;padding:0!important}
+ .card{border:0;border-radius:0;box-shadow:none;padding:8px 0;margin:0}
+ .no-print,.mzan-home-return,#mzan-app-navigation,#mzan-legal-footer,#mzan-voice-tools{display:none!important}
+ .metric{background:#fff!important;border-color:#aaa}
+ .metric strong{color:#111;font-size:17pt}
+ .donation-entry{border-color:#aaa;border-radius:0;padding:9px;break-inside:avoid}
+ .donation-entry h3{color:#111}
+ .detail-grid p{font-size:9pt}
+ table{font-size:9pt}
+ th{background:#e8e8e8!important}
+ tr{break-inside:avoid}
+ h2{break-after:avoid}
+ .report-footer{color:#333}
+ }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+<header>
+<small>MZANCONNECT · PRIVATE OWNER REPORT</small>
+<h1>Consolidated Donation Requests Report</h1>
+<p>Mzanian 102 (Pty) Ltd · Business and community support requests</p>
+</header>
+<main>
+<section class="card no-print">
+<h2>Print the complete report</h2>
+<p class="note">The report includes all saved donation requests, not only the latest 100. It is available only to the authorised owner.</p>
+<div class="controls">
+<button type="button" id="reportPrint" disabled>Print / Save Complete PDF</button>
+<button type="button" id="reportReload" class="secondary" disabled>Refresh full report</button>
+<a class="btn secondary" href="./donations.html#owner-inbox">Back to Donation Inbox</a>
+<a class="btn secondary" href="./dashboard.html">Dashboard</a>
+</div>
+<p id="reportStatus" role="status" aria-live="polite">Verifying owner access…</p>
+</section>
+<section class="card" id="reportDenied" hidden>
+<h2>Owner access required</h2>
+<p>This report contains confidential member applications. Sign in as the authorised MzanConnect owner to view or print it.</p>
+<a class="btn" href="./login.html">Member Login</a>
+</section>
+<div id="reportLoaded" hidden>
+<section class="card">
+<h2>Executive Summary</h2>
+<p id="reportAsOf" class="note"></p>
+<div id="reportMetrics" class="summary" aria-label="Donation request totals"></div>
+<p class="warning">Reported amounts are applicants' estimated requested values, not donations received, approved, granted or paid. An application marked “Review completed” does not mean financial support was awarded.</p>
+</section>
+<section class="card">
+<h2>Breakdown by status</h2>
+<div class="table-wrap"><table aria-label="Applications by review status"><thead><tr><th>Status</th><th>Requests</th></tr></thead><tbody id="reportStatusRows"></tbody></table></div>
+</section>
+<section class="card">
+<h2>Breakdown by support requested</h2>
+<div class="table-wrap"><table aria-label="Applications by support category"><thead><tr><th>Type of support</th><th>Requests</th><th>Stated requested value (R)</th></tr></thead><tbody id="reportCategoryRows"></tbody></table></div>
+</section>
+<section class="card">
+<h2>Complete application register</h2>
+<p class="note">Each record includes submission date, reference, applicant, contact, area, support type, estimated amount, purpose, expected impact and latest saved review status.</p>
+<div id="reportRecords"></div>
+</section>
+<p class="report-footer">CONFIDENTIAL — Mzanian 102 (Pty) Ltd / MzanConnect. For internal administrative review. Protect applicant information and dispose of printed copies securely.</p>
+</div>
+</main>
+<script defer src="./donation-report.js?v=1"></script>
+<script defer src="./voice-accessibility.js?v=14"></script>
+<script defer src="./legal-notices.js?v=1"></script>
+<script defer src="./app-shell.js?v=4"></script>
+</body>
+</html>

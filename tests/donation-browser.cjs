@@ -77,8 +77,8 @@ async function scenario(browser,role){
   await page.locator('#donationOwnerFilter').selectOption('open');
   await page.getByText('No matching donation requests.').waitFor();
   await page.locator('#donationOwnerFilter').selectOption('all');
-  await page.getByRole('button',{name:'Print / Save PDF'}).click();
-  assert.equal(await page.evaluate(()=>window.didPrint===true),true);
+  const completeReport=page.getByRole('link',{name:'Print Complete Consolidated Report'});
+  assert.equal(await completeReport.getAttribute('href'),'./donation-report.html');
  }
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'Mobile overflow');
  assert.deepEqual(errors,[],'No uncaught browser errors: '+errors.join('; '));
