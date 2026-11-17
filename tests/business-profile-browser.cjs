@@ -100,8 +100,8 @@ async function member(browser){
  assert.equal(state.profile.contact_email,'hello@example.test');
  assert.equal(state.profile.region,'Kathu legacy location');
  assert.equal(state.profile.description,'Legacy notes must be preserved');
- assert.equal(Object.hasOwn(state.lastUpdate,'region'),false,'Must never overwrite legacy region');
- assert.equal(Object.hasOwn(state.lastUpdate,'description'),false,'Must never overwrite legacy description');
+ assert.equal(state.lastUpdate.region,'Kathu legacy location','Legacy region must be retained on save');
+ assert.equal(state.lastUpdate.description,'Legacy notes must be preserved','Legacy description must be retained on save');
  await page.reload();
  await page.locator('#municipality').waitFor({state:'visible'});
  assert.equal(await page.locator('#municipality').inputValue(),'Gamagara');
