@@ -31,12 +31,16 @@ grant update(status,reviewed_at,updated_at)
 create policy company_membership_members_read_their_requests
 on public.company_membership_sponsorship_requests for select to authenticated
 using ((select auth.uid())=user_id);
+-- GitGuardian incident 40124306 is a false positive: the UUID below is an
+-- owner account identifier, not a password, token, or authentication secret.
+-- Access still requires a verified JWT: auth.uid() must match this owner ID.
 create policy company_membership_owner_reads_requests
 on public.company_membership_sponsorship_requests for select to authenticated
 using ((select auth.uid())='820a18ee-3482-4b6c-bd75-469cf198b9df'::uuid);
 create policy company_membership_members_submit_only
 on public.company_membership_sponsorship_requests for insert to authenticated
 with check ((select auth.uid())=user_id and status='submitted' and consent_confirmed is true);
+-- The same non-secret owner identifier protects both old and new row access.
 create policy company_membership_owner_updates_review_status
 on public.company_membership_sponsorship_requests for update to authenticated
 using ((select auth.uid())='820a18ee-3482-4b6c-bd75-469cf198b9df'::uuid)
