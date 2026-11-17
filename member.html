@@ -2,6 +2,12 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MzanConnect | Manage Account</title>
 <style>
+#profileForm select{font:inherit;width:100%;padding:12px;min-height:46px;border:1px solid #b9c8d1;border-radius:8px;background:#fff;color:#14283b}
+#profileForm .profile-other[hidden]{display:none!important}
+#profileForm .profile-other:not([hidden]){margin-top:8px}
+#profileForm .profile-subheading{font-size:17px;margin:17px 0 4px;border-bottom:1px solid #dbe6e8;padding-bottom:7px}
+#profileForm .profile-note{font-size:13px;color:#516777;line-height:1.5}
+
 *{box-sizing:border-box}body{font:16px system-ui,Arial;margin:0;background:#edf2f5;color:#14283b}
 header{background:#14283b;color:#fff;padding:20px}main{max-width:650px;margin:auto;padding:20px}
 .card{background:white;padding:22px;border-radius:15px;margin:14px 0}label{display:block;margin:14px 0 6px;font-weight:600}
@@ -76,12 +82,35 @@ main{width:100%;max-width:650px;margin:0 auto;padding:10px 14px 20px}
 <body><header><p class="header-brand">◈ MzanConnect</p><h1 id="sectionTitle">My Business</h1><p id="sectionDescription">Manage and update your business profile.</p></header>
 <main><div class="dashboard-return"><a href="dashboard.html" aria-label="Back to dashboard">← Back to Dashboard</a></div><p id="message" role="status" aria-live="polite"></p>
 <section class="card" id="profilePanel" hidden><h2>My Business</h2>
-<form id="profileForm"><label for="business">Business name</label><input id="business" maxlength="100" required>
-<label for="contact">Contact person</label><input id="contact" maxlength="100">
-<label for="sector">Business sector</label><input id="sector" maxlength="100">
-<label for="region">Region</label><input id="region" maxlength="100">
-<label for="description">Description</label><input id="description" maxlength="500">
-<p><button type="submit">Save business profile</button></p></form></section>
+<form id="profileForm">
+<p class="profile-note">Create a corporate-ready profile. If your business is not yet registered, leave the registration fields blank and complete them later.</p>
+<label for="registeredName">Business Registered Name</label>
+<input id="registeredName" maxlength="160" autocomplete="organization" placeholder="Name on CIPC registration certificate">
+<label for="registrationNumber">Business Registration Number</label>
+<input id="registrationNumber" maxlength="50" autocapitalize="off" placeholder="Example: 2026/123456/07">
+<label for="business">Business Trading Name</label>
+<input id="business" required maxlength="100" placeholder="Name customers know your business by">
+<label for="contact">Contact Person</label><input id="contact" maxlength="100" autocomplete="name">
+<h3 class="profile-subheading">Contacts</h3>
+<label for="contactPhone">Contact Telephone / WhatsApp</label>
+<input id="contactPhone" type="tel" maxlength="40" autocomplete="tel" placeholder="+27 73 000 0000">
+<label for="contactEmail">Contact Email</label>
+<input id="contactEmail" type="email" maxlength="160" autocomplete="email" placeholder="business@example.co.za">
+<label for="sector">Business Sector</label>
+<select id="sector"><option value="">Select business sector</option></select>
+<input id="sectorOther" class="profile-other" aria-label="Specify business sector" maxlength="100" placeholder="Specify business sector" hidden>
+<h3 class="profile-subheading">Business Location</h3>
+<label for="province">Province</label>
+<select id="province"><option value="">Select province</option></select>
+<input id="provinceOther" class="profile-other" aria-label="Specify province" maxlength="90" placeholder="Specify province / location" hidden>
+<label for="district">District</label>
+<select id="district"><option value="">Select district or metro</option></select>
+<input id="districtOther" class="profile-other" aria-label="Specify district" maxlength="120" placeholder="Specify district" hidden>
+<label for="municipality">Municipality</label>
+<select id="municipality"><option value="">Select municipality</option></select>
+<input id="municipalityOther" class="profile-other" aria-label="Specify municipality" maxlength="120" placeholder="Specify municipality" hidden>
+<p class="profile-note">Selecting a province filters districts; selecting a district filters municipalities. Use “Other / Not listed” for a location that is missing. Existing business records remain saved.</p>
+<p><button type="submit">Save Business Profile</button></p></form></section>
 <section class="card" id="compliancePanel" hidden><h2>My Compliance Checklist</h2>
 <p class="compliance-hint">Upload a document for each category (PDF, Word, JPG or PNG; up to 10 MB). Your checkbox ticks automatically after a successful upload and save. Documents are private to your account. This does not verify official compliance.</p>
 <form id="complianceForm"><div id="checks"></div><p><button type="submit">Save checklist</button></p></form></section>
@@ -97,7 +126,7 @@ main{width:100%;max-width:650px;margin:0 auto;padding:10px 14px 20px}
 <p><button type="button" id="growthRefresh">Refresh My Readiness</button></p>
 <p id="growthFeedback" role="status" aria-live="polite"></p>
 </section>
-</main><script src="growth-passport-status.js?v=1"></script><script>
+</main><script src="business-profile-options.js?v=1"></script><script src="growth-passport-status.js?v=1"></script><script>
 (async()=>{
 const message=document.getElementById('message');
 const showMessage=(text)=>{message.textContent=text};
@@ -171,14 +200,44 @@ if(section==='growth'){
   return;
 }
 if(!checklist){
-const {data,error:readError}=await db.from('business_profiles').select('business_name,contact_name,sector,region,description').eq('user_id',user.id).maybeSingle();
+const {data,error:readError}=await db.from('business_profiles')
+ .select('business_name,registered_name,registration_number,contact_name,contact_phone,contact_email,sector,province,district,municipality')
+ .eq('user_id',user.id).maybeSingle();
 if(readError)throw readError;
-for(const [field,id] of [['business_name','business'],['contact_name','contact'],['sector','sector'],['region','region'],['description','description']])document.getElementById(id).value=data?.[field]||'';
-document.getElementById('profileForm').addEventListener('submit',async e=>{
-e.preventDefault();showMessage('Saving...');
-const values={user_id:user.id,business_name:document.getElementById('business').value.trim(),contact_name:document.getElementById('contact').value.trim(),sector:document.getElementById('sector').value.trim(),region:document.getElementById('region').value.trim(),description:document.getElementById('description').value.trim()};
-const {error}=await db.from('business_profiles').upsert(values,{onConflict:'user_id'});
-showMessage(error?'Unable to save: '+error.message:'Business profile saved successfully.');
+for(const [field,id] of [
+ ['registered_name','registeredName'],['registration_number','registrationNumber'],['business_name','business'],
+ ['contact_name','contact'],['contact_phone','contactPhone'],['contact_email','contactEmail']
+])document.getElementById(id).value=data?.[field]||'';
+if(!data?.contact_email&&user.email)document.getElementById('contactEmail').value=user.email;
+if(!window.MzanBusinessOptions)throw Error('Business field choices unavailable; refresh this page.');
+const selects=window.MzanBusinessOptions.init({
+ sector:data?.sector,province:data?.province,district:data?.district,municipality:data?.municipality
+});
+const profileForm=document.getElementById('profileForm');
+const saveButton=profileForm.querySelector('button[type=submit]');
+profileForm.addEventListener('submit',async event=>{
+ event.preventDefault();
+ if(saveButton.disabled||!profileForm.reportValidity())return;
+ saveButton.disabled=true;
+ showMessage('Saving your business profile...');
+ try{
+  const opts=selects.values();
+  const values={
+   user_id:user.id,
+   registered_name:document.getElementById('registeredName').value.trim(),
+   registration_number:document.getElementById('registrationNumber').value.trim(),
+   business_name:document.getElementById('business').value.trim(),
+   contact_name:document.getElementById('contact').value.trim(),
+   contact_phone:document.getElementById('contactPhone').value.trim(),
+   contact_email:document.getElementById('contactEmail').value.trim(),
+   sector:opts.sector,province:opts.province,district:opts.district,municipality:opts.municipality
+  };
+  // Legacy region and description are intentionally omitted to preserve older records.
+  const {error}=await db.from('business_profiles').upsert(values,{onConflict:'user_id'});
+  if(error)throw error;
+  showMessage('Business profile saved successfully. Updated details will appear on your dashboard and printed reports.');
+ }catch(error){showMessage('Unable to save your business profile: '+(error.message||'Please try again.'));}
+ finally{saveButton.disabled=false;}
 });
 }else{
 const items = checklist.labels.map((label, index) => ({ label, key: checklist.prefix + index }));
