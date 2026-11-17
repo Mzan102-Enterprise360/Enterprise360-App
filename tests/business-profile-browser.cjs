@@ -5,12 +5,18 @@ const {spawn}=require('node:child_process');
 const server=spawn('python3',['-m','http.server','8770','--bind','127.0.0.1'],{cwd:path.resolve(__dirname,'..'),stdio:'ignore'});
 const base='http://127.0.0.1:8770/';
 const mock=String.raw`(()=>{
- const user={id:'11111111-1111-4111-8111-111111111111',email:'member@example.test',app_metadata:{mzanconnect_role:'member'},user_metadata:{}};
+ const newMember=new URLSearchParams(location.search).get('simulateNew')==='1';
+ const user={id:'11111111-1111-4111-8111-111111111111',email:'member@example.test',app_metadata:{mzanconnect_role:'member'},user_metadata:newMember?{
+  business_name:'New Signup Trading',registered_name:'New Signup (Pty) Ltd',
+  registration_number:'2026/111111/07',contact_name:'Signup Member',
+  contact_phone:'0711111111',business_sector:'Retail and Trading',
+  province:'Northern Cape',district:'John Taolo Gaetsewe',municipality:'Gamagara'
+ }:{} };
  const initial={
    business_name:'Hair dress',contact_name:'Test Member',sector:'Mining and Industrial Services',
    region:'Kathu legacy location',description:'Legacy notes must be preserved'
  };
- const state={profile:JSON.parse(sessionStorage.getItem('mock-business-profile')||'null')||initial,
+ const state={profile:JSON.parse(sessionStorage.getItem('mock-business-profile')||'null')||(newMember?null:initial),
   signedUp:null,lastUpdate:null,inserted:null};
  window.mockBusiness=state;
  function tableQuery(table){
@@ -160,11 +166,13 @@ async function report(browser){
  await page.close();
 }
 async function firstLogin(browser){
- const {page,errors}=await open(browser,'member.html');
+ const {page,errors}=await open(browser,'member.html?simulateNew=1');
  await page.locator('#business').waitFor({state:'visible'});
- const x=await page.evaluate(()=>({business:mockBusiness.profile.business_name,location:mockBusiness.profile.region}));
- assert.equal(x.business,'Hair dress');
- assert.equal(x.location,'Kathu legacy location');
+ assert.equal(await page.locator('#business').inputValue(),'New Signup Trading');
+ assert.equal(await page.locator('#registeredName').inputValue(),'New Signup (Pty) Ltd');
+ assert.equal(await page.locator('#registrationNumber').inputValue(),'2026/111111/07');
+ assert.equal(await page.locator('#municipality').inputValue(),'Gamagara');
+ assert.equal(await page.evaluate(()=>mockBusiness.inserted.user_id),'11111111-1111-4111-8111-111111111111');
  assert.deepEqual(errors,[]);
  await page.close();
 }
