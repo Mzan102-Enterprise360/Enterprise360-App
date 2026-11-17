@@ -40,6 +40,7 @@ function ownerView(){
  const rows=ownerRecords.filter(r=>selected==='all'||
    (selected==='open'&&OPEN_STATES.has(r.status))||r.status===selected);
  const open=ownerRecords.filter(r=>OPEN_STATES.has(r.status)).length;
+ $('donationOwnerPrint').disabled=ownerRecords.length===0;
  $('donationOwnerSummary').textContent=ownerRecords.length+' recent request'+(ownerRecords.length===1?'':'s')+
   ' · '+open+' awaiting action';
  container.replaceChildren();
