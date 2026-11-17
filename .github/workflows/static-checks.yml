@@ -44,6 +44,7 @@ jobs:
       - name: Check donation request JavaScript and shared inbox syntax
         run: |
           node --check donation-requests.js
+          node --check growth-passport-status.js
           node --check donation-report.js
           node --check business-service-requests.js
           node --check voice-accessibility.js
