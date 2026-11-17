@@ -50,6 +50,18 @@ async function scenario(browser,role){
   await page.getByRole('button',{name:'Submit Donation Request'}).click();
   await page.locator('#donationHistory').getByText('Member Food Enterprise',{exact:false}).waitFor();
   assert.equal(await page.evaluate(()=>window.testDb.records.length),3);
+  assert.equal(await page.locator('#donationHistoryFilters button').count(),4,'Show status buttons even before requests');
+  assert.match(await page.locator('#donationCountSubmitted').innerText(),/2/);
+  await page.locator('[data-donation-stage="submitted"]').click();
+  assert.equal(await page.locator('#donationHistory article').count(),2);
+  assert.equal(await page.locator('[data-donation-stage="submitted"]').getAttribute('aria-pressed'),'true');
+  await page.locator('[data-donation-stage="in_progress"]').click();
+  await page.getByText('No requests at this stage yet.').waitFor();
+  assert.equal(await page.locator('[data-donation-stage="in_progress"]').getAttribute('aria-pressed'),'true');
+  await page.locator('[data-donation-stage="completed"]').click();
+  await page.getByText('No requests at this stage yet.').waitFor();
+  await page.locator('[data-donation-stage="all"]').click();
+  assert.equal(await page.locator('#donationHistory .history-stages span').count(),6,'Member requests have progress markers');
   const saved=await page.evaluate(()=>window.testDb.records.at(-1));
   assert.match(saved.details,/Estimated value: R15000/);
   assert.equal(saved.status,'new');
