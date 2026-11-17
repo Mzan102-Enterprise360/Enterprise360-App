@@ -70,7 +70,7 @@ async function scenario(browser,role){
   await page.getByText('Kathu Catering Collective',{exact:true}).waitFor();
   assert.equal(await page.getByText('Paid business plan',{exact:false}).count(),0);
   assert.match(await page.locator('#donationOwnerSummary').innerText(),/1 awaiting action/);
-  await page.getByRole('button',{name:'Review completed'}).click();
+  await page.locator('#donationOwnerList').getByRole('button',{name:'Review completed'}).click();
   await page.getByText('0 awaiting action',{exact:false}).waitFor();
   const updated=await page.evaluate(()=>window.testDb.updates.at(-1));
   assert.equal(updated.status,'completed');
