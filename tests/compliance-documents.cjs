@@ -66,11 +66,12 @@ async function testCompliance(browser){
   'SARS Compliance',
   'CSD Compliance',
   'BBBEE Certificates',
-  'Relevant Industry Licences'
+  'Relevant Industry Licences',
+  'Proof of Residence'
  ];
  await page.locator('.compliance-item').first().waitFor({state:'visible'});
- assert.equal(await page.locator('.compliance-item').count(),5);
- assert.equal(await page.getByRole('button',{name:/Upload document for/}).count(),5);
+ assert.equal(await page.locator('.compliance-item').count(),6);
+ assert.equal(await page.getByRole('button',{name:/Upload document for/}).count(),6);
  for(let i=0;i<names.length;i++){
   const row=page.locator('.compliance-item').nth(i);
   assert.match(await row.innerText(),new RegExp(names[i].replace(/[()]/g,'\\$&'),'i'));
@@ -89,6 +90,13 @@ async function testCompliance(browser){
  await page.getByRole('link',{name:/Open cipc-register.pdf/}).waitFor();
  assert.equal(await page.getByRole('link',{name:/Open cipc-register.pdf/}).getAttribute('href'),'https://example.test/private-file?token=temporary');
  // Failed storage uploads must never tick a checkbox.
+ await page.locator('.compliance-item').nth(5).locator('input[type=file]').setInputFiles({
+  name:'proof-of-residence.pdf',mimeType:'application/pdf',buffer:Buffer.from('%PDF-1.4\n')
+ });
+ await page.getByText('Document uploaded. ✓ Proof of Residence',{exact:false}).waitFor();
+ assert.equal(await page.locator('#c5').isChecked(),true);
+ assert.equal(await page.evaluate(()=>window.mockCompliance.checks.c5),true);
+ assert.equal((await page.evaluate(()=>window.mockCompliance.uploads[1])).includes('/c5/'),true);
  await page.evaluate(()=>{window.mockCompliance.failUpload=true});
  await page.locator('.compliance-item').nth(1).locator('input[type=file]').setInputFiles({
   name:'tax.pdf',mimeType:'application/pdf',buffer:Buffer.from('%PDF-1.4\\n')
@@ -123,5 +131,5 @@ async function testGrowthUnchanged(browser){
  await new Promise(resolve=>setTimeout(resolve,1100));
  const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
  try{await testCompliance(browser);await testGrowthUnchanged(browser)}finally{await browser.close()}
- console.log('PASS: five compliance uploads, auto-ticking on persisted save, private files, error handling, growth unchanged');
+ console.log('PASS: six compliance uploads, auto-ticking on persisted save, private files, error handling, growth unchanged');
 }catch(error){console.error(error);process.exitCode=1}finally{server.kill()}})();
