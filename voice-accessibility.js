@@ -140,7 +140,7 @@ function textForPage(){
  }
  if(page==='member.html'){
   if(shown('compliancePanel')){
-   return 'You are viewing your business compliance checklist. Review each requirement, update the items you have completed, then select Save checklist. This records your progress; it does not replace official compliance verification.';
+   return 'You are viewing your business compliance checklist. Each category has an Upload Document button. Choose a PDF, Word, JPG or PNG document up to ten megabytes. Once your file is securely uploaded and the checklist is saved, the matching box ticks automatically. You can view your saved documents under each category. You may also tick items manually and select Save checklist. Uploading a document does not mean official compliance has been verified.';
   }
   if(shown('growthPanel')){
    return 'You are viewing your Growth Passport. Review the business milestones, update your progress, and save your changes. You can return later to continue where you left off.';
