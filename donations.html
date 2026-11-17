@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#14283b">
+<meta name="description" content="Request donation support for a small business or community initiative through MzanConnect. Requests are reviewed and support is not guaranteed.">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="./mzanconnect-icon-192.png">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<title>Donation Requests | MzanConnect</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f3f6f8;color:#14283b;font:15px/1.5 Arial,sans-serif}
+header{padding:18px 16px;background:linear-gradient(115deg,#14283b,#116a71);color:#fff}
+header small{display:block;font-size:12px;font-weight:800;letter-spacing:.07em;color:#bde9e4}
+header h1{font-size:clamp(24px,5.5vw,32px);line-height:1.15;margin:7px 0}
+header p{margin:0;font-size:14px;color:#ecf7f5}
+main{max-width:760px;margin:auto;padding:14px}
+.card{background:#fff;border:1px solid #dce7e8;border-radius:15px;padding:16px;margin:0 0 12px;box-shadow:0 4px 15px #14283b0b}
+.intro{background:#e8f6f2;border-color:#c8e7df}
+h2{font-size:21px;margin:0 0 9px}
+p{margin:7px 0 10px}
+.small{color:#4c626e;font-size:13px}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:14px 0 4px}
+.step{background:#f6fbfa;border:1px solid #d9ece8;border-radius:10px;padding:10px;font-size:13px}
+.step strong{display:block;color:#087a79;font-size:14px}
+form{display:grid;gap:12px}
+label{display:block;font-size:14px;font-weight:700}
+label .hint{display:block;color:#5d6f78;font-size:12px;font-weight:400;margin-top:1px}
+input:not([type=checkbox]),select,textarea{display:block;width:100%;min-height:44px;margin-top:5px;padding:11px;border:1px solid #adbfc6;border-radius:10px;color:#14283b;background:#fff;font:16px Arial,sans-serif}
+textarea{min-height:96px;resize:vertical;line-height:1.4}
+.checkbox-label{display:flex;align-items:flex-start;gap:9px;font-weight:400;line-height:1.45}
+.checkbox-label input{width:20px;height:20px;flex:none;margin:2px 0 0}
+button,.button-link{display:inline-flex;align-items:center;justify-content:center;min-height:46px;border:0;border-radius:10px;background:#116a71;color:#fff;padding:11px 15px;font:700 14px Arial,sans-serif;cursor:pointer;text-decoration:none;text-align:center}
+button:disabled{opacity:.6;cursor:wait}
+.secondary{background:#14283b}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid #e2ad29;outline-offset:2px}
+#donationStatus{font-weight:700;overflow-wrap:anywhere}
+#donationStatus:empty{display:none}
+.request{padding:12px 0;border-top:1px solid #dbe7e7;overflow-wrap:anywhere}
+.request strong{color:#0d5961}
+.request p{white-space:pre-wrap;overflow-wrap:anywhere;color:#38525d;font-size:13px}
+.request small{display:block;color:#57717a}
+.notice{font-size:12px;line-height:1.5;color:#4c616c}
+[hidden]{display:none!important}
+@media(max-width:500px){.steps{grid-template-columns:1fr}.step{padding:8px}.card{padding:13px}}
+@media print{button,.button-link{display:none!important}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+<header>
+<small>◇ MZANCONNECT · BUSINESS &amp; COMMUNITY SUPPORT</small>
+<h1>Request Donation Support</h1>
+<p>Share your need. We will review your request and advise on possible next steps.</p>
+</header>
+<main>
+<section class="card intro" aria-label="How donation requests work">
+<h2>Helping ideas and enterprises move forward</h2>
+<p>Small businesses and community initiatives may submit a request for financial, equipment, material or other support. MzanConnect can review the request and, where appropriate, consider possible referrals to potential supporters.</p>
+<div class="steps">
+<div class="step"><strong>1. Tell us</strong>Explain the support you need.</div>
+<div class="step"><strong>2. We review</strong>The owner reviews requests privately.</div>
+<div class="step"><strong>3. Track progress</strong>Return here to check your status.</div>
+</div>
+<p class="small"><strong>Important:</strong> This is an expression of need, not an approved grant or fundraising campaign. MzanConnect is not promising funding, a donor match or a response by a particular date. <strong>No payment is required to submit this request.</strong></p>
+</section>
+<section id="donationSignIn" class="card" hidden>
+<h2>Sign in before applying</h2>
+<p>Donation requests are linked to your MzanConnect account so your details and progress are not published. You can submit a request after signing in.</p>
+<div class="actions"><a class="button-link" href="./login.html">Member Login</a><a class="button-link secondary" href="./register.html">Join MzanConnect</a></div>
+<p class="small">Return to Donation Requests after signing in. Opening registration does not submit a donation request.</p>
+</section>
+<section id="donationFormPanel" class="card" hidden>
+<h2>Donation Request Form</h2>
+<p class="small">Complete the short form below. Only the authorised MzanConnect owner can review the details.</p>
+<form id="donationForm">
+<label for="donationApplicant">Your name, business or organisation
+<span class="hint">Use the name connected to the request.</span>
+<input id="donationApplicant" maxlength="140" autocomplete="organization" required placeholder="e.g. Local catering business"></label>
+<label for="donationType">Type of support requested
+<select id="donationType" required>
+<option value="">Select support type</option>
+<option value="Financial support">Financial support</option>
+<option value="Equipment or tools">Equipment or tools</option>
+<option value="Materials or supplies">Materials or supplies</option>
+<option value="Training or mentorship">Training or mentorship</option>
+<option value="Community project support">Community project support</option>
+<option value="Other in-kind support">Other in-kind support</option>
+</select></label>
+<label for="donationLocation">Town / area
+<input id="donationLocation" maxlength="80" required placeholder="e.g. Kathu, Northern Cape" autocomplete="address-level2"></label>
+<label for="donationAmount">Estimated amount or value (R)
+<span class="hint">Optional. Enter an estimated rand value if known, including for equipment or supplies.</span>
+<input id="donationAmount" type="number" min="1" max="10000000" step="1" placeholder="e.g. 15000"></label>
+<label for="donationPurpose">What do you need, and why?
+<span class="hint">Describe the items, amount or specific need. Maximum 360 characters.</span>
+<textarea id="donationPurpose" maxlength="360" required placeholder="Describe exactly what support would help you."></textarea></label>
+<label for="donationImpact">Who will benefit, and what will change?
+<span class="hint">Maximum 280 characters.</span>
+<textarea id="donationImpact" maxlength="280" required placeholder="Tell us about the business or community impact."></textarea></label>
+<label class="checkbox-label"><input id="donationConsent" type="checkbox" required><span>I consent to Mzanian 102 (Pty) Ltd, operating MzanConnect, using my submitted information and account email to review my request and contact me. I understand that submitting does not guarantee a donation or referral.</span></label>
+<p class="notice">Do not include ID numbers, passwords, OTPs, personal banking details or sensitive documents. Your request is not posted publicly. Please review our <a href="./privacy.html">Privacy Notice</a>.</p>
+<button id="donationSubmit" type="submit">Submit Donation Request</button>
+<p id="donationStatus" role="status" aria-live="polite"></p>
+</form>
+</section>
+<section id="donationHistoryPanel" class="card" hidden>
+<h2>My Donation Requests</h2>
+<p class="small">Submitted → In progress → Review completed. A completed review does not mean a donation was awarded.</p>
+<p id="donationAccount" class="small"></p>
+<div id="donationHistory" aria-live="polite">Loading your requests…</div>
+<div class="actions"><button id="donationRefresh" type="button" class="secondary">Refresh status</button></div>
+</section>
+<section id="donationOwnerPanel" class="card" hidden>
+<h2>Owner review</h2>
+<p class="small">Donation requests are included in the private Business Support owner inbox, where you can update each status.</p>
+<a class="button-link" href="./business-support.html">Open Owner Requests Inbox</a>
+</section>
+<section class="card">
+<h2>Other business support</h2>
+<p>Need a business plan, professional profile, registration or compliance assistance instead?</p>
+<a class="button-link secondary" href="./business-support.html">Explore Business Support</a>
+</section>
+</main>
+<script defer src="./donation-requests.js?v=1"></script>
+<script defer src="./legal-notices.js?v=1"></script>
+<script defer src="./voice-accessibility.js?v=13"></script>
+<script defer src="./app-shell.js?v=4"></script>
+</body></html>

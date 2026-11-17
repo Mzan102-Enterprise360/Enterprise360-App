@@ -113,6 +113,10 @@ function textForPage(){
  if(page==='survey.html'){
   return 'This is the free MzanConnect SMME Readiness and Equipment Utilisation Survey. Your answers help us understand business needs and sustainability. Read the introduction and privacy information, then answer the eleven questions about your business, equipment and support needs. At the end, choose whether you would like us to contact you. Contact details are only needed if you request follow-up. Review the consent statement and select Submit survey when ready. Participation is voluntary and does not create a paid membership.';
  }
+ if(page==='donations.html'){
+  if(shown('donationFormPanel'))return 'This is MzanConnect Donation Requests. Sign-in is confirmed. Enter your business or organisation name, town, type of assistance, optional estimated value, why you need support, and who will benefit. Do not include your bank details or identity number. Review the consent statement and submit. Submitting is free and does not guarantee a donation. Your previous requests and statuses appear below the form.';
+  return 'Welcome to Donation Requests. MzanConnect accepts requests for potential financial, equipment, materials or community project support. Sign in or join MzanConnect to submit your request privately. Support is not guaranteed and submitting a request costs nothing.';
+ }
  if(page==='business-support.html'){
   if(shown('serviceRequestPanel')){
    const service=document.getElementById('selectedService')?.textContent?.trim();

@@ -2,13 +2,14 @@
 (() => {
 'use strict';
 const byId = id => document.getElementById(id);
-const titles={cipc:'CIPC BizPortal assistance',csd:'CSD supplier registration',sars:'SARS compliance guidance',cidb:'CIDB contractor registration',business_plan:'Business plan service',business_profile:'Business profile service',other:'Other business service'};
+const titles={cipc:'CIPC BizPortal assistance',csd:'CSD supplier registration',sars:'SARS compliance guidance',cidb:'CIDB contractor registration',business_plan:'Business plan service',business_profile:'Business profile service',donation_request:'Donation request',other:'Other business service'};
 const create=(tag, text, className)=>{const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el;};
 let db, user, owner=false;
 const loginPrompt=byId('serviceSignIn'), panel=byId('serviceRequestPanel'), form=byId('serviceRequestForm');
 const note=byId('serviceFeedback'), myList=byId('myServiceRequests'), ownerPanel=byId('serviceOwnerPanel'), ownerList=byId('ownerServiceRequests');
 function notify(message, failure=false){note.textContent=message;note.style.color=failure?'#9a2c2c':'#126763';}
 function statusText(status){return ({new:'Submitted to owner',reviewing:'Under review',awaiting_documents:'Documents requested',quoted:'Quote prepared',in_progress:'In progress',completed:'Completed',cancelled:'Cancelled'})[status]||status;}
+function requestStatus(r){return r.service_type==='donation_request'&&r.status==='completed'?'Review completed':statusText(r.status);}
 function showRequest(type){
  if(!user){loginPrompt.hidden=false;loginPrompt.scrollIntoView({behavior:'smooth',block:'nearest'});return;}
  byId('serviceType').value=type;byId('selectedService').textContent=titles[type]||titles.other;
@@ -110,10 +111,10 @@ function attachDeliverables(card, request, ownerView){
 
 function requestRow(r,admin){
  const card=create('article',undefined,'request-record');
- const heading=create('strong',(titles[r.service_type]||'Business assistance')+' · '+statusText(r.status));
+ const heading=create('strong',(titles[r.service_type]||'Business assistance')+' · '+requestStatus(r));
  card.append(heading,create('small',new Date(r.created_at).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'})));
  if(r.business_name)card.append(create('p','Business: '+r.business_name));
- if(r.details)card.append(create('p',r.details));
+ if(r.details){const details=create('p',r.details);details.style.whiteSpace='pre-wrap';card.append(details);}
  if(admin){
   card.append(create('p','Member email: '+r.contact_email));
   const actions=create('div',undefined,'status-actions');
@@ -140,7 +141,7 @@ function requestRow(r,admin){
       .eq('id',r.id).select('id,status').single();
      if(error||!data)throw error||new Error('No updated request returned');
      r.status=data.status;
-     heading.textContent=(titles[r.service_type]||'Business assistance')+' · '+statusText(r.status);
+     heading.textContent=(titles[r.service_type]||'Business assistance')+' · '+requestStatus(r);
      feedback.textContent='Saved: '+statusText(r.status)+'. The member will see this when opening their requests.';
     }catch(e){
      feedback.textContent='Status was not saved. Please try again.';
@@ -151,7 +152,7 @@ function requestRow(r,admin){
   setButtons(false);
   card.append(title,actions,feedback);
  }
- attachDeliverables(card,r,admin);
+ if(r.service_type!=='donation_request')attachDeliverables(card,r,admin);
  return card;
 }
 async function refreshLists(){

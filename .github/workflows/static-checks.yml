@@ -40,3 +40,9 @@ jobs:
                       subprocess.run(['node','--check',f.name],check=True)
                   print(f'{name} script {i+1}: syntax OK')
           PY
+
+      - name: Check donation request JavaScript and shared inbox syntax
+        run: |
+          node --check donation-requests.js
+          node --check business-service-requests.js
+          node --check voice-accessibility.js
