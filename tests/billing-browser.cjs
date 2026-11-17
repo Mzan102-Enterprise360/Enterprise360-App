@@ -50,7 +50,7 @@ async function checkDashboardFeatures(browser){
   await page.reload();
   assert.equal(await page.getByLabel('Prepare funding documents').isChecked(),true);
   await page.goto(base+'member.html?section=compliance');
-  await page.getByLabel('CIPC records').check();
+  await page.locator('#c0').check();
   await page.getByRole('button',{name:'Save checklist'}).click();
   await page.getByText('Checklist saved successfully.').waitFor();
   await page.goto(base+'member.html?section=growth');
