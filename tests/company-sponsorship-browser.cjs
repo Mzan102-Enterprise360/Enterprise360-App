@@ -16,6 +16,7 @@ function mock(role){
  const existing=owner?[{
   id:'aaaaaaaa-1111-4111-8111-111111111111',
   user_id:'11111111-1111-4111-8111-111111111111',
+  applicant_email:'member@example.test',
   company_name:'Kathu Sponsor Co',
   company_contact_name:'Company Contact',
   company_contact_email:'sponsor@example.test',
@@ -39,7 +40,7 @@ function mock(role){
  ' },',
  ' async insert(payload){',
  '   if(table!=="company_membership_sponsorship_requests"||owner||!user)throw Error("Bad sponsor submission");',
- '   if(payload.user_id!==user.id||payload.consent_confirmed!==true)throw Error("Unauthorized sponsor submission");',
+ '   if(payload.user_id!==user.id||payload.applicant_email!==user.email||payload.consent_confirmed!==true)throw Error("Unauthorized sponsor submission");',
  '   if(rows.some(x=>x.user_id===user.id&&x.status==="submitted"))return {error:{code:"23505",message:"Already open"}};',
  '   rows.push({...payload,id:"bbbbbbbb-1111-4111-8111-111111111111",status:"submitted",created_at:"2026-11-17T14:00:00Z"});',
  '   return {error:null};',
@@ -75,6 +76,7 @@ async function scene(browser,role){
   assert.equal(await page.locator('#sponsorMembership').isVisible(),false);
   assert.equal(await page.locator('#liveMembership').isVisible(),false);
   await page.getByText('Kathu Sponsor Co',{exact:true}).waitFor();
+  await page.getByText('Member contact email: member@example.test').waitFor();
   await page.locator('#ownerSponsorInbox').getByRole('button',{name:/Company contacted for Kathu Sponsor Co/}).click();
   await page.getByText('Company contacted',{exact:true}).waitFor();
   const updates=await page.evaluate(()=>window.mockFunding.updates);
@@ -98,6 +100,7 @@ async function scene(browser,role){
   assert.equal(stored[0].status,'submitted','Member cannot self-confirm funding');
   assert.equal(stored[0].requested_months,3);
   assert.equal(stored[0].company_contact_email,'development@example.test');
+  assert.equal(stored[0].applicant_email,'member@example.test');
   assert.equal(await page.locator('#sponsorForm').isVisible(),false,'Second open request must be blocked');
   assert.equal(await page.evaluate(()=>window.mockFunding.checkoutCalls),0,'Sponsorship request never charges a company');
   await page.locator('#fundingSelf').check();
