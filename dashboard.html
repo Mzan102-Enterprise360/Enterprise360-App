@@ -204,7 +204,7 @@ main{padding:14px}
 </div>
 </section>
 </main>
-<script src="growth-passport-status.js?v=1"></script>
+<script src="business-profile-bootstrap.js?v=1"></script><script src="growth-passport-status.js?v=1"></script>
 <script>
 (async function initializeDashboard(){
   const $=id=>document.getElementById(id);
@@ -240,6 +240,7 @@ main{padding:14px}
   }catch(error){location.replace('login.html');return;}
 
   document.body.style.visibility='visible';
+  try{await window.MzanBusinessProfileBootstrap.ensure(client,user);}catch(error){console.warn('First-time profile could not be restored:',error.message);}
   logoutButton.addEventListener('click',async()=>{
     logoutButton.disabled=true;
     logoutButton.textContent='Signing out...';
