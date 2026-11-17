@@ -153,7 +153,7 @@ main{padding:14px}
 <h3>🛡️ My Compliance Progress</h3>
 <p>Checklist Completion: <strong id="compliancePercent">0%</strong></p>
 <div class="progress"><div id="complianceBar"></div></div>
-<p id="complianceCount" class="note">0 of 5 requirements completed</p>
+<p id="complianceCount" class="note">0 of 6 requirements completed</p>
 <div id="complianceList"></div>
 <p class="note">Self-reported checklist only. This does not verify official compliance.</p>
 <div class="actions"><a href="member.html?section=compliance&v=20261110b">Update Checklist</a></div>
@@ -207,7 +207,7 @@ main{padding:14px}
   const logoutButton=$('logoutButton');
   const logoutMessage=$('logoutMessage');
   const money=value=>new Intl.NumberFormat('en-ZA',{style:'currency',currency:'ZAR'}).format(value);
-  const requirements=['CIPC records','SARS tax status','CSD registration','B-BBEE documents','Relevant industry licences'];
+  const requirements=['CIPC Records (Director + Shareholder)','SARS Compliance','CSD Compliance','BBBEE Certificates','Relevant Industry Licences','Proof of Residence'];
   const growthLabels=['Complete business assessment','Review compliance','Prepare funding documents','Identify procurement opportunities','Complete monthly business review'];
   let client,user;
   try{
@@ -317,7 +317,7 @@ main{padding:14px}
       const readiness=Math.round((profileFieldsCompleted+completed)/7*100);
       $('readinessPercent').textContent=readiness+'%';
       $('readinessBar').style.width=readiness+'%';
-      $('readinessExplanation').textContent=profileFieldsCompleted+' of 2 profile fields and '+completed+' of 5 self-reported compliance items completed. Not an official certification.';
+      $('readinessExplanation').textContent=profileFieldsCompleted+' of 2 profile fields and '+completed+' of 6 self-reported compliance items completed. Not an official certification.';
 
       let income=0,expense=0;
       const rows=$('financeRows');

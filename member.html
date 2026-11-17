@@ -41,6 +41,21 @@ main{width:100%;max-width:650px;margin:0 auto;padding:10px 14px 20px}
 .card{padding:14px;margin:8px 0}
 .card h2{margin:0 0 10px}
 }
+/* Private compliance document upload controls */
+.compliance-item{border:1px solid #dbe7e8;background:#fcfefd;border-radius:13px;padding:13px;margin:0 0 12px}
+.compliance-item .compliance-check-label{display:flex;gap:10px;align-items:center;font-size:16px;margin:0 0 8px;font-weight:700}
+.compliance-item .compliance-check-label input{margin:0;width:21px;height:21px;min-height:21px;flex:none;accent-color:#147b59}
+.compliance-upload-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.compliance-item input[type=file][hidden]{display:none!important}
+.compliance-item .upload-document{font-size:14px;font-weight:700;min-height:43px;padding:9px 12px;background:#116a71}
+.compliance-upload-status{font-size:13px;line-height:1.45;color:#365c5e;white-space:pre-wrap;margin:7px 0}
+.compliance-file-list{margin:9px 0 0;font-size:13px}
+.compliance-file-list .file-entry{border-top:1px solid #dce9e9;padding:8px 0;display:flex;justify-content:space-between;gap:7px;flex-wrap:wrap;align-items:center}
+.compliance-file-list .file-name{min-width:0;max-width:100%;overflow-wrap:anywhere}
+.compliance-file-list button{padding:7px 10px;min-height:35px;font-size:13px;background:#14283b}
+.compliance-file-list a{font-size:13px;font-weight:700}
+#compliancePanel .compliance-hint{font-size:13px;line-height:1.4;color:#526875;margin:6px 0 14px}
+@media(max-width:500px){.compliance-item{padding:11px}.compliance-item .compliance-check-label{font-size:15px}}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script></head>
 <body><header><p class="header-brand">◈ MzanConnect</p><h1 id="sectionTitle">My Business</h1><p id="sectionDescription">Manage and update your business profile.</p></header>
 <main><div class="dashboard-return"><a href="dashboard.html" aria-label="Back to dashboard">← Back to Dashboard</a></div><p id="message" role="status" aria-live="polite"></p>
@@ -52,7 +67,7 @@ main{width:100%;max-width:650px;margin:0 auto;padding:10px 14px 20px}
 <label for="description">Description</label><input id="description" maxlength="500">
 <p><button type="submit">Save business profile</button></p></form></section>
 <section class="card" id="compliancePanel" hidden><h2>My Compliance Checklist</h2>
-<p>Self-reported only; this does not verify official compliance.</p>
+<p class="compliance-hint">Upload a document for each category (PDF, Word, JPG or PNG; up to 10 MB). Your checkbox ticks automatically after a successful upload and save. Documents are private to your account. This does not verify official compliance.</p>
 <form id="complianceForm"><div id="checks"></div><p><button type="submit">Save checklist</button></p></form></section>
 <section class="card" id="growthPanel" hidden><h2>Business Growth Passport</h2>
 <p>Track your business development milestones. Your progress is saved to your account.</p>
@@ -73,7 +88,7 @@ document.getElementById('sectionDescription').textContent = sectionInfo[1];
 const checklists = {
   compliance: {
     panel: 'compliancePanel', form: 'complianceForm', root: 'checks', prefix: 'c',
-    labels: ['CIPC records', 'SARS tax status', 'CSD registration', 'B-BBEE documents', 'Relevant industry licences'],
+    labels: ['CIPC Records (Director + Shareholder)', 'SARS Compliance', 'CSD Compliance', 'BBBEE Certificates', 'Relevant Industry Licences', 'Proof of Residence'],
     savedMessage: 'Checklist saved successfully.'
   },
   growth: {
@@ -102,6 +117,63 @@ const { data, error: readError } = await db.from('compliance_items')
 if (readError) throw readError;
 const saved = new Map(data.map(item => [item.item_key, item.completed]));
 const root = document.getElementById(checklist.root);
+const DOCUMENT_BUCKET='mzanconnect-compliance-documents';
+const FILE_FORMATS={
+  pdf:'application/pdf',
+  jpg:'image/jpeg',
+  jpeg:'image/jpeg',
+  png:'image/png',
+  docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+};
+async function loadComplianceDocuments(item,list){
+  list.textContent='Checking uploaded documents…';
+  try{
+    const path=user.id+'/'+item.key;
+    const {data,error}=await db.storage.from(DOCUMENT_BUCKET)
+      .list(path,{limit:100,sortBy:{column:'created_at',order:'desc'}});
+    if(error)throw error;
+    list.replaceChildren();
+    const files=(data||[]).filter(file=>file.name && file.id);
+    if(!files.length){list.textContent='No documents uploaded yet.';return;}
+    const title=document.createElement('p');
+    title.textContent='Saved documents ('+files.length+')';
+    title.style.fontWeight='700';
+    list.append(title);
+    for(const file of files){
+      const entry=document.createElement('div');
+      entry.className='file-entry';
+      const name=file.name.replace(/^[0-9a-f-]{36}_/i,'');
+      const filename=document.createElement('span');
+      filename.className='file-name';
+      filename.textContent=name;
+      const open=document.createElement('button');
+      open.type='button';
+      open.textContent='View / Download';
+      open.setAttribute('aria-label','View '+name);
+      open.addEventListener('click',async()=>{
+        open.disabled=true;
+        open.textContent='Preparing link…';
+        try{
+          const {data:signed,error:signError}=await db.storage.from(DOCUMENT_BUCKET)
+            .createSignedUrl(path+'/'+file.name,120);
+          if(signError||!signed?.signedUrl)throw signError||Error('Link unavailable');
+          const a=document.createElement('a');
+          a.href=signed.signedUrl;
+          a.target='_blank';
+          a.rel='noopener noreferrer';
+          a.textContent='Tap here to open';
+          a.setAttribute('aria-label','Open '+name+' (temporary private link)');
+          open.replaceWith(a);
+        }catch(error){
+          open.textContent='Could not open. Retry';
+          open.disabled=false;
+        }
+      });
+      entry.append(filename,open);
+      list.append(entry);
+    }
+  }catch(error){list.textContent='Could not load saved documents. Refresh this page to try again.';}
+}
 for (const item of items) {
   const label = document.createElement('label');
   const checkbox = document.createElement('input');
@@ -109,7 +181,71 @@ for (const item of items) {
   checkbox.id = item.key;
   checkbox.checked = saved.get(item.key) === true;
   label.append(checkbox, document.createTextNode(item.label));
-  root.appendChild(label);
+  if(section!=='compliance'){
+    root.appendChild(label);
+    continue;
+  }
+  label.className='compliance-check-label';
+  const row=document.createElement('section');
+  row.className='compliance-item';
+  row.setAttribute('aria-label',item.label);
+  const actions=document.createElement('div');
+  actions.className='compliance-upload-actions';
+  const button=document.createElement('button');
+  button.type='button';
+  button.className='upload-document';
+  button.textContent='Upload Document';
+  button.setAttribute('aria-label','Upload document for '+item.label);
+  const fileInput=document.createElement('input');
+  fileInput.type='file';
+  fileInput.hidden=true;
+  fileInput.setAttribute('aria-label','Choose file for '+item.label);
+  fileInput.accept='.pdf,.docx,.jpg,.jpeg,.png';
+  const status=document.createElement('p');
+  status.className='compliance-upload-status';
+  status.setAttribute('role','status');
+  status.setAttribute('aria-live','polite');
+  const list=document.createElement('div');
+  list.className='compliance-file-list';
+  button.addEventListener('click',()=>fileInput.click());
+  fileInput.addEventListener('change',async()=>{
+    const file=fileInput.files?.[0];
+    if(!file)return;
+    button.disabled=true;
+    status.textContent='Checking and uploading your file…';
+    try{
+      const extension=(file.name.split('.').pop()||'').toLowerCase();
+      const mime=FILE_FORMATS[extension];
+      if(!mime)throw Error('Please choose a PDF, Word (.docx), JPG or PNG file.');
+      if(file.size<1||file.size>10485760)throw Error('The file must be larger than 0 bytes and no more than 10 MB.');
+      if(file.type && file.type!==mime && file.type!=='application/octet-stream')
+        throw Error('The file type does not match its extension. Choose the correct document.');
+      const safeBase=(file.name.slice(0,-extension.length-1).replace(/[^a-z0-9_-]+/gi,'_').slice(0,50)||'document');
+      const key=user.id+'/'+item.key+'/'+crypto.randomUUID()+'_'+safeBase+'.'+extension;
+      const {error:uploadError}=await db.storage.from(DOCUMENT_BUCKET)
+        .upload(key,file,{contentType:mime,upsert:false});
+      if(uploadError)throw uploadError;
+      const {error:saveError}=await db.from('compliance_items').upsert([{
+        user_id:user.id,item_key:item.key,completed:true
+      }],{onConflict:'user_id,item_key'});
+      if(saveError){
+        status.textContent='Document uploaded securely, but the checklist could not be ticked automatically. Please tick it and tap Save checklist.';
+      }else{
+        checkbox.checked=true;
+        status.textContent='Document uploaded. ✓ '+item.label+' is ticked and saved.';
+      }
+      await loadComplianceDocuments(item,list);
+    }catch(error){
+      status.textContent='Upload not completed: '+(error.message||'Please try again.');
+    }finally{
+      fileInput.value='';
+      button.disabled=false;
+    }
+  });
+  actions.append(button,fileInput);
+  row.append(label,actions,status,list);
+  root.appendChild(row);
+  void loadComplianceDocuments(item,list);
 }
 const form = document.getElementById(checklist.form);
 const save = form.querySelector('button[type="submit"]');
