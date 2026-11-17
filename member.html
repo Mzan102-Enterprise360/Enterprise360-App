@@ -126,7 +126,7 @@ main{width:100%;max-width:650px;margin:0 auto;padding:10px 14px 20px}
 <p><button type="button" id="growthRefresh">Refresh My Readiness</button></p>
 <p id="growthFeedback" role="status" aria-live="polite"></p>
 </section>
-</main><script src="business-profile-options.js?v=1"></script><script src="growth-passport-status.js?v=1"></script><script>
+</main><script src="business-profile-bootstrap.js?v=1"></script><script src="business-profile-options.js?v=1"></script><script src="growth-passport-status.js?v=1"></script><script>
 (async()=>{
 const message=document.getElementById('message');
 const showMessage=(text)=>{message.textContent=text};
@@ -200,6 +200,7 @@ if(section==='growth'){
   return;
 }
 if(!checklist){
+try{await window.MzanBusinessProfileBootstrap.ensure(db,user);}catch(error){console.warn('First-time profile could not be restored:',error.message);}
 const {data,error:readError}=await db.from('business_profiles')
  .select('business_name,registered_name,registration_number,contact_name,contact_phone,contact_email,sector,province,district,municipality')
  .eq('user_id',user.id).maybeSingle();
