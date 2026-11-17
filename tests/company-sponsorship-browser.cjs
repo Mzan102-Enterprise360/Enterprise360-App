@@ -80,7 +80,7 @@ async function scene(browser,role){
   await page.getByText('Kathu Sponsor Co',{exact:true}).waitFor();
   await page.getByText('Member contact email: member@example.test').waitFor();
   await page.locator('#ownerSponsorInbox').getByRole('button',{name:/Company contacted for Kathu Sponsor Co/}).click();
-  await page.getByText('Company contacted',{exact:true}).waitFor();
+  await page.locator('#ownerSponsorInbox .sponsor-entry > p').first().filter({hasText:'Company contacted'}).waitFor();
   const updates=await page.evaluate(()=>window.mockFunding.updates);
   assert.equal(updates.length,1);
   assert.equal(updates[0].status,'company_contacted');
